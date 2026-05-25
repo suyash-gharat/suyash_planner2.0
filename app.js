@@ -167,11 +167,15 @@ function buildGridTable(theadId, tbodyId, rows, dates, todayS, isDaily){
     return `<tr>
       <td class="task-name-cell">
         <span class="row-icon">📋</span>
-        <div style="flex:1">
+        <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:600;color:#0f1f4b">${esc(row.name)}</div>
           <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt}">${row.cat}</span>
+          ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
         </div>
-        <button class="row-del" onclick="deleteFixedTask(${row.id})" title="Remove"><i class="ti ti-trash"></i></button>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="row-edit" onclick="openEditFixedTask(${row.id})" title="Edit"><i class="ti ti-edit"></i></button>
+          <button class="row-del" onclick="deleteFixedTask(${row.id})" title="Remove"><i class="ti ti-trash"></i></button>
+        </div>
       </td>
       ${cells}
       <td></td>
@@ -681,3 +685,42 @@ startTimer();
 midnightReset();
 renderDashboard();
 renderToday();
+
+// ===== EDIT FIXED TASK =====
+function openEditFixedTask(id){
+  const row=fixedTasks.find(x=>x.id===id);if(!row)return;
+  document.getElementById('ef-id').value=id;
+  document.getElementById('ef-name').value=row.name;
+  document.getElementById('ef-cat').value=row.cat||'work';
+  document.getElementById('ef-note').value=row.note||'';
+  const typeEl=document.getElementById('ef-type');
+  typeEl.value=row.type||'daily';
+  const picker=document.getElementById('ef-day-picker');
+  picker.style.display=row.type==='weekly'?'block':'none';
+  document.querySelectorAll('#ef-day-checks input').forEach(cb=>{
+    cb.checked=(row.days||[]).includes(parseInt(cb.value));
+  });
+  openModal('edit-fixed-modal');
+}
+
+function saveEditFixedTask(){
+  const id=parseInt(document.getElementById('ef-id').value);
+  const name=document.getElementById('ef-name').value.trim();
+  if(!name){toast('Enter task name');return;}
+  const type=document.getElementById('ef-type').value;
+  const days=type==='weekly'
+    ?Array.from(document.querySelectorAll('#ef-day-checks input:checked')).map(i=>parseInt(i.value))
+    :[];
+  const row=fixedTasks.find(x=>x.id===id);
+  if(!row){toast('Task not found');return;}
+  row.name=name;
+  row.cat=document.getElementById('ef-cat').value;
+  row.type=type;
+  row.days=days;
+  row.note=document.getElementById('ef-note').value.trim();
+  save('fixedTasks',fixedTasks);
+  closeModal('edit-fixed-modal');
+  renderWeeklyGrid();
+  renderDashboard();
+  toast('Task updated ✓');
+}
