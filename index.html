@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>WorkLife Planner</title>
+<title>WorkLife Planner Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
@@ -21,209 +21,231 @@
     </div>
   </div>
 
-  <div class="sb-greeting" id="sb-greeting">Good morning</div>
-  <div class="sb-date" id="sb-date">—</div>
+  <div class="sb-user">
+    <div class="sb-avatar">WP</div>
+    <div>
+      <div class="sb-greeting" id="sb-greeting">Good morning</div>
+      <div class="sb-date" id="sb-date">—</div>
+    </div>
+  </div>
 
-  <div class="sb-progress-ring">
-    <svg width="80" height="80" viewBox="0 0 80 80">
-      <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
-      <circle id="sb-ring" cx="40" cy="40" r="34" fill="none" stroke="#c9b8ff" stroke-width="7"
-        stroke-dasharray="213.6" stroke-dashoffset="213.6" stroke-linecap="round"
-        transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .7s ease"/>
+  <div class="sb-ring-wrap">
+    <svg width="72" height="72" viewBox="0 0 72 72">
+      <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+      <circle id="sb-ring" cx="36" cy="36" r="30" fill="none" stroke="#7dd3fc" stroke-width="6"
+        stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"
+        transform="rotate(-90 36 36)" style="transition:stroke-dashoffset .7s ease"/>
     </svg>
-    <div class="sb-ring-txt">
+    <div class="sb-ring-center">
       <div class="sb-ring-pct" id="sb-ring-pct">0%</div>
       <div class="sb-ring-lbl">today</div>
     </div>
   </div>
 
   <nav class="sb-nav">
-    <div class="sb-nav-section">Overview</div>
+    <div class="sb-sec">Overview</div>
     <a class="sb-link active" data-view="dashboard"><i class="ti ti-home-2"></i>Dashboard</a>
-    <a class="sb-link" data-view="today"><i class="ti ti-calendar-today"></i>Today</a>
+    <a class="sb-link" data-view="weekly"><i class="ti ti-calendar-week"></i>Weekly Grid</a>
+    <a class="sb-link" data-view="today"><i class="ti ti-sun"></i>Today's Tasks</a>
 
-    <div class="sb-nav-section">Planner</div>
-    <a class="sb-link" data-view="tasks"><i class="ti ti-list-check"></i>Tasks</a>
+    <div class="sb-sec">Planner</div>
+    <a class="sb-link" data-view="tasks"><i class="ti ti-list-check"></i>All Tasks</a>
     <a class="sb-link" data-view="habits"><i class="ti ti-repeat"></i>Habits</a>
     <a class="sb-link" data-view="goals"><i class="ti ti-target"></i>Goals</a>
     <a class="sb-link" data-view="journal"><i class="ti ti-notebook"></i>Journal</a>
 
-    <div class="sb-nav-section">Life</div>
+    <div class="sb-sec">Life</div>
     <a class="sb-link" data-view="finance"><i class="ti ti-wallet"></i>Finance</a>
     <a class="sb-link" data-view="health"><i class="ti ti-heart-rate-monitor"></i>Health</a>
     <a class="sb-link" data-view="notes"><i class="ti ti-notes"></i>Notes</a>
     <a class="sb-link" data-view="analytics"><i class="ti ti-chart-bar"></i>Analytics</a>
   </nav>
 
-  <div class="sb-session">
+  <div class="sb-timer-box">
     <i class="ti ti-clock"></i>
     <span id="sb-timer">00:00:00</span>
   </div>
 </aside>
 
-<!-- MOBILE TOGGLE -->
-<button class="mob-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+<button class="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
   <i class="ti ti-menu-2"></i>
 </button>
 
 <!-- MAIN -->
 <main class="main">
 
-<!-- ============ DASHBOARD ============ -->
+<!-- ===== DASHBOARD ===== -->
 <section id="view-dashboard" class="view active">
-  <div class="page-header">
+  <div class="page-hdr">
     <div>
       <h1 class="page-title">Dashboard</h1>
-      <p class="page-sub">Your life at a glance</p>
+      <p class="page-sub">Your complete life overview</p>
     </div>
-    <div class="header-actions">
-      <button class="btn-secondary" onclick="exportData()"><i class="ti ti-download"></i> Export</button>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="exportData()"><i class="ti ti-download"></i> Export</button>
       <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> Quick add</button>
     </div>
   </div>
 
-  <div class="dash-stats">
-    <div class="kpi-card">
-      <div class="kpi-icon purple"><i class="ti ti-list-check"></i></div>
-      <div class="kpi-val" id="kpi-tasks">0</div>
-      <div class="kpi-lbl">Tasks today</div>
-      <div class="kpi-sub" id="kpi-tasks-done">0 done</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon green"><i class="ti ti-repeat"></i></div>
-      <div class="kpi-val" id="kpi-habits">0%</div>
-      <div class="kpi-lbl">Habit rate</div>
-      <div class="kpi-sub" id="kpi-habits-sub">today</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon amber"><i class="ti ti-target"></i></div>
-      <div class="kpi-val" id="kpi-goals">0</div>
-      <div class="kpi-lbl">Active goals</div>
-      <div class="kpi-sub" id="kpi-goals-sub">in progress</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon blue"><i class="ti ti-wallet"></i></div>
-      <div class="kpi-val" id="kpi-budget">₹0</div>
-      <div class="kpi-lbl">Spent today</div>
-      <div class="kpi-sub" id="kpi-budget-sub">of daily budget</div>
-    </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-icon blue"><i class="ti ti-list-check"></i></div><div><div class="kpi-num" id="kpi-tasks">0</div><div class="kpi-lbl">Tasks today</div><div class="kpi-sub" id="kpi-tasks-sub">0 done</div></div></div>
+    <div class="kpi"><div class="kpi-icon sky"><i class="ti ti-repeat"></i></div><div><div class="kpi-num" id="kpi-habits">0%</div><div class="kpi-lbl">Habit rate</div><div class="kpi-sub" id="kpi-habits-sub">—</div></div></div>
+    <div class="kpi"><div class="kpi-icon navy"><i class="ti ti-target"></i></div><div><div class="kpi-num" id="kpi-goals">0</div><div class="kpi-lbl">Active goals</div><div class="kpi-sub" id="kpi-goals-sub">in progress</div></div></div>
+    <div class="kpi"><div class="kpi-icon slate"><i class="ti ti-wallet"></i></div><div><div class="kpi-num" id="kpi-budget">₹0</div><div class="kpi-lbl">Spent today</div><div class="kpi-sub">of daily budget</div></div></div>
   </div>
 
   <div class="dash-grid">
-    <div class="panel span2">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-list-check"></i> Today's tasks</span>
-        <button class="btn-link" onclick="switchView('today')">See all →</button></div>
-      <div id="dash-tasks-list"></div>
+    <div class="card span2">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-sun"></i> Today's Tasks</span>
+        <button class="btn-link" onclick="switchView('today')">View all →</button></div>
+      <div id="dash-task-list"></div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-repeat"></i> Habits</span>
-        <button class="btn-link" onclick="switchView('habits')">See all →</button></div>
-      <div id="dash-habits-list"></div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-calendar-week"></i> This Week</span>
+        <button class="btn-link" onclick="switchView('weekly')">Full grid →</button></div>
+      <div id="dash-week-mini"></div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-target"></i> Goals</span>
-        <button class="btn-link" onclick="switchView('goals')">See all →</button></div>
-      <div id="dash-goals-list"></div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-repeat"></i> Habits</span>
+        <button class="btn-link" onclick="switchView('habits')">View all →</button></div>
+      <div id="dash-habits"></div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-notebook"></i> Last journal entry</span></div>
-      <div id="dash-journal"></div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-target"></i> Goals</span>
+        <button class="btn-link" onclick="switchView('goals')">View all →</button></div>
+      <div id="dash-goals"></div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-wallet"></i> Recent expenses</span></div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-wallet"></i> Recent Expenses</span></div>
       <div id="dash-finance"></div>
     </div>
   </div>
 </section>
 
-<!-- ============ TODAY ============ -->
-<section id="view-today" class="view">
-  <div class="page-header">
-    <div><h1 class="page-title">Today</h1><p class="page-sub" id="today-date-sub">—</p></div>
-    <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> Add task</button>
-  </div>
-  <div class="today-progress-bar">
-    <div class="tpb-fill" id="today-prog-fill" style="width:0%"></div>
-  </div>
-  <div class="today-prog-label"><span id="today-prog-label">0 of 0 tasks complete</span></div>
-
-  <div class="filter-row">
-    <button class="ftab active" data-filter="all">All</button>
-    <button class="ftab" data-filter="pending">Pending</button>
-    <button class="ftab" data-filter="done">Completed</button>
-    <button class="ftab" data-filter="high">High priority</button>
-    <div style="flex:1"></div>
-    <button class="btn-ghost" onclick="resetTasks()"><i class="ti ti-refresh"></i> Reset</button>
-  </div>
-
-  <div class="task-board" id="today-task-list"></div>
-</section>
-
-<!-- ============ TASKS ============ -->
-<section id="view-tasks" class="view">
-  <div class="page-header">
-    <div><h1 class="page-title">All Tasks</h1><p class="page-sub">Manage your complete task list</p></div>
-    <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> New task</button>
-  </div>
-
-  <div class="panel" style="margin-bottom:16px">
-    <div class="add-form">
-      <input id="t-name" placeholder="Task name…" onkeydown="if(event.key==='Enter')quickAddTask()"/>
-      <select id="t-cat">
-        <option value="work">Work</option><option value="personal">Personal</option>
-        <option value="health">Health</option><option value="admin">Admin</option>
-        <option value="team">Team</option><option value="learning">Learning</option>
-      </select>
-      <select id="t-pri"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select>
-      <button class="btn-primary" onclick="quickAddTask()"><i class="ti ti-plus"></i> Add</button>
+<!-- ===== WEEKLY GRID ===== -->
+<section id="view-weekly" class="view">
+  <div class="page-hdr">
+    <div>
+      <h1 class="page-title"><i class="ti ti-calendar-week"></i> Weekly Task Grid</h1>
+      <p class="page-sub">Track your recurring daily tasks across the week</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="prevWeek()"><i class="ti ti-chevron-left"></i> Prev</button>
+      <button class="btn-outline" onclick="goToday()">Today</button>
+      <button class="btn-outline" onclick="nextWeek()">Next <i class="ti ti-chevron-right"></i></button>
+      <button class="btn-primary" onclick="openModal('fixed-task-modal')"><i class="ti ti-plus"></i> Add task row</button>
     </div>
   </div>
 
-  <div class="filter-row">
-    <button class="ftab active" data-filter2="all">All</button>
-    <button class="ftab" data-filter2="work">Work</button>
-    <button class="ftab" data-filter2="personal">Personal</button>
-    <button class="ftab" data-filter2="health">Health</button>
+  <div class="week-nav-label" id="week-nav-label">Week of —</div>
+
+  <!-- Daily section -->
+  <div class="grid-section-hdr">
+    <span><i class="ti ti-sun"></i> Daily Tasks</span>
+    <span class="grid-section-sub">These repeat every day — check off as you complete them</span>
   </div>
-  <div class="task-board" id="all-task-list"></div>
+  <div class="weekly-table-wrap">
+    <table class="weekly-table" id="daily-grid-table">
+      <thead id="weekly-thead"></thead>
+      <tbody id="daily-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Weekly section -->
+  <div class="grid-section-hdr" style="margin-top:28px">
+    <span><i class="ti ti-calendar-week"></i> Weekly Tasks</span>
+    <span class="grid-section-sub">Specific tasks assigned to certain days</span>
+  </div>
+  <div class="weekly-table-wrap">
+    <table class="weekly-table">
+      <thead id="weekly-thead2"></thead>
+      <tbody id="weekly-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Progress summary -->
+  <div class="week-summary-row" id="week-summary-row"></div>
 </section>
 
-<!-- ============ HABITS ============ -->
+<!-- ===== TODAY ===== -->
+<section id="view-today" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Today's Tasks</h1><p class="page-sub" id="today-date-lbl">—</p></div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="resetToday()"><i class="ti ti-refresh"></i> Reset</button>
+      <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> Add task</button>
+    </div>
+  </div>
+  <div class="prog-bar-wrap">
+    <div class="prog-track"><div class="prog-fill" id="today-prog" style="width:0%"></div></div>
+    <span class="prog-label" id="today-prog-lbl">0% complete</span>
+  </div>
+  <div class="ftabs" id="today-filters">
+    <button class="ftab active" data-f="all">All</button>
+    <button class="ftab" data-f="pending">Pending</button>
+    <button class="ftab" data-f="done">Done</button>
+    <button class="ftab" data-f="high">High priority</button>
+  </div>
+  <div class="task-list" id="today-task-list"></div>
+</section>
+
+<!-- ===== ALL TASKS ===== -->
+<section id="view-tasks" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">All Tasks</h1><p class="page-sub">Manage your full task list</p></div>
+    <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> New task</button>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="add-row">
+      <input id="t-name" placeholder="Task name…" onkeydown="if(event.key==='Enter')quickAdd()"/>
+      <select id="t-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option><option value="learning">Learning</option></select>
+      <select id="t-pri"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select>
+      <button class="btn-primary" onclick="quickAdd()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+  </div>
+  <div class="ftabs" id="task-filters">
+    <button class="ftab active" data-f2="all">All</button>
+    <button class="ftab" data-f2="work">Work</button>
+    <button class="ftab" data-f2="personal">Personal</button>
+    <button class="ftab" data-f2="health">Health</button>
+  </div>
+  <div class="task-list" id="all-task-list"></div>
+</section>
+
+<!-- ===== HABITS ===== -->
 <section id="view-habits" class="view">
-  <div class="page-header">
-    <div><h1 class="page-title">Habits</h1><p class="page-sub">Build consistency, one day at a time</p></div>
+  <div class="page-hdr">
+    <div><h1 class="page-title">Habits</h1><p class="page-sub">Build streaks. Stay consistent.</p></div>
     <button class="btn-primary" onclick="openModal('habit-modal')"><i class="ti ti-plus"></i> New habit</button>
   </div>
-
   <div class="habits-grid" id="habits-grid"></div>
-
-  <div class="panel" style="margin-top:24px">
-    <div class="panel-hdr"><span class="panel-title"><i class="ti ti-calendar-week"></i> This week's streak</span></div>
-    <div id="habit-week-grid"></div>
+  <div class="card" style="margin-top:24px">
+    <div class="card-hdr"><span class="card-title"><i class="ti ti-calendar-week"></i> Weekly heatmap</span></div>
+    <div id="habit-week-map"></div>
   </div>
 </section>
 
-<!-- ============ GOALS ============ -->
+<!-- ===== GOALS ===== -->
 <section id="view-goals" class="view">
-  <div class="page-header">
+  <div class="page-hdr">
     <div><h1 class="page-title">Goals</h1><p class="page-sub">Dream big. Track progress.</p></div>
     <button class="btn-primary" onclick="openModal('goal-modal')"><i class="ti ti-plus"></i> New goal</button>
   </div>
   <div class="goals-grid" id="goals-grid"></div>
 </section>
 
-<!-- ============ JOURNAL ============ -->
+<!-- ===== JOURNAL ===== -->
 <section id="view-journal" class="view">
-  <div class="page-header">
+  <div class="page-hdr">
     <div><h1 class="page-title">Journal</h1><p class="page-sub">Reflect. Write. Grow.</p></div>
-    <button class="btn-primary" onclick="saveJournalEntry()"><i class="ti ti-device-floppy"></i> Save entry</button>
+    <button class="btn-primary" onclick="saveJournal()"><i class="ti ti-device-floppy"></i> Save entry</button>
   </div>
   <div class="journal-layout">
-    <div class="panel journal-write">
-      <div class="journal-date-lbl" id="journal-today-lbl">—</div>
+    <div class="card journal-write">
+      <div class="j-date-lbl" id="j-date-lbl">—</div>
       <div class="mood-row">
-        <span class="mood-label">Mood:</span>
-        <div class="mood-btns" id="mood-btns">
+        <span class="mood-lbl">Mood:</span>
+        <div id="mood-btns">
           <button class="mood-btn active" data-mood="5">😄</button>
           <button class="mood-btn" data-mood="4">🙂</button>
           <button class="mood-btn" data-mood="3">😐</button>
@@ -231,103 +253,87 @@
           <button class="mood-btn" data-mood="1">😞</button>
         </div>
       </div>
-      <input class="journal-title-inp" id="journal-title-inp" placeholder="Entry title…"/>
-      <textarea class="journal-body-inp" id="journal-body-inp" placeholder="What's on your mind today? Reflect on your work, personal life, or anything that matters…"></textarea>
-      <div class="journal-tags-row">
-        <input class="tag-inp" id="journal-tag-inp" placeholder="Add tag and press Enter…" onkeydown="addJournalTag(event)"/>
-        <div class="tags-list" id="journal-tags-preview"></div>
+      <input class="j-title-inp" id="j-title" placeholder="Entry title…"/>
+      <textarea class="j-body-inp" id="j-body" placeholder="What's on your mind today?…"></textarea>
+      <div class="j-tags-row">
+        <input class="tag-inp" id="j-tag-inp" placeholder="Tag + Enter…" onkeydown="addTag(event)"/>
+        <div id="j-tags-list"></div>
       </div>
     </div>
-    <div class="panel journal-history">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-history"></i> Past entries</span></div>
-      <div id="journal-entries-list"></div>
+    <div class="card journal-hist">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-history"></i> Past entries</span></div>
+      <div id="journal-list"></div>
     </div>
   </div>
 </section>
 
-<!-- ============ FINANCE ============ -->
+<!-- ===== FINANCE ===== -->
 <section id="view-finance" class="view">
-  <div class="page-header">
+  <div class="page-hdr">
     <div><h1 class="page-title">Finance</h1><p class="page-sub">Track every rupee</p></div>
-    <button class="btn-primary" onclick="openModal('expense-modal')"><i class="ti ti-plus"></i> Add expense</button>
+    <button class="btn-primary" onclick="openModal('exp-modal')"><i class="ti ti-plus"></i> Add expense</button>
   </div>
-
-  <div class="finance-kpis">
-    <div class="fkpi green"><div class="fkpi-lbl">Monthly budget</div><div class="fkpi-val" id="fin-budget">₹0</div></div>
-    <div class="fkpi red"><div class="fkpi-lbl">Spent this month</div><div class="fkpi-val" id="fin-spent">₹0</div></div>
-    <div class="fkpi blue"><div class="fkpi-lbl">Remaining</div><div class="fkpi-val" id="fin-remaining">₹0</div></div>
-    <div class="fkpi amber"><div class="fkpi-lbl">Saved this month</div><div class="fkpi-val" id="fin-saved">₹0</div></div>
+  <div class="fin-kpis">
+    <div class="fkpi" style="border-top:3px solid #1e40af"><div class="fkpi-lbl">Monthly budget</div><div class="fkpi-val" id="fin-budget">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #ef4444"><div class="fkpi-lbl">Spent this month</div><div class="fkpi-val" id="fin-spent">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #0ea5e9"><div class="fkpi-lbl">Remaining</div><div class="fkpi-val" id="fin-rem">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #22c55e"><div class="fkpi-lbl">Today's spend</div><div class="fkpi-val" id="fin-today">₹0</div></div>
   </div>
-
-  <div class="panel" style="margin-bottom:16px">
-    <div class="add-form">
-      <input id="exp-name" placeholder="Expense description…"/>
-      <input id="exp-amt" type="number" placeholder="Amount (₹)" style="max-width:130px"/>
-      <select id="exp-cat">
-        <option value="food">Food</option><option value="transport">Transport</option>
-        <option value="shopping">Shopping</option><option value="bills">Bills</option>
-        <option value="health">Health</option><option value="other">Other</option>
-      </select>
-      <button class="btn-primary" onclick="addExpense()"><i class="ti ti-plus"></i> Add</button>
+  <div class="card" style="margin-bottom:16px">
+    <div class="add-row" style="flex-wrap:wrap">
+      <input id="e-name" placeholder="Description…" style="flex:2"/>
+      <input id="e-amt" type="number" placeholder="Amount (₹)" style="max-width:140px"/>
+      <select id="e-cat"><option value="food">Food</option><option value="transport">Transport</option><option value="shopping">Shopping</option><option value="bills">Bills</option><option value="health">Health</option><option value="other">Other</option></select>
+      <button class="btn-primary" onclick="addExp()"><i class="ti ti-plus"></i> Add</button>
     </div>
-    <div style="margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <label style="font-size:12px;color:var(--text2)">Monthly budget (₹):</label>
-      <input id="budget-inp" type="number" placeholder="e.g. 30000" style="width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px"/>
-      <button class="btn-secondary" onclick="setBudget()">Set</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <label style="font-size:12px;color:var(--text2)">Monthly budget:</label>
+      <input id="budget-inp" type="number" placeholder="e.g. 30000" class="mini-inp"/>
+      <button class="btn-outline" onclick="setBudget()">Set</button>
     </div>
   </div>
-
-  <div class="panel">
-    <div class="panel-hdr"><span class="panel-title"><i class="ti ti-receipt"></i> Expense log</span></div>
-    <div id="expense-list"></div>
-  </div>
+  <div class="card"><div class="card-hdr"><span class="card-title"><i class="ti ti-receipt"></i> Expense log</span></div><div id="exp-list"></div></div>
 </section>
 
-<!-- ============ HEALTH ============ -->
+<!-- ===== HEALTH ===== -->
 <section id="view-health" class="view">
-  <div class="page-header">
-    <div><h1 class="page-title">Health</h1><p class="page-sub">Your body deserves the best</p></div>
-  </div>
+  <div class="page-hdr"><div><h1 class="page-title">Health</h1><p class="page-sub">Your body, your priority</p></div></div>
   <div class="health-grid">
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-droplet"></i> Water intake</span></div>
-      <div class="water-tracker">
-        <div class="water-cups" id="water-cups"></div>
-        <div class="water-label" id="water-label">0 / 8 glasses</div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-droplet"></i> Water intake</span></div>
+      <div class="water-cups" id="water-cups"></div>
+      <div class="water-lbl" id="water-lbl">0 / 8 glasses</div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-run"></i> Daily steps</span></div>
+      <input id="steps-inp" class="full-inp" type="number" placeholder="Steps today…"/>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="logSteps()">Log steps</button>
+      <div style="text-align:center;margin-top:16px">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--border)" stroke-width="8"/>
+          <circle id="steps-ring" cx="55" cy="55" r="46" fill="none" stroke="#0ea5e9" stroke-width="8"
+            stroke-dasharray="289" stroke-dashoffset="289" stroke-linecap="round"
+            transform="rotate(-90 55 55)" style="transition:stroke-dashoffset .7s ease"/>
+        </svg>
+        <div style="font-size:20px;font-weight:700;color:var(--navy);margin-top:-62px;position:relative" id="steps-val">0</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:38px">/ 10,000 goal</div>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-run"></i> Daily steps</span></div>
-      <div class="steps-wrap">
-        <input id="steps-inp" type="number" placeholder="Steps today…" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;margin-bottom:10px"/>
-        <button class="btn-primary" style="width:100%" onclick="logSteps()">Log steps</button>
-        <div class="steps-ring-wrap" style="margin-top:16px;text-align:center">
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="9"/>
-            <circle id="steps-ring" cx="60" cy="60" r="50" fill="none" stroke="#5ad4a8" stroke-width="9"
-              stroke-dasharray="314.2" stroke-dashoffset="314.2" stroke-linecap="round"
-              transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .7s ease"/>
-          </svg>
-          <div style="font-size:22px;font-weight:600;color:var(--text);margin-top:-68px;position:relative" id="steps-val">0</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:36px">/ 10,000 goal</div>
-        </div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-moon"></i> Sleep log</span></div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-moon"></i> Sleep log</span></div>
       <div class="sleep-form">
-        <div class="sleep-row"><label>Bedtime</label><input type="time" id="sleep-bed" value="23:00"/></div>
-        <div class="sleep-row"><label>Wake time</label><input type="time" id="sleep-wake" value="07:00"/></div>
-        <button class="btn-primary" style="width:100%;margin-top:12px" onclick="logSleep()">Log sleep</button>
+        <div class="sleep-row"><label>Bedtime</label><input type="time" id="sl-bed" value="23:00" class="time-inp"/></div>
+        <div class="sleep-row"><label>Wake time</label><input type="time" id="sl-wake" value="07:00" class="time-inp"/></div>
+        <button class="btn-primary" style="width:100%;margin-top:10px" onclick="logSleep()">Log sleep</button>
         <div class="sleep-result" id="sleep-result"></div>
-        <div id="sleep-history"></div>
+        <div id="sleep-hist"></div>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-hdr"><span class="panel-title"><i class="ti ti-barbell"></i> Workout log</span></div>
-      <div class="add-form" style="flex-wrap:wrap;gap:8px">
-        <input id="workout-name" placeholder="Workout name…" style="flex:1"/>
-        <input id="workout-dur" type="number" placeholder="Mins" style="width:80px"/>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-barbell"></i> Workout</span></div>
+      <div class="add-row" style="flex-wrap:wrap">
+        <input id="wk-name" placeholder="Workout…" style="flex:1"/>
+        <input id="wk-dur" type="number" placeholder="Mins" style="max-width:80px"/>
         <button class="btn-primary" onclick="logWorkout()"><i class="ti ti-plus"></i></button>
       </div>
       <div id="workout-list" style="margin-top:12px"></div>
@@ -335,147 +341,116 @@
   </div>
 </section>
 
-<!-- ============ NOTES ============ -->
+<!-- ===== NOTES ===== -->
 <section id="view-notes" class="view">
-  <div class="page-header">
+  <div class="page-hdr">
     <div><h1 class="page-title">Notes</h1><p class="page-sub">Capture ideas instantly</p></div>
     <button class="btn-primary" onclick="addNote()"><i class="ti ti-plus"></i> New note</button>
   </div>
   <div class="notes-grid" id="notes-grid"></div>
 </section>
 
-<!-- ============ ANALYTICS ============ -->
+<!-- ===== ANALYTICS ===== -->
 <section id="view-analytics" class="view">
-  <div class="page-header">
-    <div><h1 class="page-title">Analytics</h1><p class="page-sub">Insights from your data</p></div>
+  <div class="page-hdr"><div><h1 class="page-title">Analytics</h1><p class="page-sub">Insights from your data</p></div></div>
+  <div class="ana-grid">
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-chart-bar"></i> Tasks by category</div><div id="ana-cat"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-flag"></i> By priority</div><div id="ana-pri"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-repeat"></i> Habit completion</div><div id="ana-hab"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-wallet"></i> Spending by category</div><div id="ana-fin"></div></div>
   </div>
-  <div class="analytics-cards">
-    <div class="panel">
-      <div class="panel-title" style="margin-bottom:16px"><i class="ti ti-chart-bar"></i> Tasks by category</div>
-      <div id="ana-cat-bars"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title" style="margin-bottom:16px"><i class="ti ti-flag"></i> Tasks by priority</div>
-      <div id="ana-pri-bars"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title" style="margin-bottom:16px"><i class="ti ti-repeat"></i> Habit completion</div>
-      <div id="ana-habits"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title" style="margin-bottom:16px"><i class="ti ti-wallet"></i> Spending by category</div>
-      <div id="ana-finance"></div>
-    </div>
-  </div>
-  <div class="panel" style="margin-top:16px">
-    <div class="panel-title" style="margin-bottom:16px"><i class="ti ti-award"></i> Life score</div>
-    <div class="life-score-grid" id="life-score-grid"></div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title" style="margin-bottom:16px"><i class="ti ti-award"></i> Life Score</div>
+    <div class="life-score-grid" id="life-score"></div>
   </div>
 </section>
 
 </main>
 
 <!-- ========== MODALS ========== -->
-<div class="modal-overlay" id="task-modal" onclick="closeModalBg(event,'task-modal')">
+<!-- Task modal -->
+<div class="modal-ov" id="task-modal" onclick="closeBg(event,'task-modal')">
   <div class="modal">
-    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-list-check"></i> Add task</span>
-      <button class="modal-close" onclick="closeModal('task-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-list-check"></i> Add Task</span><button class="modal-x" onclick="closeModal('task-modal')"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
-      <label>Task name *</label>
-      <input id="m-task-name" placeholder="What needs to be done?"/>
-      <div class="form-row2">
-        <div><label>Category</label>
-          <select id="m-task-cat">
-            <option value="work">Work</option><option value="personal">Personal</option>
-            <option value="health">Health</option><option value="admin">Admin</option>
-            <option value="team">Team</option><option value="learning">Learning</option>
-          </select></div>
-        <div><label>Priority</label>
-          <select id="m-task-pri">
-            <option value="high">High</option><option value="med">Medium</option><option value="low">Low</option>
-          </select></div>
-      </div>
-      <label>Notes (optional)</label>
-      <textarea id="m-task-notes" placeholder="Any details…" rows="3"></textarea>
+      <label>Task name *</label><input id="m-t-name" placeholder="What needs to be done?"/>
+      <div class="form2"><div><label>Category</label><select id="m-t-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option><option value="learning">Learning</option></select></div><div><label>Priority</label><select id="m-t-pri"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div></div>
+      <label>Notes</label><textarea id="m-t-notes" rows="3" placeholder="Any details…"></textarea>
     </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('task-modal')">Cancel</button>
-      <button class="btn-primary" onclick="addTaskModal()"><i class="ti ti-plus"></i> Add task</button>
-    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('task-modal')">Cancel</button><button class="btn-primary" onclick="addTaskModal()"><i class="ti ti-plus"></i> Add task</button></div>
   </div>
 </div>
 
-<div class="modal-overlay" id="habit-modal" onclick="closeModalBg(event,'habit-modal')">
+<!-- Fixed task (weekly grid row) modal -->
+<div class="modal-ov" id="fixed-task-modal" onclick="closeBg(event,'fixed-task-modal')">
   <div class="modal">
-    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-repeat"></i> New habit</span>
-      <button class="modal-close" onclick="closeModal('habit-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-calendar-week"></i> Add to Weekly Grid</span><button class="modal-x" onclick="closeModal('fixed-task-modal')"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
-      <label>Habit name *</label>
-      <input id="m-habit-name" placeholder="e.g. Morning meditation"/>
-      <label>Icon (emoji)</label>
-      <input id="m-habit-icon" placeholder="e.g. 🧘" maxlength="2"/>
-      <label>Target (days/week)</label>
-      <input id="m-habit-target" type="number" min="1" max="7" value="7"/>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('habit-modal')">Cancel</button>
-      <button class="btn-primary" onclick="addHabit()"><i class="ti ti-plus"></i> Add habit</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="goal-modal" onclick="closeModalBg(event,'goal-modal')">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-target"></i> New goal</span>
-      <button class="modal-close" onclick="closeModal('goal-modal')"><i class="ti ti-x"></i></button></div>
-    <div class="modal-body">
-      <label>Goal title *</label>
-      <input id="m-goal-title" placeholder="What do you want to achieve?"/>
-      <label>Category</label>
-      <select id="m-goal-cat">
-        <option value="career">Career</option><option value="health">Health</option>
-        <option value="finance">Finance</option><option value="personal">Personal</option><option value="learning">Learning</option>
+      <label>Task name *</label><input id="m-ft-name" placeholder="e.g. techalphawaba count"/>
+      <label>Type</label>
+      <select id="m-ft-type">
+        <option value="daily">Daily (shows every day)</option>
+        <option value="weekly">Weekly (specific days)</option>
       </select>
-      <label>Target date</label>
-      <input id="m-goal-date" type="date"/>
-      <label>Progress (%)</label>
-      <input id="m-goal-prog" type="number" min="0" max="100" value="0"/>
-      <label>Description</label>
-      <textarea id="m-goal-desc" rows="3" placeholder="Describe your goal…"></textarea>
+      <div id="day-picker" style="display:none;margin-top:12px">
+        <label>Select days</label>
+        <div class="day-check-row" id="day-checks">
+          <label class="day-chk"><input type="checkbox" value="0"/> Mon</label>
+          <label class="day-chk"><input type="checkbox" value="1"/> Tue</label>
+          <label class="day-chk"><input type="checkbox" value="2"/> Wed</label>
+          <label class="day-chk"><input type="checkbox" value="3"/> Thu</label>
+          <label class="day-chk"><input type="checkbox" value="4"/> Fri</label>
+          <label class="day-chk"><input type="checkbox" value="5"/> Sat</label>
+          <label class="day-chk"><input type="checkbox" value="6"/> Sun</label>
+        </div>
+      </div>
+      <label>Category</label>
+      <select id="m-ft-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option></select>
     </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('goal-modal')">Cancel</button>
-      <button class="btn-primary" onclick="addGoal()"><i class="ti ti-plus"></i> Add goal</button>
-    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('fixed-task-modal')">Cancel</button><button class="btn-primary" onclick="addFixedTask()"><i class="ti ti-plus"></i> Add to grid</button></div>
   </div>
 </div>
 
-<div class="modal-overlay" id="expense-modal" onclick="closeModalBg(event,'expense-modal')">
+<!-- Habit modal -->
+<div class="modal-ov" id="habit-modal" onclick="closeBg(event,'habit-modal')">
   <div class="modal">
-    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-wallet"></i> Add expense</span>
-      <button class="modal-close" onclick="closeModal('expense-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-repeat"></i> New Habit</span><button class="modal-x" onclick="closeModal('habit-modal')"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
-      <label>Description *</label>
-      <input id="m-exp-name" placeholder="What did you spend on?"/>
-      <div class="form-row2">
-        <div><label>Amount (₹) *</label><input id="m-exp-amt" type="number" placeholder="0"/></div>
-        <div><label>Category</label>
-          <select id="m-exp-cat">
-            <option value="food">Food</option><option value="transport">Transport</option>
-            <option value="shopping">Shopping</option><option value="bills">Bills</option>
-            <option value="health">Health</option><option value="other">Other</option>
-          </select></div>
-      </div>
+      <label>Habit name *</label><input id="m-h-name" placeholder="e.g. Morning meditation"/>
+      <label>Icon (emoji)</label><input id="m-h-icon" placeholder="🧘" maxlength="2"/>
+      <label>Target (days/week)</label><input id="m-h-tgt" type="number" min="1" max="7" value="7"/>
     </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('expense-modal')">Cancel</button>
-      <button class="btn-primary" onclick="addExpenseModal()"><i class="ti ti-plus"></i> Add expense</button>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('habit-modal')">Cancel</button><button class="btn-primary" onclick="addHabit()"><i class="ti ti-plus"></i> Add</button></div>
+  </div>
+</div>
+
+<!-- Goal modal -->
+<div class="modal-ov" id="goal-modal" onclick="closeBg(event,'goal-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-target"></i> New Goal</span><button class="modal-x" onclick="closeModal('goal-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Goal title *</label><input id="m-g-title" placeholder="What do you want to achieve?"/>
+      <div class="form2"><div><label>Category</label><select id="m-g-cat"><option value="career">Career</option><option value="health">Health</option><option value="finance">Finance</option><option value="personal">Personal</option><option value="learning">Learning</option></select></div><div><label>Target date</label><input id="m-g-date" type="date"/></div></div>
+      <label>Progress (%)</label><input id="m-g-prog" type="number" min="0" max="100" value="0"/>
+      <label>Description</label><textarea id="m-g-desc" rows="3" placeholder="Describe your goal…"></textarea>
     </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('goal-modal')">Cancel</button><button class="btn-primary" onclick="addGoal()"><i class="ti ti-plus"></i> Add goal</button></div>
+  </div>
+</div>
+
+<!-- Expense modal -->
+<div class="modal-ov" id="exp-modal" onclick="closeBg(event,'exp-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-wallet"></i> Add Expense</span><button class="modal-x" onclick="closeModal('exp-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Description *</label><input id="m-e-name" placeholder="What did you spend on?"/>
+      <div class="form2"><div><label>Amount (₹) *</label><input id="m-e-amt" type="number"/></div><div><label>Category</label><select id="m-e-cat"><option value="food">Food</option><option value="transport">Transport</option><option value="shopping">Shopping</option><option value="bills">Bills</option><option value="health">Health</option><option value="other">Other</option></select></div></div>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('exp-modal')">Cancel</button><button class="btn-primary" onclick="addExpModal()"><i class="ti ti-plus"></i> Add</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="app.js"></script>
 </body>
 </html>
