@@ -168,8 +168,10 @@ function buildGridTable(theadId, tbodyId, rows, dates, todayS, isDaily){
       <td class="task-name-cell">
         <span class="row-icon">📋</span>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600;color:#0f1f4b">${esc(row.name)}</div>
-          <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt}">${row.cat}</span>
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <div style="font-size:13px;font-weight:600;color:#0f1f4b;line-height:1.3">${esc(row.name)}</div>
+            <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt};white-space:nowrap;flex-shrink:0">${row.cat}</span>
+          </div>
           ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
