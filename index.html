@@ -450,6 +450,39 @@
   </div>
 </div>
 
+<!-- Edit Fixed Task modal -->
+<div class="modal-ov" id="edit-fixed-modal" onclick="closeBg(event,'edit-fixed-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-edit"></i> Edit Weekly Task</span><button class="modal-x" onclick="closeModal('edit-fixed-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ef-id"/>
+      <label>Task name *</label><input id="ef-name" placeholder="Task name…"/>
+      <label>Type</label>
+      <select id="ef-type" onchange="document.getElementById('ef-day-picker').style.display=this.value==='weekly'?'block':'none'">
+        <option value="daily">Daily (shows every day)</option>
+        <option value="weekly">Weekly (specific days)</option>
+      </select>
+      <div id="ef-day-picker" style="display:none;margin-top:12px">
+        <label>Select days</label>
+        <div class="day-check-row" id="ef-day-checks">
+          <label class="day-chk"><input type="checkbox" value="0"/> Mon</label>
+          <label class="day-chk"><input type="checkbox" value="1"/> Tue</label>
+          <label class="day-chk"><input type="checkbox" value="2"/> Wed</label>
+          <label class="day-chk"><input type="checkbox" value="3"/> Thu</label>
+          <label class="day-chk"><input type="checkbox" value="4"/> Fri</label>
+          <label class="day-chk"><input type="checkbox" value="5"/> Sat</label>
+          <label class="day-chk"><input type="checkbox" value="6"/> Sun</label>
+        </div>
+      </div>
+      <label>Category</label>
+      <select id="ef-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option></select>
+      <label>Note <span style="font-size:11px;color:#94a3b8;font-weight:400">(what to do in this task)</span></label>
+      <textarea id="ef-note" rows="4" placeholder="Describe what needs to be done, steps, links, anything useful…"></textarea>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('edit-fixed-modal')">Cancel</button><button class="btn-primary" onclick="saveEditFixedTask()"><i class="ti ti-device-floppy"></i> Save changes</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script src="app.js"></script>
 </body>
