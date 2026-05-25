@@ -289,12 +289,12 @@ function taskHTML(t){
   return `<div class="task-item${t.done?' done':''}" onclick="toggleTask(${t.id})">
     <div class="chk"><i class="ti ti-check"></i></div>
     <div class="t-body">
-      <div class="t-name">${esc(t.name)}</div>
-      ${t.notes?`<div class="t-note">${esc(t.notes)}</div>`:''}
-      <div class="t-meta">
-        <span class="badge b-${t.cat}">${CAT_L[t.cat]||t.cat}</span>
-        <div style="display:flex;align-items:center;gap:4px"><div class="pdot p-${t.pri}"></div><span class="pt">${PRI_L[t.pri]||t.pri}</span></div>
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <div class="t-name" style="margin:0">${esc(t.name)}</div>
+        <span class="badge b-${t.cat}" style="flex-shrink:0">${CAT_L[t.cat]||t.cat}</span>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0"><div class="pdot p-${t.pri}"></div><span class="pt">${PRI_L[t.pri]||t.pri}</span></div>
       </div>
+      ${t.notes?`<div class="t-note">${esc(t.notes)}</div>`:''}
     </div>
     <button class="del-btn" onclick="event.stopPropagation();delTask(${t.id})"><i class="ti ti-trash"></i></button>
   </div>`;
