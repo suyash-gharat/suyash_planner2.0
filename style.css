@@ -365,8 +365,8 @@ input,select,textarea,button{font-family:var(--font)}
 
 /* KEY FIX: task name cell uses bright text */
 .weekly-table tbody td.task-name-cell{
-  font-size:13px;font-weight:600;
-  color:var(--text);   /* FIXED: was #0f1f4b (dark on dark = invisible) */
+  font-size:13px;font-weight:700;
+  color:#e8f0fe;   /* bright white-blue - always readable on dark bg */
   min-width:240px;
   border-right:1px solid rgba(255,255,255,0.08);
   display:flex;align-items:flex-start;gap:8px;
@@ -398,7 +398,7 @@ input,select,textarea,button{font-family:var(--font)}
 
 /* Row note */
 .row-note{
-  font-size:11px;color:var(--text2);   /* FIXED: visible text */
+  font-size:11px;color:#a8bbd4;   /* soft blue-white, legible on dark */
   margin-top:5px;padding:5px 9px;
   background:rgba(56,189,248,0.07);
   border-left:2px solid rgba(56,189,248,0.45);
