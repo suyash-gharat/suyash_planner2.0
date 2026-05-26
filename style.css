@@ -951,3 +951,243 @@ html[data-theme="light"] .toast {
   color: #ffffff;
   box-shadow: 0 8px 32px rgba(15,31,75,0.25), 0 0 20px rgba(14,165,233,0.1);
 }
+
+/* =============================================
+   PREMIUM CARD HOVER & CLICK EFFECTS
+   Works for both dark and light themes
+   ============================================= */
+
+/* ── Shared hover setup for all interactive cards ── */
+.kpi, .card, .fkpi, .habit-card, .goal-card,
+.task-item, .day-summary, .je, .note-card, .ls-card {
+  cursor: pointer;
+  will-change: transform;
+}
+
+/* ── Animated border shimmer on hover ── */
+@keyframes border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── KPI cards — premium hover ── */
+.kpi {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease,
+              border-color .2s ease;
+}
+.kpi:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(56,189,248,0.22), 0 4px 12px rgba(0,0,0,0.4);
+  border-color: rgba(56,189,248,0.45) !important;
+}
+.kpi:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+
+/* ── Generic .card hover ── */
+.card {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease, border-color .2s ease;
+}
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 12px 36px rgba(56,189,248,0.18), 0 4px 12px rgba(0,0,0,0.35);
+  border-color: rgba(56,189,248,0.35) !important;
+}
+.card:active {
+  transform: translateY(-1px) scale(0.99);
+  transition: transform .1s, box-shadow .1s;
+}
+
+/* ── Finance KPI cards ── */
+.fkpi {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease, border-color .2s ease;
+}
+.fkpi:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(56,189,248,0.2), 0 4px 12px rgba(0,0,0,0.4);
+  border-color: rgba(56,189,248,0.4) !important;
+}
+.fkpi:active {
+  transform: translateY(-1px) scale(0.98);
+  transition: transform .1s, box-shadow .1s;
+}
+
+/* ── Habit cards ── */
+.habit-card {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease, border-color .2s ease;
+}
+.habit-card:hover {
+  transform: translateY(-7px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(56,189,248,0.22), 0 4px 16px rgba(0,0,0,0.4);
+  border-color: rgba(56,189,248,0.45) !important;
+}
+.habit-card:active {
+  transform: translateY(-2px) scale(0.97);
+  transition: transform .1s, box-shadow .1s;
+}
+
+/* ── Goal cards ── */
+.goal-card {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease, border-color .2s ease;
+}
+.goal-card:hover {
+  transform: translateY(-7px) scale(1.02);
+  box-shadow: 0 16px 44px rgba(129,140,248,0.2), 0 4px 16px rgba(0,0,0,0.4);
+  border-color: rgba(129,140,248,0.45) !important;
+}
+.goal-card:active {
+  transform: translateY(-2px) scale(0.97);
+  transition: transform .1s, box-shadow .1s;
+}
+
+/* ── Task items ── */
+.task-item {
+  transition: transform .22s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .22s ease, border-color .2s ease,
+              background .2s ease;
+}
+.task-item:hover {
+  transform: translateX(6px) scale(1.01);
+  box-shadow: 0 6px 24px rgba(56,189,248,0.18), -3px 0 0 var(--sky2);
+  border-color: rgba(56,189,248,0.4) !important;
+}
+.task-item:active {
+  transform: translateX(2px) scale(0.99);
+  transition: transform .1s;
+}
+
+/* ── Day summary boxes ── */
+.day-summary {
+  transition: transform .22s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .22s ease, border-color .2s ease;
+}
+.day-summary:hover {
+  transform: translateY(-5px) scale(1.04);
+  box-shadow: 0 10px 28px rgba(56,189,248,0.2), 0 0 0 1px rgba(56,189,248,0.3);
+  border-color: rgba(56,189,248,0.5) !important;
+}
+.day-summary:active {
+  transform: translateY(-1px) scale(1.0);
+  transition: transform .1s;
+}
+
+/* ── Journal entries ── */
+.je {
+  transition: transform .22s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .22s ease, border-color .2s ease;
+}
+.je:hover {
+  transform: translateX(5px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(56,189,248,0.15), -3px 0 0 var(--sky2);
+  border-color: rgba(56,189,248,0.35) !important;
+}
+
+/* ── Note cards ── */
+.note-card {
+  transition: transform .25s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .25s ease, border-color .2s ease;
+}
+.note-card:hover {
+  transform: translateY(-6px) rotate(0.5deg);
+  box-shadow: 0 14px 40px rgba(129,140,248,0.22), 0 4px 12px rgba(0,0,0,0.3);
+  border-color: rgba(129,140,248,0.5) !important;
+}
+.note-card:active {
+  transform: translateY(-2px) rotate(0deg) scale(0.98);
+  transition: transform .1s;
+}
+
+/* ── Life score cards ── */
+.ls-card {
+  transition: transform .22s cubic-bezier(.22,.68,0,1.2),
+              box-shadow .22s ease, border-color .2s ease;
+}
+.ls-card:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 10px 28px rgba(56,189,248,0.18);
+  border-color: rgba(56,189,248,0.4) !important;
+}
+
+/* ── Click ripple on cards ── */
+@keyframes card-ripple {
+  0%   { transform: scale(0); opacity: .35; }
+  100% { transform: scale(3); opacity: 0; }
+}
+.card-ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  width: 80px; height: 80px;
+  margin-left: -40px; margin-top: -40px;
+  background: radial-gradient(circle, rgba(56,189,248,0.4) 0%, transparent 70%);
+  animation: card-ripple .65s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Glow pulse on click ── */
+@keyframes click-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(56,189,248,0.5); }
+  50%  { box-shadow: 0 0 0 8px rgba(56,189,248,0); }
+  100% { box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+}
+.card-clicked {
+  animation: click-glow .55s ease-out;
+}
+
+/* =============================================
+   LIGHT THEME — hover overrides
+   ============================================= */
+html[data-theme="light"] .kpi:hover {
+  box-shadow: 0 12px 40px rgba(15,31,75,0.16), 0 4px 12px rgba(15,31,75,0.08) !important;
+  border-color: rgba(14,165,233,0.5) !important;
+}
+html[data-theme="light"] .card:hover {
+  box-shadow: 0 12px 36px rgba(15,31,75,0.13), 0 4px 12px rgba(15,31,75,0.07) !important;
+  border-color: rgba(14,165,233,0.4) !important;
+}
+html[data-theme="light"] .fkpi:hover {
+  box-shadow: 0 12px 36px rgba(15,31,75,0.14), 0 4px 12px rgba(15,31,75,0.07) !important;
+  border-color: rgba(14,165,233,0.45) !important;
+}
+html[data-theme="light"] .habit-card:hover {
+  box-shadow: 0 16px 40px rgba(15,31,75,0.14), 0 4px 16px rgba(15,31,75,0.08) !important;
+  border-color: rgba(14,165,233,0.5) !important;
+}
+html[data-theme="light"] .goal-card:hover {
+  box-shadow: 0 16px 44px rgba(129,140,248,0.2), 0 4px 16px rgba(15,31,75,0.08) !important;
+  border-color: rgba(129,140,248,0.5) !important;
+}
+html[data-theme="light"] .task-item:hover {
+  box-shadow: 0 6px 24px rgba(15,31,75,0.12), -3px 0 0 #0ea5e9 !important;
+  border-color: rgba(14,165,233,0.45) !important;
+}
+html[data-theme="light"] .day-summary:hover {
+  box-shadow: 0 10px 28px rgba(15,31,75,0.14), 0 0 0 1px rgba(14,165,233,0.3) !important;
+  border-color: rgba(14,165,233,0.55) !important;
+}
+html[data-theme="light"] .note-card:hover {
+  box-shadow: 0 14px 40px rgba(129,140,248,0.18), 0 4px 12px rgba(15,31,75,0.07) !important;
+}
+html[data-theme="light"] .ls-card:hover {
+  box-shadow: 0 10px 28px rgba(15,31,75,0.12) !important;
+  border-color: rgba(14,165,233,0.45) !important;
+}
+html[data-theme="light"] .card-ripple-effect {
+  background: radial-gradient(circle, rgba(15,31,75,0.18) 0%, transparent 70%);
+}
+html[data-theme="light"] .card-clicked {
+  animation: click-glow-light .55s ease-out;
+}
+@keyframes click-glow-light {
+  0%   { box-shadow: 0 0 0 0 rgba(14,165,233,0.45); }
+  50%  { box-shadow: 0 0 0 8px rgba(14,165,233,0); }
+  100% { box-shadow: 0 0 0 0 rgba(14,165,233,0); }
+}
