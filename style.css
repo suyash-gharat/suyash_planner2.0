@@ -600,27 +600,27 @@ input,select,textarea,button{font-family:var(--font)}
 .theme-toggle-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  width: calc(100% - 0px);
-  margin-top: 8px;
-  padding: 9px 13px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(56,189,248,0.2);
-  background: rgba(56,189,248,0.08);
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(56,189,248,0.25);
+  background: rgba(56,189,248,0.12);
   color: var(--sky2);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 15px;
   font-family: var(--font);
   cursor: pointer;
   transition: all .2s;
-  letter-spacing: .3px;
+  padding: 0;
 }
 .theme-toggle-btn:hover {
-  background: rgba(56,189,248,0.15);
+  background: rgba(56,189,248,0.25);
   border-color: var(--sky2);
-  transform: translateY(-1px);
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(56,189,248,0.3);
 }
-.theme-toggle-btn i { font-size: 14px; }
+.theme-toggle-btn i { font-size: 15px; }
 
 /* Show correct icon per theme */
 .theme-toggle-btn .theme-icon-dark { display: flex; align-items: center; gap: 7px; }
@@ -677,13 +677,14 @@ input,select,textarea,button{font-family:var(--font)}
   border-right: 1px solid rgba(56,189,248,0.15);
 }
 [data-theme="light"] .theme-toggle-btn {
-  border-color: rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15);
   color: #fff;
 }
 [data-theme="light"] .theme-toggle-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.28);
   border-color: #fff;
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 
 /* ── Mobile menu button ── */
