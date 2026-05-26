@@ -169,7 +169,7 @@ function buildGridTable(theadId, tbodyId, rows, dates, todayS, isDaily){
         <span class="row-icon">📋</span>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-            <div style="font-size:13px;font-weight:600;color:#0f1f4b;line-height:1.3">${esc(row.name)}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3">${esc(row.name)}</div>
             <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt};white-space:nowrap;flex-shrink:0">${row.cat}</span>
           </div>
           ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
@@ -401,7 +401,7 @@ function renderGoals(){
       <div class="goal-prog-track"><div class="goal-prog-fill" style="width:${g.progress}%"></div></div>
       <div class="goal-meta"><span>${g.progress}% complete</span>${g.date?`<span>Due ${fmtDate(g.date)}</span>`:''}</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-        <span style="font-size:11px;color:#94a3b8">Progress:</span>
+        <span style="font-size:11px;color:var(--text3)">Progress:</span>
         <input class="goal-prog-inp" type="number" min="0" max="100" value="${g.progress}"
           onchange="updateGoalProg(${g.id},this.value)" onclick="event.stopPropagation()"/>
         <span style="font-size:11px;color:#94a3b8">%</span>
@@ -441,14 +441,14 @@ function renderJournal(){
   jl.innerHTML=journal.length?journal.map(j=>`
     <div class="je">
       <div class="je-title">${esc(j.title||'Untitled')}</div>
-      <div class="je-meta"><span>${fmtDate(j.date)}</span><span>${moodE[j.mood]||''}</span>${j.tags.map(t=>`<span style="color:#1d4ed8;font-size:10px;font-weight:600">#${esc(t)}</span>`).join('')}</div>
+      <div class="je-meta"><span>${fmtDate(j.date)}</span><span>${moodE[j.mood]||''}</span>${j.tags.map(t=>`<span style="color:var(--sky2);font-size:10px;font-weight:600">#${esc(t)}</span>`).join('')}</div>
       <div class="je-preview">${esc(j.body||'')}</div>
     </div>`).join('')
     :`<div class="empty-st"><i class="ti ti-notebook"></i>No entries yet.</div>`;
 }
 
 // ===== FINANCE =====
-const EXP_C={food:'#16a34a',transport:'#0284c7',shopping:'#d97706',bills:'#dc2626',health:'#0d9488',other:'#7c3aed'};
+const EXP_C={food:'#16a34a',transport:'#38bdf8',shopping:'#d97706',bills:'#dc2626',health:'#0d9488',other:'#7c3aed'};
 function setBudget(){const v=parseFloat(document.getElementById('budget-inp').value);if(!v)return;budget=v;save('budget',budget);renderFinance();toast('Budget set ✓');}
 function addExp(){
   const name=document.getElementById('e-name').value.trim(),amt=parseFloat(document.getElementById('e-amt').value);
@@ -477,7 +477,7 @@ function renderFinance(){
   document.getElementById('kpi-budget').textContent=fmtAmt(todaySpent);
   const el=document.getElementById('exp-list');if(!el)return;
   el.innerHTML=expenses.length?expenses.slice(0,40).map(e=>{
-    const bg=EXP_C[e.cat]||'#64748b';
+    const bg=EXP_C[e.cat]||'#94a3b8';
     return `<div class="exp-row">
       <span class="exp-name">${esc(e.name)}</span>
       <span class="exp-cat-b" style="background:${bg}22;color:${bg}">${e.cat}</span>
@@ -496,7 +496,7 @@ function renderHealth(){
   const wl=document.getElementById('water-lbl');if(wl)wl.textContent=`${health.water} / 8 glasses`;
   const sv=document.getElementById('steps-val');if(sv)sv.textContent=health.steps.toLocaleString('en-IN');
   const sr=document.getElementById('steps-ring');if(sr){const p=Math.min(1,health.steps/10000);sr.setAttribute('stroke-dashoffset',(289*(1-p)).toFixed(1));}
-  const sh=document.getElementById('sleep-hist');if(sh)sh.innerHTML=(health.sleep||[]).slice(-5).reverse().map(s=>`<div class="sl-item"><span>${fmtDate(s.date)}</span><span>${s.bed}→${s.wake}</span><span style="font-weight:600;color:#0f1f4b">${s.hours}h</span></div>`).join('');
+  const sh=document.getElementById('sleep-hist');if(sh)sh.innerHTML=(health.sleep||[]).slice(-5).reverse().map(s=>`<div class="sl-item"><span>${fmtDate(s.date)}</span><span>${s.bed}→${s.wake}</span><span style="font-weight:700;color:#38bdf8">${s.hours}h</span></div>`).join('');
   const wl2=document.getElementById('workout-list');if(wl2)wl2.innerHTML=(health.workouts||[]).slice(-5).reverse().map(w=>`<div class="wk-item"><span class="wk-name">💪 ${esc(w.name)}</span><span class="wk-dur">${w.duration} min</span></div>`).join('');
 }
 function setWater(n){health.water=n;save('health',health);renderHealth();toast(`${n} glasses logged 💧`);}
@@ -550,12 +550,12 @@ function renderAnalytics(){
   bars('ana-pri',Object.entries(pris).map(([k,v])=>({label:v.label,val:v.done,total:v.total,color:k==='high'?'#dc2626':k==='med'?'#d97706':'#16a34a'})));
   // Habits
   const hel=document.getElementById('ana-hab');
-  if(hel)hel.innerHTML=habits.length?habits.map(h=>{const p=h.target?Math.round(h.weekLog.length/h.target*100):0;return `<div class="ana-bar-row"><span class="ana-lbl">${h.icon} ${esc(h.name)}</span><div class="ana-track"><div class="ana-fill" style="width:${p}%;background:#0f1f4b"></div></div><span class="ana-val">${h.weekLog.length}/${h.target}</span></div>`}).join(''):`<div class="empty-st" style="padding:12px">No habits.</div>`;
+  if(hel)hel.innerHTML=habits.length?habits.map(h=>{const p=h.target?Math.round(h.weekLog.length/h.target*100):0;return `<div class="ana-bar-row"><span class="ana-lbl">${h.icon} ${esc(h.name)}</span><div class="ana-track"><div class="ana-fill" style="width:${p}%;background:linear-gradient(90deg,#38bdf8,#818cf8)"></div></div><span class="ana-val">${h.weekLog.length}/${h.target}</span></div>`}).join(''):`<div class="empty-st" style="padding:12px">No habits.</div>`;
   // Finance
   const finCats={};expenses.forEach(e=>{finCats[e.cat]=(finCats[e.cat]||0)+e.amt;});
   const finMax=Math.max(...Object.values(finCats),1);
   const fel=document.getElementById('ana-fin');
-  if(fel)fel.innerHTML=Object.keys(finCats).length?Object.entries(finCats).map(([cat,amt])=>`<div class="ana-bar-row"><span class="ana-lbl">${cat}</span><div class="ana-track"><div class="ana-fill" style="width:${Math.round(amt/finMax*100)}%;background:${EXP_C[cat]||'#0f1f4b'}"></div></div><span class="ana-val">${fmtAmt(amt)}</span></div>`).join(''):`<div class="empty-st" style="padding:12px">No expenses.</div>`;
+  if(fel)fel.innerHTML=Object.keys(finCats).length?Object.entries(finCats).map(([cat,amt])=>`<div class="ana-bar-row"><span class="ana-lbl">${cat}</span><div class="ana-track"><div class="ana-fill" style="width:${Math.round(amt/finMax*100)}%;background:${EXP_C[cat]||'#818cf8'}"></div></div><span class="ana-val">${fmtAmt(amt)}</span></div>`).join(''):`<div class="empty-st" style="padding:12px">No expenses.</div>`;
   // Life score
   const tt=todayTasks(),done=tt.filter(t=>t.done).length;
   const taskScore=tt.length?Math.round(done/tt.length*100):0;
@@ -595,13 +595,13 @@ function renderDashboard(){
   if(wm){
     const daily=fixedTasks.filter(t=>t.type==='daily');
     wm.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:11px">
-      <tr>${DAY_SHORT.map((d,i)=>{const ds=dates[i].toISOString().slice(0,10);return `<th style="padding:4px 6px;text-align:center;color:${ds===todayS?'#0284c7':'#64748b'};font-weight:700">${d}</th>`}).join('')}</tr>
+      <tr>${DAY_SHORT.map((d,i)=>{const ds=dates[i].toISOString().slice(0,10);return `<th style="padding:4px 6px;text-align:center;color:${ds===todayS?'#38bdf8':'#7dd3fc'};font-weight:700">${d}</th>`}).join('')}</tr>
       <tr>${dates.map((d,i)=>{
         const ds=d.toISOString().slice(0,10);
         const done=daily.filter(ft=>gridChecks[`${ft.id}_${ds}`]).length;
         const pct=daily.length?Math.round(done/daily.length*100):0;
         const isToday=ds===todayS;
-        return `<td style="padding:6px 4px;text-align:center"><div style="font-size:14px;font-weight:700;color:${isToday?'#0f1f4b':'#64748b'}">${done}</div><div style="font-size:10px;color:#94a3b8">${pct}%</div></td>`;
+        return `<td style="padding:6px 4px;text-align:center"><div style="font-size:14px;font-weight:700;color:${isToday?'#38bdf8':'#94a3b8'}">${done}</div><div style="font-size:10px;color:#94a3b8">${pct}%</div></td>`;
       }).join('')}</tr>
     </table>`;
   }
@@ -618,7 +618,7 @@ function renderDashboard(){
   const dg=document.getElementById('dash-goals');
   if(dg)dg.innerHTML=goals.slice(0,4).map(g=>`
     <div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#0f1f4b;margin-bottom:4px"><span>${esc(g.title)}</span><span style="color:#94a3b8">${g.progress}%</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px"><span>${esc(g.title)}</span><span style="color:#94a3b8">${g.progress}%</span></div>
       <div class="goal-prog-track"><div class="goal-prog-fill" style="width:${g.progress}%"></div></div>
     </div>`).join('')||`<div class="empty-st"><i class="ti ti-target"></i>No goals.</div>`;
 
