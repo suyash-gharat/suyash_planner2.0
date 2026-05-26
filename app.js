@@ -776,3 +776,23 @@ window.renderDashboard = function() {
     }
   }, 60);
 };
+
+// ===== LIGHT / DARK THEME TOGGLE =====
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('wlp-theme', theme);
+  // swap visible icon
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.setAttribute('data-theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// On load — read saved preference, default dark
+(function() {
+  const saved = localStorage.getItem('wlp-theme') || 'dark';
+  applyTheme(saved);
+})();
