@@ -726,3 +726,53 @@ function saveEditFixedTask(){
   renderDashboard();
   toast('Task updated ✓');
 }
+
+// ===== PREMIUM UI ENHANCEMENTS =====
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.btn-primary, .btn-outline');
+  if (!btn) return;
+  const r = document.createElement('span');
+  r.className = 'ripple-effect';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);animation:ripple 0.55s linear;pointer-events:none`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+// Count-up KPI animation
+function animateCountUp(el, target, duration) {
+  if (!el) return;
+  duration = duration || 700;
+  const isPercent = String(target).includes('%');
+  const isDash = target === '—';
+  if (isDash) return;
+  const num = parseInt(target) || 0;
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(num * ease) + (isPercent ? '%' : '');
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+// Patch renderDashboard for count-up + ring pulse
+const __rd = renderDashboard;
+window.renderDashboard = function() {
+  __rd();
+  setTimeout(function() {
+    ['kpi-tasks','kpi-habits','kpi-goals'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) animateCountUp(el, el.textContent);
+    });
+    const ring = document.querySelector('.sb-ring-wrap svg');
+    if (ring) {
+      const pct = parseInt(document.getElementById('sb-ring-pct').textContent) || 0;
+      if (pct >= 50) ring.classList.add('glow-ring');
+      else ring.classList.remove('glow-ring');
+    }
+  }, 60);
+};
