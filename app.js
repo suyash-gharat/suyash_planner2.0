@@ -162,17 +162,17 @@ function buildGridTable(theadId, tbodyId, rows, dates, todayS, isDaily){
         </div>
       </td>`;
     }).join('');
-    const catColor={work:'#dbeafe',personal:'#fef3c7',health:'#dcfce7',admin:'#e0e7ff',team:'#fce7f3'}[row.cat]||'#f1f5f9';
-    const catTxt={work:'#1d4ed8',personal:'#b45309',health:'#15803d',admin:'#4338ca',team:'#be185d'}[row.cat]||'#475569';
+    const catColor={work:'rgba(59,130,246,0.25)',personal:'rgba(245,158,11,0.25)',health:'rgba(16,185,129,0.25)',admin:'rgba(129,140,248,0.25)',team:'rgba(236,72,153,0.25)'}[row.cat]||'rgba(255,255,255,0.12)';
+    const catTxt={work:'#7ab4ff',personal:'#fcd07a',health:'#4ade80',admin:'#c4b5fd',team:'#f9a8d4'}[row.cat]||'#e8f0fe';
     return `<tr>
       <td class="task-name-cell">
         <span class="row-icon">📋</span>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3">${esc(row.name)}</div>
+            <div style="font-size:13px;font-weight:700;color:#e8f0fe;line-height:1.3">${esc(row.name)}</div>
             <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt};white-space:nowrap;flex-shrink:0">${row.cat}</span>
           </div>
-          ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
+          ${row.note?`<div class="row-note" style="color:#a8bbd4;"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
           <button class="row-edit" onclick="openEditFixedTask(${row.id})" title="Edit"><i class="ti ti-edit"></i></button>
@@ -253,7 +253,7 @@ function deleteFixedTask(id){
 // ===== TASKS (regular) =====
 const CAT_L={work:'Work',personal:'Personal',health:'Health',admin:'Admin',team:'Team',learning:'Learning'};
 const PRI_L={high:'High',med:'Medium',low:'Low'};
-const CAT_C={work:'#1d4ed8',personal:'#b45309',health:'#15803d',admin:'#4338ca',team:'#be185d',learning:'#0f766e'};
+const CAT_C={work:'#60a5fa',personal:'#fbbf24',health:'#34d399',admin:'#a78bfa',team:'#f472b6',learning:'#2dd4bf'};
 
 function todayTasks(){return tasks.filter(t=>t.date===todayStr());}
 
@@ -543,7 +543,7 @@ function renderNotes(){
 function renderAnalytics(){
   // Cat bars
   const cats={};tasks.forEach(t=>{cats[t.cat]=cats[t.cat]||{total:0,done:0};cats[t.cat].total++;if(t.done)cats[t.cat].done++;});
-  bars('ana-cat',Object.entries(cats).map(([k,v])=>({label:CAT_L[k]||k,val:v.done,total:v.total,color:CAT_C[k]||'#1d4ed8'})));
+  bars('ana-cat',Object.entries(cats).map(([k,v])=>({label:CAT_L[k]||k,val:v.done,total:v.total,color:CAT_C[k]||'#60a5fa'})));
   // Pri bars
   const pris={high:{label:'High',total:0,done:0},med:{label:'Medium',total:0,done:0},low:{label:'Low',total:0,done:0}};
   tasks.forEach(t=>{if(pris[t.pri]){pris[t.pri].total++;if(t.done)pris[t.pri].done++;}});
