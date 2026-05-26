@@ -15,10 +15,14 @@
 <aside class="sidebar" id="sidebar">
   <div class="sb-brand">
     <div class="sb-logo"><i class="ti ti-layout-kanban"></i></div>
-    <div>
+    <div style="flex:1">
       <div class="sb-name">WorkLife</div>
       <div class="sb-tagline">Planner Pro</div>
     </div>
+    <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark theme">
+      <span class="theme-icon-dark"><i class="ti ti-moon"></i></span>
+      <span class="theme-icon-light"><i class="ti ti-sun"></i></span>
+    </button>
   </div>
 
   <div class="sb-user">
@@ -67,10 +71,6 @@
   </div>
 
   <!-- Theme Toggle -->
-  <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark theme">
-    <span class="theme-icon-dark"><i class="ti ti-moon"></i> Dark</span>
-    <span class="theme-icon-light"><i class="ti ti-sun"></i> Light</span>
-  </button>
 </aside>
 
 <button class="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
