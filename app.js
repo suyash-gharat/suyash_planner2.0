@@ -796,3 +796,31 @@ function toggleTheme() {
   const saved = localStorage.getItem('wlp-theme') || 'dark';
   applyTheme(saved);
 })();
+
+// ===== PREMIUM CARD CLICK EFFECTS =====
+document.addEventListener('click', function(e) {
+  const card = e.target.closest(
+    '.kpi, .card, .fkpi, .habit-card, .goal-card, .day-summary, .je, .note-card, .ls-card'
+  );
+  if (!card) return;
+
+  // Make sure card has position:relative for ripple to work
+  const pos = getComputedStyle(card).position;
+  if (pos === 'static') card.style.position = 'relative';
+  card.style.overflow = 'hidden';
+
+  // Ripple at click position
+  const ripple = document.createElement('span');
+  ripple.className = 'card-ripple-effect';
+  const rect = card.getBoundingClientRect();
+  ripple.style.left = (e.clientX - rect.left) + 'px';
+  ripple.style.top  = (e.clientY - rect.top)  + 'px';
+  card.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 700);
+
+  // Glow pulse
+  card.classList.remove('card-clicked');
+  void card.offsetWidth; // reflow to restart animation
+  card.classList.add('card-clicked');
+  setTimeout(() => card.classList.remove('card-clicked'), 600);
+});
