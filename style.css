@@ -249,26 +249,75 @@ html[data-theme="light"] .sb-profile-name-input{background:rgba(255,255,255,0.15
 .sb-timer-box i{font-size:14px}
 #sb-timer{font-family:var(--mono);font-size:13px;color:var(--sky2)}
 
-/* ===== MOBILE ===== */
-.mob-btn{display:none;position:fixed;top:14px;left:14px;z-index:300;background:rgba(5,13,28,0.92);backdrop-filter:blur(12px);border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius-sm);padding:9px 11px;color:#fff;cursor:pointer;font-size:18px;box-shadow:var(--shadow)}
+/* ===== MOBILE OPEN BUTTON ===== */
+.mob-btn{
+  display:none;position:fixed;top:14px;left:14px;z-index:400;
+  background:rgba(5,13,28,0.95);backdrop-filter:blur(14px);
+  border:1px solid rgba(56,189,248,0.25);border-radius:var(--radius-sm);
+  padding:9px 12px;color:#fff;cursor:pointer;font-size:18px;
+  box-shadow:var(--shadow);align-items:center;gap:6px;
+  transition:all .2s;
+}
+.mob-btn:hover{background:rgba(14,165,233,0.2);border-color:var(--sky2)}
+
+/* Mobile overlay backdrop */
+.mob-overlay{
+  display:none;position:fixed;inset:0;z-index:150;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);
+  transition:opacity .3s;
+}
+.mob-overlay.visible{display:block}
+
+/* Close button inside sidebar — only visible on mobile */
+.mob-close-btn{
+  display:none;width:30px;height:30px;border-radius:8px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;
+  align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.mob-close-btn:hover{background:rgba(244,63,94,0.25);border-color:rgba(244,63,94,0.5);color:#f43f5e}
+
 @media(max-width:900px){
   .mob-btn{display:flex}
-  .sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,.68,0,1.2)}
+  .mob-close-btn{display:flex}
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .32s cubic-bezier(.22,.68,0,1.2);
+    z-index:300;
+    width:min(var(--sb), 85vw);
+  }
   .sidebar.open{transform:translateX(0)}
-  .main{margin-left:0!important;padding:60px 14px 32px!important}
-  .dash-grid,.kpi-row,.fin-kpis,.health-grid,.ana-grid{grid-template-columns:1fr 1fr!important}
+  .main{margin-left:0!important;padding:64px 14px 40px!important}
+  .dash-grid{grid-template-columns:1fr!important}
+  .kpi-row,.fin-kpis{grid-template-columns:1fr 1fr!important}
+  .health-grid,.ana-grid{grid-template-columns:1fr 1fr!important}
   .goals-grid{grid-template-columns:1fr!important}
   .span2{grid-column:span 1!important}
-  .weekly-table-wrap{font-size:11px}
+  .weekly-table-wrap{font-size:11px;overflow-x:auto}
+  .week-summary-row{grid-template-columns:repeat(4,1fr)!important}
+  .hdr-btns{flex-wrap:wrap}
+  .page-hdr{padding:14px 16px}
+  .page-title{font-size:18px}
 }
 @media(max-width:600px){
   .kpi-row,.fin-kpis,.health-grid,.ana-grid{grid-template-columns:1fr!important}
   .week-summary-row{grid-template-columns:repeat(4,1fr)!important}
+  .sb-profile-pic-wrap{width:80px;height:80px}
+  .sb-profile-pic{width:80px;height:80px}
+  .sb-profile-initials{font-size:22px}
+  .dash-grid{gap:10px!important}
 }
 @media(max-width:480px){
   .week-summary-row{grid-template-columns:repeat(2,1fr)!important}
   .journal-layout{grid-template-columns:1fr!important}
+  .kpi-row{grid-template-columns:1fr 1fr!important}
+  .main{padding:60px 10px 32px!important}
 }
+
+/* Light theme mobile button */
+html[data-theme="light"] .mob-btn{background:#0f1f4b;border-color:rgba(56,189,248,0.35);color:#fff}
+html[data-theme="light"] .mob-btn:hover{background:#1a3268}
 
 /* ===== MAIN ===== */
 .main{margin-left:var(--sb);padding:28px 28px 56px;position:relative;z-index:1}
@@ -1070,6 +1119,130 @@ html[data-theme="light"] .modal-ft{background:#f8fafc;border-top-color:rgba(15,3
 
 /* ── Toast ── */
 html[data-theme="light"] .toast{background:#0f1f4b;border-color:rgba(56,189,248,0.35);color:#fff;box-shadow:0 8px 32px rgba(15,31,75,0.22)}
+
+
+/* ─────────────────────────────────────────
+   LIGHT THEME — ADDITIONAL VISIBILITY FIXES
+   Based on screenshot analysis
+   ───────────────────────────────────────── */
+
+/* Dashboard "This Week" mini grid numbers */
+html[data-theme="light"] #dash-week-mini th{color:#0f1f4b!important;font-weight:700}
+html[data-theme="light"] #dash-week-mini td div{color:#0f1f4b!important;font-weight:700}
+html[data-theme="light"] #dash-week-mini td div[style*="font-size:10px"]{color:#5572a0!important}
+
+/* Dashboard panel general text */
+html[data-theme="light"] .panel-title,
+html[data-theme="light"] .card-title{color:#0f1f4b!important}
+
+/* Section headings */
+html[data-theme="light"] .sec-sep{color:#5572a0!important;border-top-color:rgba(15,31,75,0.1)!important}
+html[data-theme="light"] .empty-st{color:#5572a0!important}
+html[data-theme="light"] .empty-st i{color:#0ea5e9!important;opacity:.4}
+
+/* Habit week heatmap labels */
+html[data-theme="light"] .hw-name{color:#0f1f4b!important}
+
+/* Progress label */
+html[data-theme="light"] .prog-label{color:#5572a0!important}
+
+/* Finance expense category badge text */
+html[data-theme="light"] .exp-cat-b{font-weight:700!important}
+
+/* Analytics labels & values */
+html[data-theme="light"] .ana-lbl{color:#0f1f4b!important;font-weight:600}
+html[data-theme="light"] .ana-val{color:#5572a0!important}
+
+/* Health step counter value */
+html[data-theme="light"] #steps-val{color:#0f1f4b!important}
+html[data-theme="light"] .water-lbl{color:#1e3a6e!important}
+
+/* Sleep form labels */
+html[data-theme="light"] .sleep-row label{color:#1e3a6e!important;font-weight:600}
+
+/* Workout items */
+html[data-theme="light"] .wk-item{border-bottom-color:rgba(15,31,75,0.08)!important}
+html[data-theme="light"] .wk-name{color:#0f1f4b!important;font-weight:600}
+html[data-theme="light"] .wk-dur{color:#5572a0!important}
+
+/* Sleep history */
+html[data-theme="light"] .sl-item{color:#1e3a6e!important}
+html[data-theme="light"] .sl-item span:last-child{color:#0ea5e9!important;font-weight:700}
+
+/* Journal body */
+html[data-theme="light"] .j-body-inp{color:#1e3a6e!important}
+
+/* Note cards input text */
+html[data-theme="light"] .note-title-inp{color:#0f1f4b!important}
+html[data-theme="light"] .note-body-inp{color:#2c4a7c!important}
+html[data-theme="light"] .note-date{color:#5572a0!important}
+
+/* Goal meta info (due date, %) */
+html[data-theme="light"] .goal-meta span{color:#5572a0!important}
+html[data-theme="light"] .goal-desc{color:#2c4a7c!important}
+
+/* Grid task name force visible */
+html[data-theme="light"] .grid-task-name{color:#0f1f4b!important;font-weight:700!important}
+html[data-theme="light"] .grid-na-dash{color:rgba(15,31,75,0.25)!important}
+html[data-theme="light"] .row-note{color:#1e3a6e!important;background:rgba(14,165,233,0.07)!important;border-left-color:#0ea5e9!important}
+
+/* Week nav label */
+html[data-theme="light"] .week-nav-label{color:#0f1f4b!important;font-weight:700}
+
+/* Day summary box text */
+html[data-theme="light"] .ds-day{color:#1e3a6e!important;font-weight:700}
+html[data-theme="light"] .ds-count{color:#0f1f4b!important;font-weight:800}
+html[data-theme="light"] .ds-label{color:#5572a0!important}
+html[data-theme="light"] .ds-pct{color:#0284c7!important;font-weight:700}
+
+/* KPI sub text */
+html[data-theme="light"] .kpi-sub{color:#5572a0!important}
+
+/* Card btn-link colour */
+html[data-theme="light"] .btn-link{color:#0ea5e9!important}
+html[data-theme="light"] .btn-link:hover{color:#0f1f4b!important}
+
+/* Mood label */
+html[data-theme="light"] .mood-lbl{color:#1e3a6e!important;font-weight:600}
+html[data-theme="light"] .j-date-lbl{color:#5572a0!important}
+
+/* Tag pill text */
+html[data-theme="light"] .tag-pill{background:#dbeafe!important;color:#1d4ed8!important;border-color:rgba(29,78,216,0.2)!important}
+
+/* Finance budget text */
+html[data-theme="light"] .fkpi-lbl{color:#5572a0!important;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+html[data-theme="light"] .fkpi-val{color:#0f1f4b!important;font-weight:800}
+
+/* Journal entry preview */
+html[data-theme="light"] .je-preview{color:#2c4a7c!important}
+html[data-theme="light"] .je-meta{color:#5572a0!important}
+
+/* Life score cards */
+html[data-theme="light"] .ls-lbl{color:#5572a0!important;font-weight:600}
+
+/* Habit streak text (fire gradient) */
+html[data-theme="light"] .habit-streak{
+  background:linear-gradient(135deg,#ea580c,#d97706)!important;
+  -webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;
+  font-weight:700!important;
+}
+
+/* Steps ring value */
+html[data-theme="light"] #steps-val{color:#0f1f4b!important;font-weight:800}
+
+/* Modal body label */
+html[data-theme="light"] .modal-body label{color:#5572a0!important;font-weight:600;text-transform:uppercase;letter-spacing:.7px}
+
+/* Inline step div after steps-ring */
+html[data-theme="light"] [style*="margin-top:-62px"]{color:#0f1f4b!important}
+html[data-theme="light"] [style*="margin-top:38px"]{color:#5572a0!important}
+
+/* Teammate sidebar links */
+html[data-theme="light"] .sb-child-name{color:rgba(255,255,255,.8)!important}
+html[data-theme="light"] .sb-child-link{color:rgba(255,255,255,.6)!important}
+html[data-theme="light"] .sb-child-link:hover{color:#fff!important;background:rgba(255,255,255,.1)!important}
+html[data-theme="light"] .sb-add-teammate-btn{color:rgba(255,255,255,.5)!important;border-color:rgba(255,255,255,.15)!important}
+html[data-theme="light"] .sb-add-teammate-btn:hover{color:#fff!important;border-color:rgba(56,189,248,.5)!important}
 
 /* ─────────────────────────────────────────
    LIGHT THEME PREMIUM HOVER EFFECTS
