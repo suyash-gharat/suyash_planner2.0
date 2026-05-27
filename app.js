@@ -824,6 +824,31 @@ document.addEventListener('click', function(e) {
   setTimeout(() => card.classList.remove('card-clicked'), 600);
 });
 
+
+// ===== MOBILE SIDEBAR OPEN / CLOSE =====
+function openMobileSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  const ov=document.getElementById('mob-overlay');
+  if(ov){ov.classList.add('visible');}
+  document.body.style.overflow='hidden'; // prevent background scroll
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  const ov=document.getElementById('mob-overlay');
+  if(ov){ov.classList.remove('visible');}
+  document.body.style.overflow='';
+}
+// Close sidebar when a nav link is clicked on mobile
+document.querySelectorAll('.sb-link, .sb-child-link').forEach(function(el){
+  el.addEventListener('click',function(){
+    if(window.innerWidth<=900) closeMobileSidebar();
+  });
+});
+// Close on Escape key
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeMobileSidebar();
+});
+
 // ===== PROFILE PICTURE FEATURE =====
 function triggerProfileUpload(){
   document.getElementById('profile-upload-input').click();
