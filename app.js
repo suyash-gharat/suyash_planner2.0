@@ -86,7 +86,7 @@ function switchView(name){
   if(name==='health')    renderHealth();
   if(name==='notes')     renderNotes();
   if(name==='analytics') renderAnalytics();
-  if(name==='dashboard') renderDashboard();
+  if(name==='dashboard') (window.renderDashboard||renderDashboard)();
 }
 document.querySelectorAll('.sb-link').forEach(el=>{
   el.addEventListener('click',e=>{e.preventDefault();switchView(el.dataset.view);});
@@ -685,7 +685,7 @@ function midnightReset(){
 initMeta();
 startTimer();
 midnightReset();
-renderDashboard();
+(window.renderDashboard||renderDashboard)();
 renderToday();
 
 // ===== EDIT FIXED TASK =====
@@ -748,6 +748,7 @@ function animateCountUp(el, target, duration) {
   const isDash = target === '—';
   if (isDash) return;
   const num = parseInt(target) || 0;
+  if (!num && target !== '0' && target !== '0%') { el.textContent = target; return; }
   const start = performance.now();
   function step(now) {
     const p = Math.min((now - start) / duration, 1);
@@ -782,8 +783,6 @@ function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('wlp-theme', theme);
   // swap visible icon
-  const btn = document.getElementById('theme-toggle-btn');
-  if (btn) btn.setAttribute('data-theme', theme);
 }
 
 function toggleTheme() {
@@ -799,8 +798,11 @@ function toggleTheme() {
 
 // ===== PREMIUM CARD CLICK EFFECTS =====
 document.addEventListener('click', function(e) {
+  // Don't fire on interactive controls inside cards
+  if (e.target.closest('button,input,select,textarea,a,.del-btn,.row-del,.row-edit,.habit-del,.goal-del,.note-del,.mood-btn')) return;
+
   const card = e.target.closest(
-    '.kpi, .card, .fkpi, .habit-card, .goal-card, .day-summary, .je, .note-card, .ls-card'
+    '.kpi, .fkpi, .habit-card, .goal-card, .day-summary, .je, .note-card, .ls-card'
   );
   if (!card) return;
 
