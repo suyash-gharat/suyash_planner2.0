@@ -167,7 +167,7 @@ input,select,textarea,button{font-family:var(--font)}
   margin-bottom:24px;flex-wrap:wrap;gap:12px;
   padding:20px 24px;
   background:var(--grad-hero);
-  background-size:300% 300%;animation:hero-slide 8s ease infinite;
+  background-size:400% 400%;animation:hero-slide 12s ease infinite;
   border-radius:var(--radius);border:1px solid rgba(56,189,248,0.12);
   backdrop-filter:blur(8px);
 }
@@ -200,7 +200,7 @@ input,select,textarea,button{font-family:var(--font)}
 }
 .btn-outline:hover{border-color:var(--sky2);color:var(--sky2);transform:translateY(-2px);background:rgba(56,189,248,0.08)}
 .btn-link{background:none;border:none;color:var(--sky2);font-size:12px;cursor:pointer;font-weight:600;transition:color .15s}
-.btn-link:hover{color:#fff}
+html[data-theme="dark"] .btn-link:hover{color:#fff}
 .btn-primary .ripple-effect,.btn-outline .ripple-effect{position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);animation:ripple 0.55s linear;pointer-events:none}
 
 /* ===== CARDS ===== */
@@ -209,9 +209,7 @@ input,select,textarea,button{font-family:var(--font)}
   border:1px solid rgba(255,255,255,0.08);
   border-radius:var(--radius);padding:18px;
   box-shadow:var(--shadow);backdrop-filter:blur(12px);
-  transition:transform .2s,box-shadow .2s,border-color .2s;
 }
-.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:rgba(56,189,248,0.2)}
 .card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .card-title{
   display:flex;align-items:center;gap:8px;
@@ -226,10 +224,9 @@ input,select,textarea,button{font-family:var(--font)}
   border-radius:var(--radius);padding:18px;
   display:flex;align-items:center;gap:14px;
   box-shadow:var(--shadow);backdrop-filter:blur(12px);
-  transition:all .25s;position:relative;overflow:hidden;
+  position:relative;overflow:hidden;
 }
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-accent,var(--grad-sky))}
-.kpi:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(56,189,248,0.2)}
 .kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .kpi-icon.blue{background:rgba(59,130,246,0.18);color:#60a5fa}
 .kpi-icon.sky{background:rgba(56,189,248,0.18);color:var(--sky2)}
@@ -284,7 +281,7 @@ input,select,textarea,button{font-family:var(--font)}
   background:rgba(255,255,255,0.04);
   cursor:pointer;transition:all .22s;backdrop-filter:blur(8px);
 }
-.task-item:hover{border-color:rgba(56,189,248,0.3);background:rgba(255,255,255,0.07);transform:translateX(3px)}
+.task-item:hover{border-color:rgba(56,189,248,0.3);background:rgba(255,255,255,0.07)}
 .task-item.done{opacity:.45}
 .task-item.done .t-name{text-decoration:line-through;color:var(--text3)}
 .chk{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.18);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .28s cubic-bezier(.22,.68,0,1.2)}
@@ -420,7 +417,7 @@ input,select,textarea,button{font-family:var(--font)}
   border-radius:var(--radius-sm);padding:10px;text-align:center;
   box-shadow:var(--shadow);backdrop-filter:blur(8px);transition:all .2s;
 }
-.day-summary:hover{border-color:rgba(255,255,255,0.14);transform:translateY(-2px)}
+.day-summary:hover{border-color:rgba(255,255,255,0.14)}
 .day-summary.today-summary{border-color:rgba(56,189,248,0.4);background:rgba(56,189,248,0.08);box-shadow:0 0 14px rgba(56,189,248,0.15)}
 .ds-day{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px}
 .ds-count{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono)}
@@ -436,7 +433,7 @@ input,select,textarea,button{font-family:var(--font)}
 /* ===== HABITS ===== */
 .habits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
 .habit-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);padding:20px;text-align:center;transition:all .25s;position:relative;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
-.habit-card:hover{border-color:rgba(56,189,248,0.3);box-shadow:var(--shadow-md);transform:translateY(-4px)}
+.habit-card:hover{border-color:rgba(56,189,248,0.3);box-shadow:var(--shadow-md)}
 .habit-card.done-today{border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);box-shadow:0 0 18px rgba(16,185,129,0.18)}
 .habit-emoji{font-size:30px;margin-bottom:10px;display:block}
 .habit-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
@@ -456,7 +453,7 @@ input,select,textarea,button{font-family:var(--font)}
 /* ===== GOALS ===== */
 .goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
 .goal-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);padding:22px;position:relative;box-shadow:var(--shadow);backdrop-filter:blur(12px);transition:all .25s}
-.goal-card:hover{border-color:rgba(56,189,248,0.25);box-shadow:var(--shadow-md);transform:translateY(-4px)}
+.goal-card:hover{border-color:rgba(56,189,248,0.25);box-shadow:var(--shadow-md)}
 .goal-badge{font-size:10px;padding:3px 10px;border-radius:8px;font-weight:700;display:inline-block;margin-bottom:10px;letter-spacing:.3px}
 .gc-career{background:rgba(59,130,246,0.2);color:#7ab4ff}
 .gc-health{background:rgba(16,185,129,0.2);color:#5ee3b0}
@@ -493,7 +490,6 @@ input,select,textarea,button{font-family:var(--font)}
 .tag-pill button{background:none;border:none;cursor:pointer;color:var(--sky2);font-size:12px;padding:0}
 .journal-hist{overflow-y:auto;max-height:600px}
 .je{padding:12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);margin-bottom:8px;cursor:pointer;transition:all .18s;backdrop-filter:blur(8px)}
-.je:hover{border-color:rgba(56,189,248,0.3);background:rgba(255,255,255,0.07)}
 .je-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
 .je-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);margin-bottom:4px}
 .je-preview{font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -541,7 +537,7 @@ input,select,textarea,button{font-family:var(--font)}
 /* ===== NOTES ===== */
 .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .note-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .25s;position:relative;min-height:150px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
-.note-card:hover{border-color:rgba(129,140,248,0.35);box-shadow:0 8px 32px rgba(129,140,248,0.15);transform:translateY(-4px)}
+.note-card:hover{border-color:rgba(129,140,248,0.35);box-shadow:0 8px 32px rgba(129,140,248,0.15)}
 .note-title-inp{width:100%;background:transparent;border:none;color:#fff;font-size:14px;font-weight:800;font-family:var(--font);outline:none;padding:0;margin-bottom:8px;letter-spacing:-.3px}
 .note-body-inp{width:100%;background:transparent;border:none;color:var(--text2);font-size:13px;font-family:var(--font);outline:none;resize:none;min-height:80px;padding:0;line-height:1.6}
 .note-date{font-size:10px;color:var(--text3);margin-top:10px;font-family:var(--mono)}
@@ -958,11 +954,12 @@ html[data-theme="light"] .toast {
    ============================================= */
 
 /* ── Shared hover setup for all interactive cards ── */
-.kpi, .card, .fkpi, .habit-card, .goal-card,
+.kpi, .fkpi, .habit-card, .goal-card,
 .task-item, .day-summary, .je, .note-card, .ls-card {
   cursor: pointer;
   will-change: transform;
 }
+.card { will-change: transform; }
 
 /* ── Animated border shimmer on hover ── */
 @keyframes border-spin {
