@@ -654,10 +654,10 @@ function exportData(){
 function initMeta(){
   const h=new Date().getHours();
   const g=h<12?'Good morning ☀️':h<17?'Good afternoon 🌤️':'Good evening 🌙';
-  document.getElementById('sb-greeting').textContent=g;
-  document.getElementById('greeting').textContent=g;
+  
+  
   const ds=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('sb-date').textContent=ds;
+  
   const tdl=document.getElementById('today-date-lbl');if(tdl)tdl.textContent=ds;
   const jd=document.getElementById('j-date-lbl');if(jd)jd.textContent=ds;
 }
@@ -823,3 +823,84 @@ document.addEventListener('click', function(e) {
   card.classList.add('card-clicked');
   setTimeout(() => card.classList.remove('card-clicked'), 600);
 });
+
+// ===== PROFILE PICTURE FEATURE =====
+function triggerProfileUpload(){
+  document.getElementById('profile-upload-input').click();
+}
+function handleProfileUpload(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const allowed=['image/png','image/jpeg'];
+  if(!allowed.includes(file.type)){toast('Only PNG, JPG, JPEG allowed ✕');e.target.value='';return;}
+  if(file.size>2*1024*1024){toast('Image too large! Max 2MB ✕');e.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const b64=ev.target.result;
+    localStorage.setItem('profilePic',b64);
+    applyProfilePic(b64);
+    toast('Profile picture updated ✓');
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+function applyProfilePic(b64){
+  const img=document.getElementById('sb-profile-img');
+  const ini=document.getElementById('sb-profile-initials');
+  if(b64){img.src=b64;img.style.display='block';ini.style.display='none';}
+  else{img.style.display='none';ini.style.display='flex';}
+}
+function editProfileName(){
+  const nameEl=document.getElementById('sb-profile-name');
+  if(!nameEl)return;
+  const current=nameEl.textContent;
+  const input=document.createElement('input');
+  input.type='text';input.value=current;input.className='sb-profile-name-input';
+  input.maxLength=20;
+  nameEl.replaceWith(input);
+  input.focus();input.select();
+  function saveName(){
+    const val=input.value.trim()||current;
+    localStorage.setItem('profileName',val);
+    input.replaceWith(nameEl);
+    nameEl.textContent=val;
+    // Update initials
+    const iniEl=document.getElementById('sb-profile-initials');
+    if(iniEl){
+      const parts=val.trim().split(' ');
+      iniEl.textContent=parts.length>1?(parts[0][0]+parts[1][0]).toUpperCase():val.slice(0,2).toUpperCase();
+    }
+    updateSbGreeting();
+  }
+  input.addEventListener('blur',saveName);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')saveName();if(e.key==='Escape'){input.replaceWith(nameEl);}});
+}
+function updateSbGreeting(){
+  const h=new Date().getHours();
+  const time=h<12?'Good morning ☀️':h<17?'Good afternoon 🌤️':'Good evening 🌙';
+  const name=localStorage.getItem('profileName')||'';
+  const greetEl=document.getElementById('sb-greeting');
+  if(greetEl)greetEl.textContent=name?`${time}, ${name}`:`${time}`;
+  const mainGreet=document.getElementById('greeting');
+  if(mainGreet)mainGreet.textContent=name?`${time}, ${name}`:`${time}`;
+}
+function initProfile(){
+  // Load saved name
+  const savedName=localStorage.getItem('profileName')||'WorkPlanner';
+  const nameEl=document.getElementById('sb-profile-name');
+  if(nameEl)nameEl.textContent=savedName;
+  const iniEl=document.getElementById('sb-profile-initials');
+  if(iniEl){
+    const parts=savedName.trim().split(' ');
+    iniEl.textContent=parts.length>1?(parts[0][0]+parts[1][0]).toUpperCase():savedName.slice(0,2).toUpperCase();
+  }
+  // Load saved picture
+  const savedPic=localStorage.getItem('profilePic');
+  if(savedPic)applyProfilePic(savedPic);
+  // Update greeting with name
+  updateSbGreeting();
+}
+// Run profile init after DOM is ready
+document.addEventListener('DOMContentLoaded', initProfile);
+// Also run immediately in case DOM is already loaded
+if(document.readyState!=='loading') initProfile();
