@@ -25,13 +25,26 @@
     </button>
   </div>
 
-  <div class="sb-user">
-    <div class="sb-avatar">WP</div>
-    <div>
+  <!-- PROFILE PICTURE SECTION -->
+  <div class="sb-profile-section">
+    <div class="sb-profile-pic-wrap" id="sb-profile-pic-wrap" onclick="triggerProfileUpload()" title="Click to change profile picture">
+      <div class="sb-profile-pic" id="sb-profile-pic">
+        <div class="sb-profile-initials" id="sb-profile-initials">WP</div>
+        <img class="sb-profile-img" id="sb-profile-img" src="" alt="Profile" style="display:none"/>
+      </div>
+      <div class="sb-profile-overlay">
+        <i class="ti ti-camera"></i>
+      </div>
+    </div>
+    <div class="sb-profile-info">
       <div class="sb-greeting" id="sb-greeting">Good morning</div>
-      <div class="sb-date" id="sb-date">—</div>
+      <div class="sb-profile-name-wrap">
+        <span class="sb-profile-name" id="sb-profile-name" ondblclick="editProfileName()" title="Double-click to edit name">WorkPlanner</span>
+        <i class="ti ti-pencil sb-name-edit-icon" onclick="editProfileName()"></i>
+      </div>
     </div>
   </div>
+  <input type="file" id="profile-upload-input" accept=".png,.jpg,.jpeg" style="display:none" onchange="handleProfileUpload(event)"/>
 
   <div class="sb-ring-wrap">
     <svg width="72" height="72" viewBox="0 0 72 72">
