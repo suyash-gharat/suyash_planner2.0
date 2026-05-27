@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>WorkLife Planner Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@400;600&family=Dancing+Script:wght@400;600&family=Patrick+Hand&family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
@@ -98,6 +98,7 @@
     </div>
 
     <a class="sb-link" data-view="today"><i class="ti ti-sun"></i>Today's Tasks</a>
+    <a class="sb-link" data-view="notebook"><i class="ti ti-notebook"></i>Notebook</a>
 
     <div class="sb-sec">Planner</div>
     <a class="sb-link" data-view="tasks"><i class="ti ti-list-check"></i>All Tasks</a>
@@ -427,6 +428,195 @@
   <div class="card" style="margin-top:16px">
     <div class="card-title" style="margin-bottom:16px"><i class="ti ti-award"></i> Life Score</div>
     <div class="life-score-grid" id="life-score"></div>
+  </div>
+</section>
+
+<!-- ===== NOTEBOOK ===== -->
+<section id="view-notebook" class="view">
+  <div class="nb-layout">
+
+    <!-- LEFT: Chapter list -->
+    <aside class="nb-chapters" id="nb-chapters">
+      <div class="nb-chapters-top">
+        <button class="nb-new-chapter-btn" onclick="nbNewChapter()">
+          <i class="ti ti-plus"></i> New Chapter
+        </button>
+      </div>
+      <div class="nb-chapter-list" id="nb-chapter-list"></div>
+      <div class="nb-page-style-switcher">
+        <span class="nb-style-label">Page style</span>
+        <div class="nb-style-btns" id="nb-style-btns">
+          <button class="nb-style-btn active" data-style="blank" onclick="nbSetPageStyle('blank',this)">Blank</button>
+          <button class="nb-style-btn" data-style="lined" onclick="nbSetPageStyle('lined',this)">Lined</button>
+          <button class="nb-style-btn" data-style="dot" onclick="nbSetPageStyle('dot',this)">Dot Grid</button>
+          <button class="nb-style-btn" data-style="grid" onclick="nbSetPageStyle('grid',this)">Grid</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Editor -->
+    <div class="nb-editor-wrap" id="nb-editor-wrap">
+
+      <!-- Toolbar -->
+      <div class="nb-toolbar" id="nb-toolbar">
+        <!-- Row 1: Formatting -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn" onclick="nbExec('bold')" title="Bold"><i class="ti ti-bold"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('italic')" title="Italic"><i class="ti ti-italic"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('underline')" title="Underline"><i class="ti ti-underline"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('strikeThrough')" title="Strikethrough"><i class="ti ti-strikethrough"></i></button>
+          <div class="nb-tb-divider"></div>
+          <select class="nb-font-select" id="nb-font-select" onchange="nbSetFont(this.value)" title="Font family">
+            <option value="default">Default</option>
+            <option value="Caveat">Handwritten</option>
+            <option value="Dancing Script">Elegant</option>
+            <option value="Patrick Hand">Casual</option>
+            <option value="JetBrains Mono">Monospace</option>
+            <option value="Lora">Serif</option>
+            <option value="Playfair Display">Editorial</option>
+            <option value="Nunito">Rounded</option>
+            <option value="DM Sans">Modern</option>
+            <option value="Libre Baskerville">Newspaper</option>
+          </select>
+          <select class="nb-size-select" id="nb-size-select" onchange="nbSetSize(this.value)" title="Font size">
+            <option value="12">12</option>
+            <option value="14" selected>14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="28">28</option>
+            <option value="32">32</option>
+            <option value="48">48</option>
+          </select>
+          <div class="nb-tb-divider"></div>
+          <label class="nb-color-btn" title="Text color">
+            <i class="ti ti-typography"></i>
+            <input type="color" id="nb-text-color" onchange="nbExec('foreColor',this.value)" style="opacity:0;width:0;height:0;position:absolute"/>
+          </label>
+          <label class="nb-color-btn" title="Highlight color">
+            <i class="ti ti-palette"></i>
+            <input type="color" id="nb-hl-color" value="#fef08a" onchange="nbExec('hiliteColor',this.value)" style="opacity:0;width:0;height:0;position:absolute"/>
+          </label>
+          <div class="nb-tb-divider"></div>
+          <div class="nb-save-indicator" id="nb-save-indicator"></div>
+        </div>
+        <!-- Row 2: Structure -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h1')" title="Heading 1"><i class="ti ti-h-1"></i></button>
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h2')" title="Heading 2"><i class="ti ti-h-2"></i></button>
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h3')" title="Heading 3"><i class="ti ti-h-3"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbExec('insertUnorderedList')" title="Bullet list"><i class="ti ti-list"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('insertOrderedList')" title="Numbered list"><i class="ti ti-list-numbers"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertChecklist()" title="Checklist"><i class="ti ti-checkbox"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbInsertBlock('blockquote')" title="Blockquote"><i class="ti ti-quote"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertCode()" title="Code"><i class="ti ti-code"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertDivider()" title="Divider">—</button>
+        </div>
+        <!-- Row 3: Insert -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn" onclick="nbInsertLink()" title="Insert link"><i class="ti ti-link"></i></button>
+          <label class="nb-tb-btn" title="Insert image">
+            <i class="ti ti-photo"></i>
+            <input type="file" accept="image/*" id="nb-img-upload" onchange="nbInsertImage(event)" style="display:none"/>
+          </label>
+          <button class="nb-tb-btn" onclick="nbToggleEmojiPicker()" title="Emoji"><i class="ti ti-mood-smile"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertSticker()" title="Sticker"><i class="ti ti-tag"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbExec('removeFormat')" title="Clear formatting"><i class="ti ti-eraser"></i></button>
+        </div>
+      </div>
+
+      <!-- Emoji picker popup -->
+      <div class="nb-emoji-picker" id="nb-emoji-picker" style="display:none">
+        <div class="nb-emoji-cats" id="nb-emoji-cats"></div>
+        <div class="nb-emoji-grid" id="nb-emoji-grid"></div>
+      </div>
+
+      <!-- Page / editor -->
+      <div class="nb-page-wrap" id="nb-page-wrap">
+        <!-- Empty state -->
+        <div class="nb-empty-state" id="nb-empty-state">
+          <div class="nb-empty-icon">📓</div>
+          <h2 class="nb-empty-title">Your notebook is empty</h2>
+          <p class="nb-empty-sub">Create your first chapter to start writing, planning, or brainstorming.</p>
+          <button class="btn-primary" onclick="nbNewChapter()"><i class="ti ti-plus"></i> Create first chapter</button>
+        </div>
+        <!-- Editor page -->
+        <div class="nb-page" id="nb-page" style="display:none">
+          <div class="nb-page-title-row">
+            <span class="nb-chapter-emoji" id="nb-chapter-emoji" onclick="nbOpenEmojiCover()">📄</span>
+            <input class="nb-chapter-title-input" id="nb-chapter-title-input" placeholder="Chapter title…" oninput="nbDebounceSave()"/>
+          </div>
+          <div class="nb-editor"
+               id="nb-editor"
+               contenteditable="true"
+               spellcheck="true"
+               data-placeholder="Start writing, sketching ideas, or paste a link…"
+               oninput="nbDebounceSave()"
+               onkeydown="nbHandleKey(event)"
+               onclick="nbHandleChecklistClick(event)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Emoji cover picker modal -->
+      <div class="nb-cover-picker" id="nb-cover-picker" style="display:none">
+        <div class="nb-cover-picker-inner">
+          <div class="nb-cover-picker-header">
+            <span>Choose chapter emoji</span>
+            <button onclick="document.getElementById('nb-cover-picker').style.display='none'"><i class="ti ti-x"></i></button>
+          </div>
+          <div class="nb-cover-emoji-grid" id="nb-cover-emoji-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Metadata panel -->
+    <aside class="nb-meta" id="nb-meta">
+      <div class="nb-meta-section">
+        <div class="nb-meta-label">Chapter color</div>
+        <div class="nb-color-tags" id="nb-color-tags">
+          <button class="nb-ct-btn" data-color="#0ea5e9" onclick="nbSetColor('#0ea5e9',this)" style="background:#0ea5e9"></button>
+          <button class="nb-ct-btn" data-color="#818cf8" onclick="nbSetColor('#818cf8',this)" style="background:#818cf8"></button>
+          <button class="nb-ct-btn" data-color="#10b981" onclick="nbSetColor('#10b981',this)" style="background:#10b981"></button>
+          <button class="nb-ct-btn" data-color="#f59e0b" onclick="nbSetColor('#f59e0b',this)" style="background:#f59e0b"></button>
+          <button class="nb-ct-btn" data-color="#f43f5e" onclick="nbSetColor('#f43f5e',this)" style="background:#f43f5e"></button>
+          <button class="nb-ct-btn" data-color="#a855f7" onclick="nbSetColor('#a855f7',this)" style="background:#a855f7"></button>
+        </div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-chart-bar"></i> Stats</div>
+        <div class="nb-stats">
+          <div class="nb-stat"><span id="nb-word-count">0</span><span class="nb-stat-lbl">words</span></div>
+          <div class="nb-stat"><span id="nb-read-time">0 min</span><span class="nb-stat-lbl">read</span></div>
+          <div class="nb-stat"><span id="nb-char-count">0</span><span class="nb-stat-lbl">chars</span></div>
+        </div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-tag"></i> Tags</div>
+        <input class="nb-tags-input" id="nb-tags-input" placeholder="Add tag + Enter…" onkeydown="nbAddTag(event)"/>
+        <div class="nb-tags-list" id="nb-tags-list"></div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-info-circle"></i> Info</div>
+        <div class="nb-info-row"><span>Created</span><span id="nb-created-at">—</span></div>
+        <div class="nb-info-row"><span>Updated</span><span id="nb-updated-at">—</span></div>
+      </div>
+      <div class="nb-meta-section">
+        <button class="btn-outline" style="width:100%;font-size:12px" onclick="nbShareChapter()">
+          <i class="ti ti-share"></i> Copy as text
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile chapters button -->
+    <button class="nb-mob-chapters-btn" id="nb-mob-chapters-btn" onclick="nbToggleMobileChapters()">
+      <i class="ti ti-layout-sidebar"></i> Chapters
+    </button>
   </div>
 </section>
 
