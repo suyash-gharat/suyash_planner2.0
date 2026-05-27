@@ -86,7 +86,7 @@ function switchView(name){
   if(name==='health')    renderHealth();
   if(name==='notes')     renderNotes();
   if(name==='analytics') renderAnalytics();
-  if(name==='dashboard') (window.renderDashboard||renderDashboard)();
+  if(name==='dashboard') renderDashboard();
 }
 document.querySelectorAll('.sb-link').forEach(el=>{
   el.addEventListener('click',e=>{e.preventDefault();switchView(el.dataset.view);});
@@ -155,24 +155,23 @@ function buildGridTable(theadId, tbodyId, rows, dates, todayS, isDaily){
       const show=isDaily || row.days.includes(i);
       const key=`${row.id}_${ds}`;
       const checked=gridChecks[key]||false;
-      if(!show) return `<td class="check-cell${isToday?' today-check':''}"><span style="color:#e2e8f0;font-size:11px">—</span></td>`;
+      if(!show) return `<td class="check-cell${isToday?' today-check':''}"><span class="grid-na-dash">—</span></td>`;
       return `<td class="check-cell${isToday?' today-check':''}" onclick="toggleGrid(${row.id},'${ds}')">
         <div class="grid-chk${checked?' checked':''}" id="gc_${row.id}_${ds.replace(/-/g,'_')}">
           <i class="ti ti-check"></i>
         </div>
       </td>`;
     }).join('');
-    const catColor={work:'rgba(59,130,246,0.25)',personal:'rgba(245,158,11,0.25)',health:'rgba(16,185,129,0.25)',admin:'rgba(129,140,248,0.25)',team:'rgba(236,72,153,0.25)'}[row.cat]||'rgba(255,255,255,0.12)';
-    const catTxt={work:'#7ab4ff',personal:'#fcd07a',health:'#4ade80',admin:'#c4b5fd',team:'#f9a8d4'}[row.cat]||'#e8f0fe';
+    const catCls = 'cat-badge-'+(row.cat||'work');
     return `<tr>
       <td class="task-name-cell">
         <span class="row-icon">📋</span>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-            <div style="font-size:13px;font-weight:700;color:#e8f0fe;line-height:1.3">${esc(row.name)}</div>
-            <span style="font-size:10px;padding:1px 7px;border-radius:6px;font-weight:700;background:${catColor};color:${catTxt};white-space:nowrap;flex-shrink:0">${row.cat}</span>
+            <div class="grid-task-name" style="font-size:13px;font-weight:700;line-height:1.3">${esc(row.name)}</div>
+            <span class="${catCls}" style="font-size:10px;padding:2px 9px;border-radius:6px;font-weight:700;white-space:nowrap;flex-shrink:0">${row.cat}</span>
           </div>
-          ${row.note?`<div class="row-note" style="color:#a8bbd4;"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
+          ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
           <button class="row-edit" onclick="openEditFixedTask(${row.id})" title="Edit"><i class="ti ti-edit"></i></button>
@@ -685,7 +684,7 @@ function midnightReset(){
 initMeta();
 startTimer();
 midnightReset();
-(window.renderDashboard||renderDashboard)();
+renderDashboard();
 renderToday();
 
 // ===== EDIT FIXED TASK =====
@@ -748,7 +747,6 @@ function animateCountUp(el, target, duration) {
   const isDash = target === '—';
   if (isDash) return;
   const num = parseInt(target) || 0;
-  if (!num && target !== '0' && target !== '0%') { el.textContent = target; return; }
   const start = performance.now();
   function step(now) {
     const p = Math.min((now - start) / duration, 1);
@@ -783,6 +781,8 @@ function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('wlp-theme', theme);
   // swap visible icon
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.setAttribute('data-theme', theme);
 }
 
 function toggleTheme() {
@@ -798,11 +798,8 @@ function toggleTheme() {
 
 // ===== PREMIUM CARD CLICK EFFECTS =====
 document.addEventListener('click', function(e) {
-  // Don't fire on interactive controls inside cards
-  if (e.target.closest('button,input,select,textarea,a,.del-btn,.row-del,.row-edit,.habit-del,.goal-del,.note-del,.mood-btn')) return;
-
   const card = e.target.closest(
-    '.kpi, .fkpi, .habit-card, .goal-card, .day-summary, .je, .note-card, .ls-card'
+    '.kpi, .card, .fkpi, .habit-card, .goal-card, .day-summary, .je, .note-card, .ls-card'
   );
   if (!card) return;
 
