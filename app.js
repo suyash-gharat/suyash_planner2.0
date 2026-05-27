@@ -921,3 +921,368 @@ function initProfile(){
 }
 document.addEventListener('DOMContentLoaded', initProfile);
 if(document.readyState!=='loading') initProfile();
+
+// ===== TEAMMATE / MEMBER PLANNER =====
+let teammates = load('teammates', []); // [{id,name,role,color}]
+let memberFixedTasks = load('memberFixedTasks', {}); // {memberId: [{...}]}
+let memberGridChecks = load('memberGridChecks', {}); // {memberId: {taskId_date: bool}}
+let activeMemberId = 'main'; // 'main' or teammate id
+let tmSelectedColor = '#0ea5e9';
+
+const MEMBER_COLORS = ['#0ea5e9','#818cf8','#10b981','#f59e0b','#f43f5e'];
+
+function getInitialsFromName(name){
+  const p=name.trim().split(/\s+/);
+  return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():name.slice(0,2).toUpperCase();
+}
+
+// --- Sidebar group toggle ---
+function toggleWeeklyGroup(e){
+  e.preventDefault();
+  const children=document.getElementById('sb-weekly-children');
+  const toggle=document.querySelector('.sb-group-toggle');
+  const chevron=document.getElementById('sb-weekly-chevron');
+  const isOpen=children.classList.contains('open');
+  if(isOpen){
+    children.classList.remove('open');
+    toggle.classList.remove('group-open');
+  } else {
+    children.classList.add('open');
+    toggle.classList.add('group-open');
+  }
+}
+
+// --- Render teammate sidebar links ---
+function renderTeammateLinks(){
+  const container=document.getElementById('sb-teammate-links');
+  if(!container)return;
+  // Update main user link name
+  const mainName=localStorage.getItem('profileName')||'My Planner';
+  const mainLink=document.getElementById('sb-main-child-name');
+  if(mainLink)mainLink.textContent=mainName;
+
+  container.innerHTML=teammates.map(tm=>`
+    <a class="sb-child-link${activeMemberId===tm.id?' active-child':''}" id="sb-child-${tm.id}" onclick="switchMemberView('${tm.id}',event)">
+      <span class="sb-child-dot" style="background:${tm.color};box-shadow:0 0 6px ${tm.color}88"></span>
+      <span class="sb-child-name">${esc(tm.name)}</span>
+      <button class="sb-child-remove" onclick="removeTeammate('${tm.id}',event)" title="Remove teammate"><i class="ti ti-x"></i></button>
+    </a>
+  `).join('');
+
+  // Show/hide add button (max 5 teammates)
+  const addBtn=document.getElementById('sb-add-teammate-btn');
+  if(addBtn)addBtn.style.display=teammates.length>=5?'none':'flex';
+}
+
+// --- Switch active member view ---
+function switchMemberView(memberId, e){
+  if(e)e.preventDefault();
+  activeMemberId=memberId;
+
+  // Update active-child highlight
+  document.querySelectorAll('.sb-child-link').forEach(l=>l.classList.remove('active-child'));
+  const target = memberId==='main'
+    ? document.getElementById('sb-main-user-link')
+    : document.getElementById('sb-child-'+memberId);
+  if(target)target.classList.add('active-child');
+
+  // Update member context bar
+  updateMemberContextBar();
+
+  // Switch to weekly view and re-render
+  switchView('weekly');
+}
+
+function updateMemberContextBar(){
+  const avEl=document.getElementById('mcb-avatar');
+  const labelEl=document.getElementById('mcb-label');
+  const subEl=document.getElementById('mcb-sub');
+  const actionsEl=document.getElementById('mcb-actions');
+
+  if(activeMemberId==='main'){
+    const name=localStorage.getItem('profileName')||'My Planner';
+    if(avEl){
+      avEl.textContent=getInitialsFromName(name);
+      avEl.style.background='';
+      avEl.className='mcb-avatar';
+      // Try to show profile pic
+      const pic=localStorage.getItem('profilePic');
+      if(pic){
+        avEl.innerHTML=`<img src="${pic}" style="width:44px;height:44px;object-fit:cover;border-radius:50%"/>`;
+      }
+    }
+    if(labelEl)labelEl.textContent=name+"'s Planner";
+    if(subEl)subEl.textContent='Your personal weekly & daily task grid';
+    if(actionsEl)actionsEl.innerHTML='';
+  } else {
+    const tm=teammates.find(t=>t.id===activeMemberId);
+    if(!tm)return;
+    if(avEl){
+      avEl.innerHTML=getInitialsFromName(tm.name);
+      avEl.style.cssText=`background:${tm.color};box-shadow:0 4px 14px ${tm.color}55;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;`;
+    }
+    if(labelEl)labelEl.textContent=tm.name+"'s Planner";
+    if(subEl)subEl.textContent=(tm.role?tm.role+' · ':'')+'Weekly & daily task grid';
+    if(actionsEl)actionsEl.innerHTML=`
+      <button class="btn-outline" style="font-size:11px;padding:5px 12px" onclick="openModal('fixed-task-modal')">
+        <i class="ti ti-plus"></i> Add task
+      </button>`;
+  }
+}
+
+// --- Get active member's data ---
+function getActiveTasks(){
+  if(activeMemberId==='main') return fixedTasks;
+  if(!memberFixedTasks[activeMemberId]) memberFixedTasks[activeMemberId]=[];
+  return memberFixedTasks[activeMemberId];
+}
+function getActiveChecks(){
+  if(activeMemberId==='main') return gridChecks;
+  if(!memberGridChecks[activeMemberId]) memberGridChecks[activeMemberId]={};
+  return memberGridChecks[activeMemberId];
+}
+function saveActiveData(){
+  if(activeMemberId==='main'){
+    save('fixedTasks',fixedTasks);
+  } else {
+    save('memberFixedTasks',memberFixedTasks);
+  }
+}
+function saveActiveChecks(){
+  if(activeMemberId==='main'){
+    save('gridChecks',gridChecks);
+  } else {
+    save('memberGridChecks',memberGridChecks);
+  }
+}
+
+// --- Add teammate ---
+function openAddTeammate(){
+  if(teammates.length>=5){toast('Maximum 5 teammates allowed');return;}
+  tmSelectedColor='#0ea5e9';
+  document.querySelectorAll('.tm-color-btn').forEach(b=>{
+    b.classList.toggle('selected',b.dataset.color==='#0ea5e9');
+  });
+  document.getElementById('tm-name').value='';
+  document.getElementById('tm-role').value='';
+  openModal('add-teammate-modal');
+}
+function selectTmColor(color, btn){
+  tmSelectedColor=color;
+  document.querySelectorAll('.tm-color-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function addTeammate(){
+  const name=document.getElementById('tm-name').value.trim();
+  if(!name){toast('Enter teammate name');return;}
+  if(teammates.length>=5){toast('Maximum 5 teammates allowed');return;}
+  const tm={id:'tm_'+Date.now(),name,role:document.getElementById('tm-role').value.trim(),color:tmSelectedColor};
+  teammates.push(tm);
+  memberFixedTasks[tm.id]=[];
+  memberGridChecks[tm.id]={};
+  save('teammates',teammates);
+  save('memberFixedTasks',memberFixedTasks);
+  save('memberGridChecks',memberGridChecks);
+  closeModal('add-teammate-modal');
+  renderTeammateLinks();
+  toast(`${name} added as teammate ✓`);
+}
+function removeTeammate(id, e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  const tm=teammates.find(t=>t.id===id);
+  if(!tm)return;
+  if(!confirm(`Remove ${tm.name} from teammates? Their tasks will be deleted.`))return;
+  teammates=teammates.filter(t=>t.id!==id);
+  delete memberFixedTasks[id];
+  delete memberGridChecks[id];
+  save('teammates',teammates);
+  save('memberFixedTasks',memberFixedTasks);
+  save('memberGridChecks',memberGridChecks);
+  if(activeMemberId===id){ activeMemberId='main'; }
+  renderTeammateLinks();
+  if(document.getElementById('view-weekly').classList.contains('active')){
+    updateMemberContextBar();
+    renderWeeklyGrid();
+  }
+  toast(`${tm.name} removed`);
+}
+
+// --- Patch renderWeeklyGrid to use active member data ---
+const _origRenderWeeklyGrid = renderWeeklyGrid;
+renderWeeklyGrid = function(){
+  const dates=getWeekDates(weekOffset);
+  const todayS=todayStr();
+  const wl=document.getElementById('week-nav-label');
+  if(wl)wl.textContent=`📅 Week of ${dates[0].toLocaleDateString('en-IN',{day:'numeric',month:'long'})} – ${dates[6].toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}`;
+  const tasks=getActiveTasks();
+  const checks=getActiveChecks();
+  buildGridTableForMember('daily-thead','daily-tbody', tasks.filter(t=>t.type==='daily'), dates, todayS, true, checks);
+  buildGridTableForMember('weekly-thead2','weekly-tbody', tasks.filter(t=>t.type==='weekly'), dates, todayS, false, checks);
+  renderWeekSummary(dates, todayS);
+  updateMemberContextBar();
+};
+
+function buildGridTableForMember(theadId, tbodyId, rows, dates, todayS, isDaily, checks){
+  const thead=document.getElementById(theadId);
+  const tbody=document.getElementById(tbodyId);
+  if(!thead||!tbody)return;
+  const DAY_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  thead.innerHTML=`<tr>
+    <th class="task-col"><i class="ti ti-list" style="margin-right:6px;color:rgba(255,255,255,.6)"></i>Task</th>
+    ${dates.map((d,i)=>{
+      const ds=d.toISOString().slice(0,10);
+      const isToday=ds===todayS;
+      return `<th class="${isToday?'today-col':''}">${DAY_SHORT[i]}<br><span style="font-size:9px;font-weight:400;opacity:.7">${d.getDate()}/${d.getMonth()+1}</span></th>`;
+    }).join('')}
+    <th style="width:40px"></th>
+  </tr>`;
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="9" style="padding:28px;text-align:center;color:#94a3b8;font-size:13px"><i class="ti ti-plus-square" style="margin-right:6px"></i>No tasks yet — click "Add task row" to add one.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=rows.map(row=>{
+    const cells=dates.map((d,i)=>{
+      const ds=d.toISOString().slice(0,10);
+      const isToday=ds===todayS;
+      const show=isDaily||row.days.includes(i);
+      const key=`${row.id}_${ds}`;
+      const checked=checks[key]||false;
+      if(!show) return `<td class="check-cell${isToday?' today-check':''}"><span class="grid-na-dash">—</span></td>`;
+      return `<td class="check-cell${isToday?' today-check':''}" onclick="toggleGridMember(${row.id},'${ds}')">
+        <div class="grid-chk${checked?' checked':''}" id="gc_${row.id}_${ds.replace(/-/g,'_')}">
+          <i class="ti ti-check"></i>
+        </div>
+      </td>`;
+    }).join('');
+    const catCls='cat-badge-'+(row.cat||'work');
+    return `<tr>
+      <td class="task-name-cell">
+        <span class="row-icon">📋</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <div class="grid-task-name" style="font-size:13px;font-weight:700;line-height:1.3">${esc(row.name)}</div>
+            <span class="${catCls}" style="font-size:10px;padding:2px 9px;border-radius:6px;font-weight:700;white-space:nowrap;flex-shrink:0">${row.cat}</span>
+          </div>
+          ${row.note?`<div class="row-note"><i class="ti ti-notes" style="font-size:10px;margin-right:3px"></i>${esc(row.note)}</div>`:''}
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="row-edit" onclick="openEditFixedTask(${row.id})" title="Edit"><i class="ti ti-edit"></i></button>
+          <button class="row-del" onclick="deleteMemberTask(${row.id})" title="Remove"><i class="ti ti-trash"></i></button>
+        </div>
+      </td>
+      ${cells}
+      <td></td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleGridMember(taskId, dateStr){
+  const checks=getActiveChecks();
+  const key=`${taskId}_${dateStr}`;
+  checks[key]=!checks[key];
+  saveActiveChecks();
+  const el=document.getElementById(`gc_${taskId}_${dateStr.replace(/-/g,'_')}`);
+  if(el){
+    if(checks[key])el.classList.add('checked');
+    else el.classList.remove('checked');
+  }
+  renderWeekSummary(getWeekDates(weekOffset),todayStr());
+  if(activeMemberId==='main')updateSbRing();
+  toast(checks[key]?'Task checked ✓':'Task unchecked');
+}
+
+function deleteMemberTask(id){
+  if(activeMemberId==='main'){
+    fixedTasks=fixedTasks.filter(x=>x.id!==id);
+    save('fixedTasks',fixedTasks);
+  } else {
+    if(!memberFixedTasks[activeMemberId]) return;
+    memberFixedTasks[activeMemberId]=memberFixedTasks[activeMemberId].filter(x=>x.id!==id);
+    save('memberFixedTasks',memberFixedTasks);
+  }
+  renderWeeklyGrid();
+}
+
+// Patch addFixedTask to save to active member
+const _origAddFixedTask = typeof addFixedTask === 'function' ? addFixedTask : null;
+function addFixedTask(){
+  const name=document.getElementById('m-ft-name').value.trim();
+  if(!name){toast('Enter task name');return;}
+  const type=document.getElementById('m-ft-type').value;
+  const days=type==='weekly'
+    ?Array.from(document.querySelectorAll('#day-checks input:checked')).map(i=>parseInt(i.value))
+    :[];
+  const newTask={id:uid(),name,cat:document.getElementById('m-ft-cat').value,type,days};
+  if(activeMemberId==='main'){
+    fixedTasks.push(newTask);
+    save('fixedTasks',fixedTasks);
+  } else {
+    if(!memberFixedTasks[activeMemberId]) memberFixedTasks[activeMemberId]=[];
+    memberFixedTasks[activeMemberId].push(newTask);
+    save('memberFixedTasks',memberFixedTasks);
+  }
+  closeModal('fixed-task-modal');
+  document.getElementById('m-ft-name').value='';
+  toast('Task added ✓');
+  renderWeeklyGrid();
+}
+
+// Patch openEditFixedTask / saveEditFixedTask for members
+const _origOpenEdit = openEditFixedTask;
+openEditFixedTask = function(id){
+  const tasks=getActiveTasks();
+  const row=tasks.find(x=>x.id===id);
+  if(!row)return;
+  document.getElementById('ef-id').value=id;
+  document.getElementById('ef-name').value=row.name;
+  document.getElementById('ef-cat').value=row.cat||'work';
+  document.getElementById('ef-note').value=row.note||'';
+  const typeEl=document.getElementById('ef-type');
+  typeEl.value=row.type||'daily';
+  const picker=document.getElementById('ef-day-picker');
+  picker.style.display=row.type==='weekly'?'block':'none';
+  document.querySelectorAll('#ef-day-checks input').forEach(cb=>{
+    cb.checked=(row.days||[]).includes(parseInt(cb.value));
+  });
+  openModal('edit-fixed-modal');
+};
+
+const _origSaveEdit = saveEditFixedTask;
+saveEditFixedTask = function(){
+  const id=parseInt(document.getElementById('ef-id').value);
+  const name=document.getElementById('ef-name').value.trim();
+  if(!name){toast('Enter task name');return;}
+  const type=document.getElementById('ef-type').value;
+  const days=type==='weekly'
+    ?Array.from(document.querySelectorAll('#ef-day-checks input:checked')).map(i=>parseInt(i.value))
+    :[];
+  const tasks=getActiveTasks();
+  const row=tasks.find(x=>x.id===id);
+  if(!row){toast('Task not found');return;}
+  row.name=name;
+  row.cat=document.getElementById('ef-cat').value;
+  row.type=type;
+  row.days=days;
+  row.note=document.getElementById('ef-note').value.trim();
+  saveActiveData();
+  closeModal('edit-fixed-modal');
+  renderWeeklyGrid();
+  toast('Task updated ✓');
+};
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function(){
+  renderTeammateLinks();
+  // Auto-open the weekly group if on weekly view
+  const children=document.getElementById('sb-weekly-children');
+  const toggle=document.querySelector('.sb-group-toggle');
+  if(children){ children.classList.add('open'); }
+  if(toggle){ toggle.classList.add('group-open'); }
+});
+if(document.readyState!=='loading'){
+  renderTeammateLinks();
+  const children=document.getElementById('sb-weekly-children');
+  const toggle=document.querySelector('.sb-group-toggle');
+  if(children) children.classList.add('open');
+  if(toggle) toggle.classList.add('group-open');
+}
