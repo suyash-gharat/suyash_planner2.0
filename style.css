@@ -109,77 +109,122 @@ input,select,textarea,button{font-family:var(--font)}
 .sb-tagline{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.8px;text-transform:uppercase}
 
 /* ===== PROFILE SECTION ===== */
+/* ===== PROFILE SECTION ===== */
 .sb-profile-section{
   display:flex;flex-direction:column;align-items:center;
-  padding:10px 6px 16px;
-  border-bottom:1px solid rgba(56,189,248,0.1);
-  margin-bottom:6px;gap:10px;
+  padding:14px 8px 18px;
+  border-bottom:1px solid rgba(56,189,248,0.12);
+  margin-bottom:4px;gap:11px;
 }
+
+/* --- Photo ring & wrap --- */
 .sb-profile-pic-wrap{
-  position:relative;width:82px;height:82px;
+  position:relative;width:100px;height:100px;
   cursor:pointer;flex-shrink:0;
 }
+/* Outer glow ring */
+.sb-profile-pic-wrap::before{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(var(--sky) 0deg,var(--violet) 120deg,var(--sky2) 240deg,var(--sky) 360deg);
+  animation:spin-ring 6s linear infinite;opacity:.7;
+  z-index:0;
+}
+@keyframes spin-ring{to{transform:rotate(360deg)}}
+.sb-profile-pic-wrap::after{
+  content:'';position:absolute;inset:-2px;border-radius:50%;
+  background:var(--bg);z-index:1;
+}
 .sb-profile-pic{
-  width:82px;height:82px;border-radius:50%;
+  position:relative;z-index:2;
+  width:100px;height:100px;border-radius:50%;
   background:linear-gradient(135deg,var(--navy3) 0%,var(--violet) 60%,var(--sky) 100%);
-  border:3px solid var(--sky);
-  box-shadow:0 0 0 3px rgba(56,189,248,0.3),0 8px 28px rgba(56,189,248,0.25);
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;transition:box-shadow .3s,transform .3s;
-  position:relative;
+  overflow:hidden;transition:transform .3s;
 }
-.sb-profile-pic-wrap:hover .sb-profile-pic{
-  box-shadow:0 0 0 3px rgba(56,189,248,0.6),0 12px 36px rgba(56,189,248,0.45);
-  transform:scale(1.04);
-}
+.sb-profile-pic-wrap:hover .sb-profile-pic{transform:scale(1.04)}
 .sb-profile-initials{
-  font-size:22px;font-weight:800;color:var(--sky2);
+  font-size:28px;font-weight:800;color:var(--sky2);
   letter-spacing:-1px;line-height:1;user-select:none;
-  text-shadow:0 2px 8px rgba(56,189,248,0.5);
+  text-shadow:0 2px 12px rgba(56,189,248,0.6);
 }
 .sb-profile-img{
-  width:100%;height:100%;object-fit:cover;
-  border-radius:50%;
+  width:100%;height:100%;object-fit:cover;border-radius:50%;
 }
 .sb-profile-overlay{
-  position:absolute;inset:0;border-radius:50%;
-  background:rgba(5,13,28,0.72);backdrop-filter:blur(3px);
-  display:flex;align-items:center;justify-content:center;
+  position:absolute;inset:0;border-radius:50%;z-index:3;
+  background:rgba(5,13,28,0.75);backdrop-filter:blur(3px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   opacity:0;transition:opacity .25s;
 }
-.sb-profile-overlay i{font-size:22px;color:var(--sky2)}
+.sb-profile-overlay i{font-size:20px;color:#fff}
+.sb-overlay-txt{font-size:9px;color:rgba(255,255,255,.8);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
 .sb-profile-pic-wrap:hover .sb-profile-overlay{opacity:1}
 
+/* --- Info block below photo --- */
 .sb-profile-info{
-  display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;
 }
-.sb-greeting{font-size:13px;font-weight:700;color:#fff;text-align:center}
-.sb-profile-name-wrap{
-  display:flex;align-items:center;gap:5px;
+.sb-greeting{
+  font-size:12.5px;font-weight:600;color:rgba(255,255,255,.7);
+  text-align:center;letter-spacing:.1px;line-height:1.5;
 }
-.sb-profile-name{
-  font-size:11px;color:var(--sky2);font-weight:600;
-  cursor:pointer;letter-spacing:.2px;
-  border-bottom:1px dashed rgba(56,189,248,0.3);
-  transition:color .2s,border-color .2s;
-}
-.sb-profile-name:hover{color:#fff;border-color:rgba(56,189,248,0.6)}
-.sb-name-edit-icon{font-size:10px;color:rgba(56,189,248,0.45);cursor:pointer;transition:color .2s}
-.sb-name-edit-icon:hover{color:var(--sky2)}
-.sb-profile-name-input{
-  font-size:11px;font-weight:600;color:var(--sky2);
-  background:rgba(56,189,248,0.1);border:1px solid var(--sky2);
-  border-radius:5px;padding:2px 8px;outline:none;
-  text-align:center;max-width:120px;font-family:var(--font);
+.sb-greeting strong{
+  display:block;font-size:15px;font-weight:800;color:#fff;
+  letter-spacing:-.3px;margin-top:1px;
 }
 
-/* Light theme profile */
-html[data-theme="light"] .sb-profile-pic{
-  box-shadow:0 0 0 3px rgba(14,165,233,0.35),0 8px 28px rgba(14,165,233,0.25);
+/* Edit name button — subtle, professional */
+.sb-edit-name-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;border-radius:20px;
+  background:rgba(56,189,248,0.08);
+  border:1px solid rgba(56,189,248,0.2);
+  color:var(--sky2);font-size:10.5px;font-weight:600;
+  cursor:pointer;transition:all .2s;font-family:var(--font);
+  letter-spacing:.3px;
 }
-html[data-theme="light"] .sb-profile-name{color:#0ea5e9}
-html[data-theme="light"] .sb-profile-name:hover{color:#0f1f4b}
-html[data-theme="light"] .sb-greeting{color:#fff}
+.sb-edit-name-btn i{font-size:11px}
+.sb-edit-name-btn:hover{background:rgba(56,189,248,0.16);border-color:var(--sky2);color:#fff}
+
+/* Name edit panel */
+.sb-name-edit-panel{
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:7px;
+  animation:fadeSlideIn .2s ease both;
+}
+.sb-profile-name-input{
+  width:100%;padding:7px 12px;
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid var(--sky2);border-radius:8px;
+  color:#fff;font-size:13px;font-weight:600;
+  outline:none;text-align:center;font-family:var(--font);
+  box-shadow:0 0 0 3px rgba(56,189,248,0.12);
+}
+.sb-name-edit-actions{display:flex;gap:6px;width:100%}
+.sb-save-btn{
+  flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:7px 0;border-radius:8px;
+  background:var(--grad-sky);border:none;
+  color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;font-family:var(--font);
+  box-shadow:0 4px 14px rgba(56,189,248,0.3);
+}
+.sb-save-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(56,189,248,0.45)}
+.sb-cancel-btn{
+  width:36px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:8px;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);color:var(--text2);
+  cursor:pointer;transition:all .2s;font-size:14px;font-family:var(--font);
+}
+.sb-cancel-btn:hover{background:rgba(244,63,94,0.15);border-color:rgba(244,63,94,0.4);color:#f43f5e}
+
+/* Light theme */
+html[data-theme="light"] .sb-profile-pic-wrap::after{background:#f0f6ff}
+html[data-theme="light"] .sb-profile-overlay{background:rgba(10,22,40,0.65)}
+html[data-theme="light"] .sb-greeting{color:rgba(255,255,255,.85)}
+html[data-theme="light"] .sb-greeting strong{color:#fff}
+html[data-theme="light"] .sb-edit-name-btn{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35);color:#fff}
+html[data-theme="light"] .sb-edit-name-btn:hover{background:rgba(255,255,255,0.3);color:#fff}
+html[data-theme="light"] .sb-profile-name-input{background:rgba(255,255,255,0.15);color:#fff}
 
 .sb-ring-wrap{display:flex;justify-content:center;align-items:center;padding:12px 0;position:relative}
 .sb-ring-wrap svg.glow-ring{animation:ring-pulse 2.5s ease-in-out infinite}
