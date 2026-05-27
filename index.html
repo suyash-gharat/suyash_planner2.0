@@ -70,7 +70,28 @@
   <nav class="sb-nav">
     <div class="sb-sec">Overview</div>
     <a class="sb-link active" data-view="dashboard"><i class="ti ti-home-2"></i>Dashboard</a>
-    <a class="sb-link" data-view="weekly"><i class="ti ti-calendar-week"></i>Weekly Grid</a>
+
+    <!-- Weekly Grid with user/team sub-sections -->
+    <div class="sb-group-wrap" id="sb-weekly-group">
+      <a class="sb-link sb-group-toggle" onclick="toggleWeeklyGroup(event)">
+        <i class="ti ti-calendar-week"></i>Weekly Grid
+        <i class="ti ti-chevron-down sb-chevron" id="sb-weekly-chevron"></i>
+      </a>
+      <div class="sb-group-children" id="sb-weekly-children">
+        <!-- Main user row -->
+        <a class="sb-child-link sb-child-main active-child" id="sb-main-user-link" onclick="switchMemberView('main',event)">
+          <span class="sb-child-dot main-dot"></span>
+          <span class="sb-child-name" id="sb-main-child-name">My Planner</span>
+        </a>
+        <!-- Teammate rows (rendered by JS) -->
+        <div id="sb-teammate-links"></div>
+        <!-- Add teammate button (max 5) -->
+        <button class="sb-add-teammate-btn" id="sb-add-teammate-btn" onclick="openAddTeammate()">
+          <i class="ti ti-user-plus"></i> Add Teammate
+        </button>
+      </div>
+    </div>
+
     <a class="sb-link" data-view="today"><i class="ti ti-sun"></i>Today's Tasks</a>
 
     <div class="sb-sec">Planner</div>
@@ -151,16 +172,25 @@
 
 <!-- ===== WEEKLY GRID ===== -->
 <section id="view-weekly" class="view">
+  <!-- Member context bar -->
+  <div class="member-context-bar" id="member-context-bar">
+    <div class="mcb-avatar" id="mcb-avatar"><i class="ti ti-user"></i></div>
+    <div class="mcb-info">
+      <div class="mcb-label" id="mcb-label">My Planner</div>
+      <div class="mcb-sub" id="mcb-sub">Your personal weekly &amp; daily tasks</div>
+    </div>
+    <div class="mcb-actions" id="mcb-actions"></div>
+  </div>
   <div class="page-hdr">
     <div>
       <h1 class="page-title"><i class="ti ti-calendar-week"></i> Weekly Task Grid</h1>
-      <p class="page-sub">Track your recurring daily tasks across the week</p>
+      <p class="page-sub" id="weekly-grid-sub">Track your recurring daily tasks across the week</p>
     </div>
     <div class="hdr-btns">
       <button class="btn-outline" onclick="prevWeek()"><i class="ti ti-chevron-left"></i> Prev</button>
       <button class="btn-outline" onclick="goToday()">Today</button>
       <button class="btn-outline" onclick="nextWeek()">Next <i class="ti ti-chevron-right"></i></button>
-      <button class="btn-primary" onclick="openModal('fixed-task-modal')"><i class="ti ti-plus"></i> Add task row</button>
+      <button class="btn-primary" id="add-task-row-btn" onclick="openModal('fixed-task-modal')"><i class="ti ti-plus"></i> Add task row</button>
     </div>
   </div>
 
@@ -507,6 +537,34 @@
       <textarea id="ef-note" rows="4" placeholder="Describe what needs to be done, steps, links, anything useful…"></textarea>
     </div>
     <div class="modal-ft"><button class="btn-outline" onclick="closeModal('edit-fixed-modal')">Cancel</button><button class="btn-primary" onclick="saveEditFixedTask()"><i class="ti ti-device-floppy"></i> Save changes</button></div>
+  </div>
+</div>
+
+<!-- Add Teammate Modal -->
+<div class="modal-ov" id="add-teammate-modal" onclick="closeBg(event,'add-teammate-modal')">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title"><i class="ti ti-user-plus"></i> Add Teammate</span>
+      <button class="modal-x" onclick="closeModal('add-teammate-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <label>Full Name *</label>
+      <input id="tm-name" placeholder="e.g. Rahul Sharma"/>
+      <label>Role / Title</label>
+      <input id="tm-role" placeholder="e.g. Sales Executive"/>
+      <label>Avatar Color</label>
+      <div class="tm-color-row" id="tm-color-row">
+        <button class="tm-color-btn selected" data-color="#0ea5e9" style="background:#0ea5e9" onclick="selectTmColor('#0ea5e9',this)"></button>
+        <button class="tm-color-btn" data-color="#818cf8" style="background:#818cf8" onclick="selectTmColor('#818cf8',this)"></button>
+        <button class="tm-color-btn" data-color="#10b981" style="background:#10b981" onclick="selectTmColor('#10b981',this)"></button>
+        <button class="tm-color-btn" data-color="#f59e0b" style="background:#f59e0b" onclick="selectTmColor('#f59e0b',this)"></button>
+        <button class="tm-color-btn" data-color="#f43f5e" style="background:#f43f5e" onclick="selectTmColor('#f43f5e',this)"></button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-outline" onclick="closeModal('add-teammate-modal')">Cancel</button>
+      <button class="btn-primary" onclick="addTeammate()"><i class="ti ti-user-plus"></i> Add Teammate</button>
+    </div>
   </div>
 </div>
 
