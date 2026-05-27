@@ -27,20 +27,28 @@
 
   <!-- PROFILE PICTURE SECTION -->
   <div class="sb-profile-section">
-    <div class="sb-profile-pic-wrap" id="sb-profile-pic-wrap" onclick="triggerProfileUpload()" title="Click to change profile picture">
+    <div class="sb-profile-pic-wrap" id="sb-profile-pic-wrap" onclick="triggerProfileUpload()" title="Click to upload profile picture">
       <div class="sb-profile-pic" id="sb-profile-pic">
         <div class="sb-profile-initials" id="sb-profile-initials">WP</div>
         <img class="sb-profile-img" id="sb-profile-img" src="" alt="Profile" style="display:none"/>
       </div>
       <div class="sb-profile-overlay">
-        <i class="ti ti-camera"></i>
+        <i class="ti ti-camera-plus"></i>
+        <span class="sb-overlay-txt">Change</span>
       </div>
     </div>
     <div class="sb-profile-info">
-      <div class="sb-greeting" id="sb-greeting">Good morning</div>
-      <div class="sb-profile-name-wrap">
-        <span class="sb-profile-name" id="sb-profile-name" ondblclick="editProfileName()" title="Double-click to edit name">WorkPlanner</span>
-        <i class="ti ti-pencil sb-name-edit-icon" onclick="editProfileName()"></i>
+      <div class="sb-greeting" id="sb-greeting">Good afternoon ☀️, <strong id="sb-greeting-name">User</strong></div>
+      <button class="sb-edit-name-btn" id="sb-edit-name-btn" onclick="editProfileName()" title="Edit your name">
+        <i class="ti ti-pencil"></i> Edit name
+      </button>
+    </div>
+    <!-- Edit name panel (hidden by default) -->
+    <div class="sb-name-edit-panel" id="sb-name-edit-panel" style="display:none">
+      <input class="sb-profile-name-input" id="sb-profile-name-input" type="text" maxlength="24" placeholder="Your name…"/>
+      <div class="sb-name-edit-actions">
+        <button class="sb-save-btn" onclick="saveProfileName()"><i class="ti ti-check"></i> Save</button>
+        <button class="sb-cancel-btn" onclick="cancelEditName()"><i class="ti ti-x"></i></button>
       </div>
     </div>
   </div>
