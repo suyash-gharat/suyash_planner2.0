@@ -850,57 +850,74 @@ function applyProfilePic(b64){
   if(b64){img.src=b64;img.style.display='block';ini.style.display='none';}
   else{img.style.display='none';ini.style.display='flex';}
 }
-function editProfileName(){
-  const nameEl=document.getElementById('sb-profile-name');
-  if(!nameEl)return;
-  const current=nameEl.textContent;
-  const input=document.createElement('input');
-  input.type='text';input.value=current;input.className='sb-profile-name-input';
-  input.maxLength=20;
-  nameEl.replaceWith(input);
-  input.focus();input.select();
-  function saveName(){
-    const val=input.value.trim()||current;
-    localStorage.setItem('profileName',val);
-    input.replaceWith(nameEl);
-    nameEl.textContent=val;
-    // Update initials
-    const iniEl=document.getElementById('sb-profile-initials');
-    if(iniEl){
-      const parts=val.trim().split(' ');
-      iniEl.textContent=parts.length>1?(parts[0][0]+parts[1][0]).toUpperCase():val.slice(0,2).toUpperCase();
-    }
-    updateSbGreeting();
-  }
-  input.addEventListener('blur',saveName);
-  input.addEventListener('keydown',e=>{if(e.key==='Enter')saveName();if(e.key==='Escape'){input.replaceWith(nameEl);}});
+function getInitials(name){
+  const parts=name.trim().split(/\s+/);
+  return parts.length>1?(parts[0][0]+parts[parts.length-1][0]).toUpperCase():name.slice(0,2).toUpperCase();
 }
 function updateSbGreeting(){
   const h=new Date().getHours();
   const time=h<12?'Good morning ☀️':h<17?'Good afternoon 🌤️':'Good evening 🌙';
-  const name=localStorage.getItem('profileName')||'';
+  const name=localStorage.getItem('profileName')||'User';
   const greetEl=document.getElementById('sb-greeting');
-  if(greetEl)greetEl.textContent=name?`${time}, ${name}`:`${time}`;
+  const greetNameEl=document.getElementById('sb-greeting-name');
+  if(greetEl){
+    // Set the plain text part (time + comma)
+    greetEl.childNodes[0].textContent=time+', ';
+  }
+  if(greetNameEl)greetNameEl.textContent=name;
   const mainGreet=document.getElementById('greeting');
-  if(mainGreet)mainGreet.textContent=name?`${time}, ${name}`:`${time}`;
+  if(mainGreet)mainGreet.textContent=`${time}, ${name}`;
+}
+function editProfileName(){
+  const panel=document.getElementById('sb-name-edit-panel');
+  const btn=document.getElementById('sb-edit-name-btn');
+  const inp=document.getElementById('sb-profile-name-input');
+  if(!panel)return;
+  const currentName=localStorage.getItem('profileName')||'User';
+  inp.value=currentName;
+  panel.style.display='flex';
+  btn.style.display='none';
+  inp.focus();inp.select();
+}
+function saveProfileName(){
+  const inp=document.getElementById('sb-profile-name-input');
+  const panel=document.getElementById('sb-name-edit-panel');
+  const btn=document.getElementById('sb-edit-name-btn');
+  const val=inp.value.trim();
+  if(!val){toast('Please enter a name');inp.focus();return;}
+  localStorage.setItem('profileName',val);
+  // Update initials
+  const iniEl=document.getElementById('sb-profile-initials');
+  if(iniEl)iniEl.textContent=getInitials(val);
+  panel.style.display='none';
+  btn.style.display='inline-flex';
+  updateSbGreeting();
+  toast('Name saved ✓');
+}
+function cancelEditName(){
+  const panel=document.getElementById('sb-name-edit-panel');
+  const btn=document.getElementById('sb-edit-name-btn');
+  panel.style.display='none';
+  btn.style.display='inline-flex';
 }
 function initProfile(){
-  // Load saved name
-  const savedName=localStorage.getItem('profileName')||'WorkPlanner';
-  const nameEl=document.getElementById('sb-profile-name');
-  if(nameEl)nameEl.textContent=savedName;
+  const savedName=localStorage.getItem('profileName')||'User';
+  // Set initials
   const iniEl=document.getElementById('sb-profile-initials');
-  if(iniEl){
-    const parts=savedName.trim().split(' ');
-    iniEl.textContent=parts.length>1?(parts[0][0]+parts[1][0]).toUpperCase():savedName.slice(0,2).toUpperCase();
-  }
+  if(iniEl)iniEl.textContent=getInitials(savedName);
   // Load saved picture
   const savedPic=localStorage.getItem('profilePic');
   if(savedPic)applyProfilePic(savedPic);
-  // Update greeting with name
+  // Update greeting
   updateSbGreeting();
+  // Keyboard shortcut: Enter to save in name input
+  const inp=document.getElementById('sb-profile-name-input');
+  if(inp){
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter')saveProfileName();
+      if(e.key==='Escape')cancelEditName();
+    });
+  }
 }
-// Run profile init after DOM is ready
 document.addEventListener('DOMContentLoaded', initProfile);
-// Also run immediately in case DOM is already loaded
 if(document.readyState!=='loading') initProfile();
