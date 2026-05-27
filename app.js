@@ -1311,3 +1311,542 @@ if(document.readyState!=='loading'){
   if(children) children.classList.add('open');
   if(toggle) toggle.classList.add('group-open');
 }
+
+// =============================================
+//  NOTEBOOK — Premium Digital Planner
+// =============================================
+
+// --- State ---
+let nbChapters = load('wlp-notebook', []).chapters || load('wlp-notebook', {chapters:[]}).chapters;
+// Fix: ensure proper structure
+(function(){
+  const raw = load('wlp-notebook', null);
+  if(raw && Array.isArray(raw.chapters)) nbChapters = raw.chapters;
+  else nbChapters = [];
+})();
+
+let nbActiveId = null;
+let nbSaveTimer = null;
+let nbCurrentStyle = 'blank';
+
+const NB_STICKER_COLORS = [
+  {bg:'rgba(14,165,233,0.2)',color:'#38bdf8'},
+  {bg:'rgba(129,140,248,0.2)',color:'#a5b4fc'},
+  {bg:'rgba(16,185,129,0.2)',color:'#6ee7b7'},
+  {bg:'rgba(245,158,11,0.2)',color:'#fcd34d'},
+  {bg:'rgba(244,63,94,0.2)',color:'#fda4af'},
+  {bg:'rgba(168,85,247,0.2)',color:'#d8b4fe'},
+];
+
+const NB_EMOJIS = {
+  Smileys: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🥴','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤧','🥵','🥶','🥳','🤠','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱'],
+  Nature: ['🌸','🌺','🌻','🌹','🌷','🌿','🍀','🌱','🌲','🌳','🌴','🌵','🎋','🎍','🍃','🍂','🍁','🍄','🐚','🌾','💐','🌞','🌝','🌛','🌜','🌚','🌕','🌈','⛅','🌤️','🌥️','🌦️','🌧️','🌨️','🌩️','🌪️','🌫️','🌬️','🌊','🌀'],
+  Food: ['🍕','🍔','🍟','🌭','🍿','🧂','🥓','🥚','🍳','🧇','🥞','🧈','🍞','🥐','🥖','🫓','🥨','🧀','🥗','🍜','🍝','🍛','🍲','🫕','🥘','🍤','🍣','🍱','🍙','🍚','🍘','🍥','🥟','🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','☕','🧋','🍵','🥤'],
+  Travel: ['✈️','🚀','🛸','🚁','🛶','⛵','🚢','🛳️','🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🏎️','🚐','🚑','🚒','🚓','🚔','🚕','🚖','🚗','🚘','🏔️','⛰️','🌋','🗻','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏛️','🗼','🗽','🗺️'],
+  Objects: ['💡','🔦','🕯️','📱','💻','⌨️','🖥️','🖨️','🖱️','💾','💿','📀','📷','📸','📹','🎥','📡','☎️','📞','📟','📠','📺','📻','🧭','⏱️','⏰','⏲️','🕰️','⌚','📅','📆','📇','📉','📊','📈','📋','📁','📂','🗂️','📓','📔','📒','📕','📗','📘','📙','📚','📖','🔖','🏷️','💰','💳','📝','✏️','🖊️','🖋️','📌','📍','📎','🖇️','📐','📏','✂️','🔑','🗝️'],
+  Symbols: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','🕉️','✡️','🔯','🕎','☯️','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','🆒','🆓','🆕','🆖','🆗','🆙','🆚','🈶','🈯','🉐','🈹','🈚','🈲','🉑','🈸','🈴','🈳','㊗️','㊙️','🈺','🈵','▶️','⏭️','⏯️','◀️','⏮️','🔼','⏫','🔽','⏬','⏸️','⏹️','⏺️','🎦','🔅','🔆','📶','📳','📴','♀️','♂️','⚕️','♾️','♻️','⚜️','🔱','📛','🔰','⭕','✅','☑️','✔️','❎','🔲','🔳'],
+};
+
+const NB_COVER_EMOJIS = ['📓','📔','📒','📕','📗','📘','📙','📚','📖','📝','✏️','🖊️','🖋️','📌','📍','🗒️','📋','🗃️','🗂️','📁','📂','💡','🌟','⭐','✨','🎯','🏆','🎨','🎭','🎬','🎮','🎵','🎶','🌈','☀️','🌙','❤️','💙','💜','🧡','💚','🌸','🌺','🌻','🌹','🌿','🍀','🚀','🌊','🔥','💎','🦋','🦄','🌍','🌏','🏔️','🗺️'];
+
+// --- Helpers ---
+function nbSave() {
+  save('wlp-notebook', { chapters: nbChapters });
+}
+function nbActiveChapter() {
+  return nbChapters.find(c => c.id === nbActiveId) || null;
+}
+function nbFmtDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+function nbTimeAgo(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
+}
+function nbWordCount(text) {
+  return text.trim() ? text.trim().split(/\s+/).length : 0;
+}
+
+// --- Render chapter list ---
+function nbRenderChapters() {
+  const list = document.getElementById('nb-chapter-list');
+  if (!list) return;
+  if (!nbChapters.length) {
+    list.innerHTML = '<div style="padding:20px 12px;text-align:center;font-size:12px;color:var(--text3)">No chapters yet</div>';
+    return;
+  }
+  list.innerHTML = nbChapters.map(ch => `
+    <div class="nb-chapter-card${ch.id===nbActiveId?' active':''}" onclick="nbOpenChapter('${ch.id}')">
+      <div class="nb-chapter-top">
+        <div class="nb-chapter-emoji-big">${ch.emoji||'📄'}</div>
+        <div class="nb-chapter-info">
+          <div class="nb-chapter-name">${esc(ch.title||'Untitled Chapter')}</div>
+          <div class="nb-chapter-meta">
+            <span>${nbWordCount(ch.content?.replace?.(/<[^>]+>/g,'')??'')} words · ${nbTimeAgo(ch.updatedAt)}</span>
+          </div>
+        </div>
+        <div class="nb-chapter-color-dot" style="background:${ch.color||'var(--sky)'}"></div>
+      </div>
+      <button class="nb-chapter-del" onclick="nbDeleteChapter('${ch.id}',event)" title="Delete chapter">
+        <i class="ti ti-trash"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+// --- New chapter ---
+function nbNewChapter() {
+  const ch = {
+    id: 'nb_' + uid(),
+    title: '',
+    emoji: '📄',
+    content: '',
+    font: 'default',
+    pageStyle: 'blank',
+    color: '#0ea5e9',
+    tags: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    wordCount: 0,
+  };
+  nbChapters.unshift(ch);
+  nbSave();
+  nbOpenChapter(ch.id);
+  setTimeout(() => {
+    const ti = document.getElementById('nb-chapter-title-input');
+    if (ti) ti.focus();
+  }, 100);
+}
+
+// --- Open chapter ---
+function nbOpenChapter(id) {
+  // Save current before switching
+  if (nbActiveId && nbActiveId !== id) nbSaveCurrentChapter();
+
+  nbActiveId = id;
+  const ch = nbActiveChapter();
+  if (!ch) return;
+
+  // Show editor, hide empty state
+  document.getElementById('nb-empty-state').style.display = 'none';
+  document.getElementById('nb-page').style.display = 'block';
+  document.getElementById('nb-toolbar').style.display = 'flex';
+
+  // Set content
+  document.getElementById('nb-chapter-title-input').value = ch.title || '';
+  document.getElementById('nb-chapter-emoji').textContent = ch.emoji || '📄';
+  document.getElementById('nb-editor').innerHTML = ch.content || '';
+
+  // Font
+  nbSetFont(ch.font || 'default', false);
+  const fs = document.getElementById('nb-font-select');
+  if (fs) fs.value = ch.font || 'default';
+
+  // Page style
+  nbSetPageStyle(ch.pageStyle || 'blank', null, false);
+  document.querySelectorAll('.nb-style-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.style === (ch.pageStyle || 'blank'));
+  });
+
+  // Color tags
+  document.querySelectorAll('.nb-ct-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.color === ch.color);
+  });
+
+  // Tags
+  nbRenderTags(ch.tags || []);
+
+  // Stats
+  nbUpdateStats();
+
+  // Meta info
+  const ca = document.getElementById('nb-created-at');
+  const ua = document.getElementById('nb-updated-at');
+  if (ca) ca.textContent = nbFmtDate(ch.createdAt);
+  if (ua) ua.textContent = nbFmtDate(ch.updatedAt);
+
+  // Highlight active chapter
+  nbRenderChapters();
+}
+
+// --- Save current chapter ---
+function nbSaveCurrentChapter() {
+  const ch = nbActiveChapter();
+  if (!ch) return;
+  const titleInp = document.getElementById('nb-chapter-title-input');
+  const editor = document.getElementById('nb-editor');
+  if (titleInp) ch.title = titleInp.value;
+  if (editor) ch.content = editor.innerHTML;
+  ch.updatedAt = Date.now();
+  ch.wordCount = nbWordCount((editor?.innerHTML||'').replace(/<[^>]+>/g,''));
+  nbSave();
+}
+
+// --- Debounced auto-save ---
+function nbDebounceSave() {
+  if (nbSaveTimer) clearTimeout(nbSaveTimer);
+  nbSaveTimer = setTimeout(() => {
+    nbSaveCurrentChapter();
+    nbUpdateStats();
+    nbRenderChapters();
+    // Show saved indicator
+    const ind = document.getElementById('nb-save-indicator');
+    if (ind) {
+      ind.textContent = 'Saved';
+      ind.classList.add('show');
+      setTimeout(() => ind.classList.remove('show'), 2000);
+    }
+  }, 1500);
+}
+
+// --- Update stats ---
+function nbUpdateStats() {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  const text = editor.innerText || '';
+  const words = nbWordCount(text);
+  const chars = text.replace(/\s/g,'').length;
+  const readMin = Math.max(1, Math.ceil(words / 200));
+  const wc = document.getElementById('nb-word-count');
+  const rt = document.getElementById('nb-read-time');
+  const cc = document.getElementById('nb-char-count');
+  if (wc) wc.textContent = words;
+  if (rt) rt.textContent = readMin + ' min';
+  if (cc) cc.textContent = chars;
+}
+
+// --- Delete chapter ---
+function nbDeleteChapter(id, e) {
+  e.stopPropagation();
+  const ch = nbChapters.find(c => c.id === id);
+  if (!ch) return;
+  if (!confirm(`Delete "${ch.title || 'Untitled Chapter'}"? This cannot be undone.`)) return;
+  nbChapters = nbChapters.filter(c => c.id !== id);
+  nbSave();
+  if (nbActiveId === id) {
+    nbActiveId = null;
+    if (nbChapters.length) nbOpenChapter(nbChapters[0].id);
+    else {
+      document.getElementById('nb-empty-state').style.display = 'flex';
+      document.getElementById('nb-page').style.display = 'none';
+    }
+  } else {
+    nbRenderChapters();
+  }
+  toast('Chapter deleted');
+}
+
+// --- execCommand wrapper ---
+function nbExec(cmd, val) {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand(cmd, false, val || null);
+  nbDebounceSave();
+}
+
+// --- Insert heading / blockquote blocks ---
+function nbInsertBlock(tag) {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('formatBlock', false, tag);
+  nbDebounceSave();
+}
+
+// --- Insert checklist ---
+function nbInsertChecklist() {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  editor.focus();
+  const item = document.createElement('div');
+  item.className = 'nb-checklist-item';
+  item.innerHTML = '<input type="checkbox" onchange="this.parentElement.classList.toggle(\'checked\',this.checked)"><span>New item</span>';
+  const sel = window.getSelection();
+  if (sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(item);
+    range.setStartAfter(item);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    editor.appendChild(item);
+  }
+  nbDebounceSave();
+}
+
+function nbHandleChecklistClick(e) {
+  if (e.target.type === 'checkbox') {
+    const item = e.target.closest('.nb-checklist-item');
+    if (item) item.classList.toggle('checked', e.target.checked);
+    nbDebounceSave();
+  }
+}
+
+// --- Insert code block ---
+function nbInsertCode() {
+  const sel = window.getSelection();
+  const text = sel.rangeCount ? sel.toString() : '';
+  const code = document.createElement('code');
+  code.textContent = text || 'code here';
+  if (sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(code);
+    range.setStartAfter(code);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    document.getElementById('nb-editor')?.appendChild(code);
+  }
+  nbDebounceSave();
+}
+
+// --- Insert divider ---
+function nbInsertDivider() {
+  nbExec('insertHTML', '<hr/>');
+}
+
+// --- Insert link ---
+function nbInsertLink() {
+  const url = prompt('Enter URL:', 'https://');
+  if (!url) return;
+  const label = prompt('Link text:', url);
+  nbExec('insertHTML', `<a href="${url}" target="_blank" rel="noopener">${esc(label||url)}</a>`);
+}
+
+// --- Insert image ---
+function nbInsertImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('Please select an image file'); return; }
+  if (file.size > 2*1024*1024) { toast('Image too large! Max 2MB'); e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const html = `<img src="${ev.target.result}" alt="image" style="max-width:100%;border-radius:12px"/><div class="nb-img-caption" contenteditable="true">Caption…</div>`;
+    nbExec('insertHTML', html);
+    toast('Image inserted ✓');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+// --- Sticker ---
+function nbInsertSticker() {
+  const text = prompt('Sticker text:', 'Note');
+  if (!text) return;
+  const c = NB_STICKER_COLORS[Math.floor(Math.random()*NB_STICKER_COLORS.length)];
+  nbExec('insertHTML', `<span class="nb-sticker" style="background:${c.bg};color:${c.color}">${esc(text)}</span>&nbsp;`);
+}
+
+// --- Keyboard shortcuts ---
+function nbHandleKey(e) {
+  if ((e.ctrlKey||e.metaKey)) {
+    if (e.key==='b'){e.preventDefault();nbExec('bold');}
+    else if(e.key==='i'){e.preventDefault();nbExec('italic');}
+    else if(e.key==='u'){e.preventDefault();nbExec('underline');}
+    else if(e.key==='s'){e.preventDefault();nbSaveCurrentChapter();
+      const ind=document.getElementById('nb-save-indicator');
+      if(ind){ind.textContent='Saved';ind.classList.add('show');setTimeout(()=>ind.classList.remove('show'),2000);}
+    }
+  }
+}
+
+// --- Font ---
+function nbSetFont(fontVal, save_=true) {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  const fontClasses = ['nb-font-caveat','nb-font-dancing','nb-font-patrick','nb-font-mono','nb-font-lora','nb-font-playfair','nb-font-nunito','nb-font-dmsans','nb-font-baskerville'];
+  const fontMap = {
+    'Caveat':'nb-font-caveat','Dancing Script':'nb-font-dancing','Patrick Hand':'nb-font-patrick',
+    'JetBrains Mono':'nb-font-mono','Lora':'nb-font-lora','Playfair Display':'nb-font-playfair',
+    'Nunito':'nb-font-nunito','DM Sans':'nb-font-dmsans','Libre Baskerville':'nb-font-baskerville'
+  };
+  fontClasses.forEach(c => editor.classList.remove(c));
+  if (fontMap[fontVal]) editor.classList.add(fontMap[fontVal]);
+  if (save_ && nbActiveId) {
+    const ch = nbActiveChapter();
+    if (ch) { ch.font = fontVal; nbDebounceSave(); }
+  }
+}
+
+// --- Font size ---
+function nbSetSize(size) {
+  const editor = document.getElementById('nb-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('fontSize', false, '7');
+  editor.querySelectorAll('font[size="7"]').forEach(el => {
+    el.removeAttribute('size');
+    el.style.fontSize = size + 'px';
+  });
+  nbDebounceSave();
+}
+
+// --- Page style ---
+function nbSetPageStyle(style, btn, saveIt=true) {
+  const wrap = document.getElementById('nb-page-wrap');
+  if (wrap) {
+    wrap.classList.remove('nb-bg-blank','nb-bg-lined','nb-bg-dot','nb-bg-grid');
+    wrap.classList.add('nb-bg-' + (style==='dot'?'dot':style==='grid'?'grid':style==='lined'?'lined':'blank'));
+  }
+  nbCurrentStyle = style;
+  if (btn) {
+    document.querySelectorAll('.nb-style-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (saveIt && nbActiveId) {
+    const ch = nbActiveChapter();
+    if (ch) { ch.pageStyle = style; nbDebounceSave(); }
+  }
+}
+
+// --- Color tag ---
+function nbSetColor(color, btn) {
+  document.querySelectorAll('.nb-ct-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (nbActiveId) {
+    const ch = nbActiveChapter();
+    if (ch) { ch.color = color; nbDebounceSave(); nbRenderChapters(); }
+  }
+}
+
+// --- Tags ---
+function nbAddTag(e) {
+  if (e.key !== 'Enter') return;
+  const inp = document.getElementById('nb-tags-input');
+  const val = inp.value.trim();
+  if (!val || !nbActiveId) return;
+  const ch = nbActiveChapter();
+  if (!ch) return;
+  if (!ch.tags) ch.tags = [];
+  if (!ch.tags.includes(val)) {
+    ch.tags.push(val);
+    nbDebounceSave();
+    nbRenderTags(ch.tags);
+  }
+  inp.value = '';
+}
+function nbRemoveTag(tag) {
+  const ch = nbActiveChapter();
+  if (!ch) return;
+  ch.tags = (ch.tags||[]).filter(t => t !== tag);
+  nbDebounceSave();
+  nbRenderTags(ch.tags);
+}
+function nbRenderTags(tags) {
+  const list = document.getElementById('nb-tags-list');
+  if (!list) return;
+  list.innerHTML = (tags||[]).map(t => `
+    <span class="nb-tag">#${esc(t)}<button onclick="nbRemoveTag('${esc(t)}')" title="Remove">×</button></span>
+  `).join('');
+}
+
+// --- Share chapter ---
+function nbShareChapter() {
+  const ch = nbActiveChapter();
+  if (!ch) { toast('No chapter open'); return; }
+  const text = (ch.title ? ch.title + '\n\n' : '') +
+    (document.getElementById('nb-editor')?.innerText || ch.content.replace(/<[^>]+>/g,''));
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard ✓')).catch(() => {
+    prompt('Copy this text:', text);
+  });
+}
+
+// --- Emoji picker ---
+let nbEmojiCat = 'Smileys';
+function nbToggleEmojiPicker() {
+  const picker = document.getElementById('nb-emoji-picker');
+  if (!picker) return;
+  const isOpen = picker.style.display !== 'none';
+  picker.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) nbRenderEmojiPicker();
+}
+function nbRenderEmojiPicker() {
+  // Categories
+  const cats = document.getElementById('nb-emoji-cats');
+  if (cats) {
+    cats.innerHTML = Object.keys(NB_EMOJIS).map(cat =>
+      `<button class="nb-emoji-cat-btn${cat===nbEmojiCat?' active':''}" onclick="nbEmojiCatSwitch('${cat}')">${cat}</button>`
+    ).join('');
+  }
+  // Grid
+  const grid = document.getElementById('nb-emoji-grid');
+  if (grid) {
+    grid.innerHTML = (NB_EMOJIS[nbEmojiCat]||[]).map(em =>
+      `<button class="nb-emoji-btn" onclick="nbPickEmoji('${em}')">${em}</button>`
+    ).join('');
+  }
+}
+function nbEmojiCatSwitch(cat) {
+  nbEmojiCat = cat;
+  nbRenderEmojiPicker();
+}
+function nbPickEmoji(em) {
+  nbExec('insertText', em);
+  document.getElementById('nb-emoji-picker').style.display = 'none';
+}
+
+// --- Chapter emoji cover picker ---
+function nbOpenEmojiCover() {
+  const picker = document.getElementById('nb-cover-picker');
+  if (!picker) return;
+  const grid = document.getElementById('nb-cover-emoji-grid');
+  if (grid) {
+    grid.innerHTML = NB_COVER_EMOJIS.map(em =>
+      `<button class="nb-emoji-btn" onclick="nbPickCoverEmoji('${em}')" style="font-size:26px;width:40px;height:40px">${em}</button>`
+    ).join('');
+  }
+  picker.style.display = 'flex';
+}
+function nbPickCoverEmoji(em) {
+  document.getElementById('nb-chapter-emoji').textContent = em;
+  document.getElementById('nb-cover-picker').style.display = 'none';
+  const ch = nbActiveChapter();
+  if (ch) { ch.emoji = em; nbDebounceSave(); nbRenderChapters(); }
+}
+
+// --- Mobile chapters toggle ---
+function nbToggleMobileChapters() {
+  const panel = document.getElementById('nb-chapters');
+  if (panel) panel.classList.toggle('mob-open');
+}
+
+// --- Init on notebook view open ---
+function nbInit() {
+  nbRenderChapters();
+  if (nbChapters.length && !nbActiveId) {
+    nbOpenChapter(nbChapters[0].id);
+  } else if (!nbChapters.length) {
+    document.getElementById('nb-empty-state').style.display = 'flex';
+    document.getElementById('nb-page').style.display = 'none';
+  }
+}
+
+// Hook into switchView
+const _origSwitchView = switchView;
+switchView = function(name) {
+  // Save current notebook chapter before leaving
+  if (document.getElementById('view-notebook')?.classList.contains('active') && nbActiveId) {
+    nbSaveCurrentChapter();
+  }
+  _origSwitchView(name);
+  if (name === 'notebook') {
+    setTimeout(nbInit, 50);
+  }
+};
+
+// Also handle initial load if notebook is navigated to via sidebar
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-render chapters so sidebar feels live
+  nbRenderChapters();
+});
+if (document.readyState !== 'loading') nbRenderChapters();
