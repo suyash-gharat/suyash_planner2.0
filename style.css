@@ -1369,3 +1369,106 @@ html[data-theme="light"] .card-clicked {
   50%  { box-shadow: 0 0 0 8px rgba(14,165,233,0); }
   100% { box-shadow: 0 0 0 0 rgba(14,165,233,0); }
 }
+
+/* ===== WEEKLY GRID MEMBER TABS ===== */
+.sb-group-wrap{display:flex;flex-direction:column}
+.sb-group-toggle{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--radius-sm);color:rgba(255,255,255,.5);
+  font-size:13px;font-weight:500;cursor:pointer;
+  background:none;border:none;width:100%;text-align:left;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.sb-group-toggle i:first-child{font-size:15px;flex-shrink:0}
+.sb-group-toggle:hover{background:rgba(56,189,248,0.08);color:#fff;box-shadow:inset 3px 0 0 rgba(56,189,248,0.4)}
+.sb-group-toggle.group-open{color:#fff;background:rgba(56,189,248,0.06)}
+.sb-chevron{margin-left:auto;font-size:12px;transition:transform .3s;opacity:.5}
+.group-open .sb-chevron{transform:rotate(180deg);opacity:1;color:var(--sky2)}
+
+.sb-group-children{
+  display:none;flex-direction:column;gap:2px;
+  padding:3px 0 3px 14px;
+  border-left:1.5px solid rgba(56,189,248,0.18);
+  margin-left:20px;
+}
+.sb-group-children.open{display:flex}
+
+.sb-child-link{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 10px;border-radius:8px;
+  color:rgba(255,255,255,.45);font-size:12.5px;font-weight:500;
+  cursor:pointer;transition:all .2s;
+  background:none;border:none;width:100%;text-align:left;
+}
+.sb-child-link:hover{background:rgba(56,189,248,0.08);color:#fff}
+.sb-child-link.active-child{
+  background:rgba(56,189,248,0.12);color:#fff;font-weight:700;
+  border-right:none;
+}
+.sb-child-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.main-dot{background:var(--grad-sky);box-shadow:0 0 6px rgba(56,189,248,0.6)}
+.sb-child-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-child-remove{
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(244,63,94,0.1);border:none;
+  color:rgba(244,63,94,0.5);font-size:10px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.sb-child-link:hover .sb-child-remove{display:flex}
+.sb-child-remove:hover{background:rgba(244,63,94,0.25);color:#f43f5e}
+
+.sb-add-teammate-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 10px;border-radius:8px;
+  background:rgba(56,189,248,0.06);
+  border:1px dashed rgba(56,189,248,0.25);
+  color:var(--sky2);font-size:11.5px;font-weight:600;
+  cursor:pointer;transition:all .2s;width:100%;
+  font-family:var(--font);margin-top:2px;
+}
+.sb-add-teammate-btn:hover{background:rgba(56,189,248,0.14);border-color:var(--sky2)}
+.sb-add-teammate-btn i{font-size:13px}
+
+/* Member context bar (top of weekly view) */
+.member-context-bar{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 20px;border-radius:var(--radius);
+  margin-bottom:16px;
+  border:1px solid rgba(56,189,248,0.15);
+  background:linear-gradient(90deg,rgba(14,165,233,0.08),rgba(129,140,248,0.05));
+  backdrop-filter:blur(8px);
+  animation:fadeSlideIn .25s ease both;
+}
+.mcb-avatar{
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:#fff;
+  flex-shrink:0;
+  background:var(--grad-sky);
+  box-shadow:0 4px 14px rgba(56,189,248,0.35);
+}
+.mcb-avatar.teammate-av{background:var(--tm-color,var(--grad-sky))}
+.mcb-info{flex:1;min-width:0}
+.mcb-label{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.mcb-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.mcb-actions{display:flex;gap:8px}
+
+/* Teammate color picker */
+.tm-color-row{display:flex;gap:10px;margin-top:4px}
+.tm-color-btn{
+  width:28px;height:28px;border-radius:50%;border:3px solid transparent;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.tm-color-btn.selected{border-color:#fff;transform:scale(1.2);box-shadow:0 0 8px rgba(255,255,255,0.4)}
+
+/* Light theme */
+html[data-theme="light"] .sb-group-children{border-left-color:rgba(14,165,233,0.3)}
+html[data-theme="light"] .sb-group-toggle:hover{background:rgba(14,165,233,0.08);color:#0f1f4b;box-shadow:inset 3px 0 0 rgba(14,165,233,0.4)}
+html[data-theme="light"] .sb-child-link{color:rgba(15,31,75,0.5)}
+html[data-theme="light"] .sb-child-link:hover{background:rgba(14,165,233,0.08);color:#0f1f4b}
+html[data-theme="light"] .sb-child-link.active-child{background:rgba(14,165,233,0.12);color:#0f1f4b}
+html[data-theme="light"] .sb-add-teammate-btn{color:#0ea5e9;border-color:rgba(14,165,233,0.3);background:rgba(14,165,233,0.05)}
+html[data-theme="light"] .member-context-bar{border-color:rgba(14,165,233,0.2);background:linear-gradient(90deg,rgba(14,165,233,0.06),rgba(129,140,248,0.04))}
