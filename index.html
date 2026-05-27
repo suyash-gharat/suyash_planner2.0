@@ -19,10 +19,15 @@
       <div class="sb-name">WorkLife</div>
       <div class="sb-tagline">Planner Pro</div>
     </div>
-    <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark theme">
-      <span class="theme-icon-dark"><i class="ti ti-moon"></i></span>
-      <span class="theme-icon-light"><i class="ti ti-sun"></i></span>
-    </button>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark theme">
+        <span class="theme-icon-dark"><i class="ti ti-moon"></i></span>
+        <span class="theme-icon-light"><i class="ti ti-sun"></i></span>
+      </button>
+      <button class="mob-close-btn" id="mob-close-btn" onclick="closeMobileSidebar()" aria-label="Close menu" title="Close menu">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
   </div>
 
   <!-- PROFILE PICTURE SECTION -->
@@ -115,9 +120,12 @@
   <!-- Theme Toggle -->
 </aside>
 
-<button class="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+<!-- Mobile hamburger -->
+<button class="mob-btn" id="mob-open-btn" onclick="openMobileSidebar()" aria-label="Open menu">
   <i class="ti ti-menu-2"></i>
 </button>
+<!-- Mobile overlay backdrop (tap to close) -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- MAIN -->
 <main class="main">
