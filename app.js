@@ -1850,3 +1850,181 @@ document.addEventListener('DOMContentLoaded', () => {
   nbRenderChapters();
 });
 if (document.readyState !== 'loading') nbRenderChapters();
+
+// =============================================
+//  SUPABASE INTEGRATION — Batch 4
+// =============================================
+let _currentUser = null;
+
+// ── Auth guard: redirect to login if not logged in ──
+async function initAuth() {
+  const { data:{ session } } = await _supa.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  _currentUser = await getCurrentUserProfile();
+
+  // Show logout btn
+  const lb = document.getElementById('logout-btn');
+  if (lb) lb.style.display = 'flex';
+
+  // Apply saved name & photo
+  const nameEl = document.getElementById('sb-profile-name');
+  if (nameEl) nameEl.textContent = _currentUser.name;
+  localStorage.setItem('profileName', _currentUser.name);
+
+  const iniEl = document.getElementById('sb-profile-initials');
+  if (iniEl) {
+    const p = _currentUser.name.trim().split(/\s+/);
+    iniEl.textContent = p.length>1 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : _currentUser.name.slice(0,2).toUpperCase();
+  }
+  if (_currentUser.avatar_url) applyProfilePic(_currentUser.avatar_url);
+
+  updateSbGreeting();
+  await supaLoadAll();
+}
+
+// ── Load all data from Supabase ──
+async function supaLoadAll() {
+  if (!_currentUser) return;
+  const oid = _currentUser.id;
+  try {
+    // Tasks (main user)
+    const { data: dbTasks } = await _supa.from('tasks').select('*').eq('owner_id',oid).eq('teammate_id','main');
+    if (dbTasks?.length) {
+      fixedTasks = dbTasks.map(t=>({id:t.id,name:t.name,cat:t.cat,type:t.type,days:t.days||[],note:t.note||''}));
+      save('fixedTasks', fixedTasks);
+    }
+    // Grid checks
+    const { data: dbChecks } = await _supa.from('grid_checks').select('*').eq('owner_id',oid).eq('teammate_id','main');
+    if (dbChecks?.length) {
+      gridChecks = {};
+      dbChecks.forEach(c => { gridChecks[`${c.task_id}_${c.check_date}`] = c.checked; });
+      save('gridChecks', gridChecks);
+    }
+    // Teammates
+    const { data: dbTM } = await _supa.from('teammates').select('*').eq('owner_id',oid);
+    if (dbTM?.length) {
+      teammates = dbTM.map(t=>({id:t.id,name:t.name,role:t.role||'',color:t.color||'#0ea5e9',avatar_url:t.avatar_url||null}));
+      save('teammates', teammates);
+    }
+    // Notebook chapters
+    const { data: dbCh } = await _supa.from('notebook_chapters').select('*').eq('owner_id',oid).order('updated_at',{ascending:false});
+    if (dbCh?.length) {
+      nbChapters = dbCh.map(c=>({
+        id:c.id,title:c.title||'',emoji:c.emoji||'📄',content:c.content||'',
+        font:c.font||'default',pageStyle:c.page_style||'blank',color:c.color||'#0ea5e9',
+        tags:c.tags||[],wordCount:c.word_count||0,
+        createdAt:new Date(c.created_at).getTime(),updatedAt:new Date(c.updated_at).getTime()
+      }));
+      save('wlp-notebook',{chapters:nbChapters});
+    }
+    // Re-render
+    if(typeof renderDashboard==='function') renderDashboard();
+    if(typeof renderToday==='function') renderToday();
+    if(typeof renderTeammateLinks==='function') renderTeammateLinks();
+    if(typeof nbRenderChapters==='function') nbRenderChapters();
+  } catch(e){ console.error('Supabase load error:',e); }
+}
+
+// ── Save helpers ──
+async function supaSaveTask(task, tmId='main') {
+  if(!_currentUser) return;
+  await _supa.from('tasks').upsert({id:task.id,owner_id:_currentUser.id,teammate_id:tmId,name:task.name,cat:task.cat,type:task.type,days:task.days||[],note:task.note||''});
+}
+async function supaDeleteTask(id) {
+  if(!_currentUser) return;
+  await _supa.from('tasks').delete().eq('id',id).eq('owner_id',_currentUser.id);
+}
+async function supaSaveCheck(taskId, dateStr, checked, tmId='main') {
+  if(!_currentUser) return;
+  await _supa.from('grid_checks').upsert({owner_id:_currentUser.id,teammate_id:tmId,task_id:taskId,check_date:dateStr,checked},{onConflict:'owner_id,teammate_id,task_id,check_date'});
+}
+async function supaSaveChapter(ch) {
+  if(!_currentUser) return;
+  await _supa.from('notebook_chapters').upsert({id:ch.id,owner_id:_currentUser.id,title:ch.title||'',emoji:ch.emoji||'📄',content:ch.content||'',font:ch.font||'default',page_style:ch.pageStyle||'blank',color:ch.color||'#0ea5e9',tags:ch.tags||[],word_count:ch.wordCount||0,updated_at:new Date().toISOString()});
+}
+async function supaDeleteChapter(id) {
+  if(!_currentUser) return;
+  await _supa.from('notebook_chapters').delete().eq('id',id).eq('owner_id',_currentUser.id);
+}
+async function supaSaveTeammate(tm) {
+  if(!_currentUser) return;
+  await _supa.from('teammates').upsert({id:tm.id,owner_id:_currentUser.id,name:tm.name,role:tm.role||'',color:tm.color||'#0ea5e9',avatar_url:tm.avatar_url||null});
+}
+async function supaDeleteTeammate(id) {
+  if(!_currentUser) return;
+  await _supa.from('teammates').delete().eq('id',id).eq('owner_id',_currentUser.id);
+  await _supa.from('tasks').delete().eq('teammate_id',id).eq('owner_id',_currentUser.id);
+  await _supa.from('grid_checks').delete().eq('teammate_id',id).eq('owner_id',_currentUser.id);
+}
+
+// ── Profile picture upload to Supabase Storage ──
+const _origHandleProfileUpload = handleProfileUpload;
+handleProfileUpload = async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!['image/png','image/jpeg'].includes(file.type)) { toast('Only PNG/JPG allowed'); e.target.value=''; return; }
+  if (file.size > 2*1024*1024) { toast('Max 2MB'); e.target.value=''; return; }
+  if (_currentUser) {
+    try {
+      toast('Uploading...');
+      const ext = file.name.split('.').pop();
+      const path = `${_currentUser.id}/avatar.${ext}`;
+      await _supa.storage.from('avatars').upload(path, file, {upsert:true});
+      const { data } = _supa.storage.from('avatars').getPublicUrl(path);
+      await _supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',_currentUser.id);
+      _currentUser.avatar_url = data.publicUrl;
+      applyProfilePic(data.publicUrl);
+      toast('Profile picture updated ✓');
+    } catch(err) { toast('Upload failed'); }
+  } else { _origHandleProfileUpload(e); }
+  e.target.value = '';
+};
+
+// ── Notebook: patch save+delete to sync Supabase ──
+const _origNbSave = nbSaveCurrentChapter;
+nbSaveCurrentChapter = function() {
+  _origNbSave();
+  const ch = nbActiveChapter();
+  if (ch && _currentUser) supaSaveChapter(ch);
+};
+const _origNbDel = nbDeleteChapter;
+nbDeleteChapter = function(id, e) {
+  if (_currentUser) supaDeleteChapter(id);
+  _origNbDel(id, e);
+};
+
+// ── PDF/CSV upload in Notebook ──
+function nbInsertFileUpload() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.pdf,.csv';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10*1024*1024) { toast('Max 10MB'); return; }
+    if (!nbActiveId) { toast('Open a chapter first'); return; }
+    if (!_currentUser) { toast('Login required'); return; }
+    try {
+      toast('Uploading...');
+      const path = `${_currentUser.id}/${nbActiveId}/${Date.now()}_${file.name}`;
+      await _supa.storage.from('notebook-files').upload(path, file, {upsert:true});
+      const { data } = _supa.storage.from('notebook-files').getPublicUrl(path);
+      await _supa.from('notebook_files').insert({chapter_id:nbActiveId,owner_id:_currentUser.id,file_name:file.name,file_type:file.type,file_url:data.publicUrl,file_size:file.size});
+      const isPdf = file.type==='application/pdf';
+      nbExec('insertHTML', `<div class="nb-file-embed"><div class="nb-file-icon">${isPdf?'📄':'📊'}</div><div class="nb-file-info"><div class="nb-file-name">${esc(file.name)}</div><div class="nb-file-size">${(file.size/1024).toFixed(1)} KB · ${isPdf?'PDF':'CSV'}</div></div><a href="${data.publicUrl}" target="_blank" class="nb-file-open-btn">${isPdf?'Open PDF':'Download CSV'}</a></div>`);
+      toast(file.name + ' uploaded ✓');
+    } catch(err) { toast('Upload failed: '+err.message); }
+  };
+  input.click();
+}
+
+// ── Logout button CSS ──
+(function(){
+  const s = document.createElement('style');
+  s.textContent = `.logout-btn{width:28px;height:28px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);color:rgba(244,63,94,0.7);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}.logout-btn:hover{background:rgba(244,63,94,0.22);color:#f43f5e;}`;
+  document.head.appendChild(s);
+})();
+
+// ── Boot ──
+document.addEventListener('DOMContentLoaded', initAuth);
+if (document.readyState !== 'loading') initAuth();
