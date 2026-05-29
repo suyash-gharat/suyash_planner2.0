@@ -49,7 +49,7 @@ body{
 /* ── Brand panel (left) ── */
 .auth-brand-panel{
   flex:1;display:flex;align-items:center;justify-content:center;
-  padding:60px 48px;
+  padding:40px 36px;
   background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(129,140,248,0.06));
   border-right:1px solid rgba(56,189,248,0.1);
 }
@@ -58,7 +58,7 @@ body{
   width:64px;height:64px;border-radius:18px;
   background:var(--grad-sky);
   display:flex;align-items:center;justify-content:center;
-  font-size:28px;color:#fff;margin-bottom:24px;
+  font-size:28px;color:#fff;margin-bottom:14px;
   box-shadow:0 12px 40px rgba(14,165,233,0.4);
 }
 .auth-brand-name{
@@ -71,9 +71,9 @@ body{
 }
 .auth-brand-desc{
   font-size:14px;color:var(--text2);line-height:1.8;
-  margin-bottom:36px;
+  margin-bottom:20px;
 }
-.auth-features{display:flex;flex-direction:column;gap:14px}
+.auth-features{display:flex;flex-direction:column;gap:10px}
 .auth-feature{
   display:flex;align-items:center;gap:12px;
   font-size:13.5px;font-weight:600;color:var(--text2);
@@ -89,7 +89,7 @@ body{
 .auth-form-panel{
   width:480px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  padding:40px 32px;
+  padding:24px 28px;
 }
 .auth-card{
   width:100%;max-width:400px;
@@ -101,7 +101,7 @@ body{
 }
 
 .auth-card-logo{
-  display:flex;align-items:center;gap:10px;margin-bottom:32px;
+  display:flex;align-items:center;gap:10px;margin-bottom:10px;
 }
 .auth-card-logo-icon{
   width:36px;height:36px;border-radius:10px;
@@ -112,14 +112,14 @@ body{
 }
 .auth-card-app-name{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.2px}
 
-.auth-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.4px;margin-bottom:6px}
-.auth-sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
+.auth-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.4px;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5}
 
 /* ── Fields ── */
 .auth-field{margin-bottom:18px}
 .auth-field label{
   display:block;font-size:11.5px;font-weight:700;
-  color:var(--text2);margin-bottom:7px;letter-spacing:.4px;
+  color:var(--text2);margin-bottom:5px;letter-spacing:.4px;
   text-transform:uppercase;
 }
 .auth-hint{text-transform:none;font-weight:400;color:var(--text3);font-size:10.5px}
@@ -139,7 +139,7 @@ body{
 .auth-input-wrap > i{font-size:17px;color:var(--text3);flex-shrink:0}
 .auth-input-wrap input{
   flex:1;background:transparent;border:none;outline:none;
-  color:#fff;font-size:14px;padding:13px 0;font-family:var(--font);
+  color:#fff;font-size:14px;padding:10px 0;font-family:var(--font);
 }
 .auth-input-wrap input::placeholder{color:rgba(255,255,255,.2)}
 .auth-eye-btn{
@@ -178,7 +178,7 @@ body{
 
 /* ── Buttons ── */
 .auth-submit-btn{
-  width:100%;padding:14px;
+  width:100%;padding:11px;
   background:var(--grad-sky);
   border:none;border-radius:12px;
   color:#fff;font-size:14.5px;font-weight:800;
@@ -186,7 +186,7 @@ body{
   font-family:var(--font);letter-spacing:.2px;
   display:flex;align-items:center;justify-content:center;gap:8px;
   box-shadow:0 8px 28px rgba(14,165,233,0.4);
-  margin-bottom:18px;
+  margin-bottom:10px;
 }
 .auth-submit-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(14,165,233,0.55)}
 .auth-submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
