@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sign Up — WorkLife Planner Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="auth.css"/>
+</head>
+<body>
+
+<div class="auth-bg">
+  <div class="auth-orb auth-orb-1"></div>
+  <div class="auth-orb auth-orb-2"></div>
+  <div class="auth-orb auth-orb-3"></div>
+
+  <div class="auth-split">
+
+    <!-- LEFT: Brand Panel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-content">
+        <div class="auth-brand-logo">
+          <i class="ti ti-layout-kanban"></i>
+        </div>
+        <h1 class="auth-brand-name">WorkLife</h1>
+        <p class="auth-brand-tagline">Planner Pro</p>
+        <p class="auth-brand-desc">
+          Join thousands of professionals managing their work and life
+          in one beautiful, powerful workspace.
+        </p>
+
+        <!-- Steps -->
+        <div class="auth-steps">
+          <div class="auth-step">
+            <div class="auth-step-num">1</div>
+            <div>
+              <div class="auth-step-title">Create your account</div>
+              <div class="auth-step-sub">Choose a username & password</div>
+            </div>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step-num">2</div>
+            <div>
+              <div class="auth-step-title">Set up your profile</div>
+              <div class="auth-step-sub">Add photo, name, preferences</div>
+            </div>
+          </div>
+          <div class="auth-step">
+            <div class="auth-step-num">3</div>
+            <div>
+              <div class="auth-step-title">Start planning</div>
+              <div class="auth-step-sub">Tasks, notebook, habits & more</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Signup Form -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
+
+        <div class="auth-card-logo">
+          <div class="auth-card-logo-icon">
+            <i class="ti ti-layout-kanban"></i>
+          </div>
+          <div class="auth-card-app-name">WorkLife Planner Pro</div>
+        </div>
+
+        <h2 class="auth-title">Create your account ✨</h2>
+        <p class="auth-sub">Takes less than a minute to get started</p>
+
+        <!-- Full Name -->
+        <div class="auth-field">
+          <label>Full Name</label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-id-badge"></i>
+            <input
+              type="text"
+              id="signup-name"
+              placeholder="Suyash Gharat"
+              autocomplete="name"
+              onkeydown="if(event.key==='Enter')document.getElementById('signup-username').focus()"
+            />
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="auth-field">
+          <label>
+            Username
+            <span class="auth-hint"> — used to log in, cannot be changed</span>
+          </label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-at"></i>
+            <input
+              type="text"
+              id="signup-username"
+              placeholder="suyash_gharat"
+              autocomplete="username"
+              oninput="checkUsername(this.value)"
+              onkeydown="if(event.key==='Enter')document.getElementById('signup-password').focus()"
+            />
+            <span class="auth-check-icon" id="signup-username-icon"></span>
+          </div>
+          <div class="auth-field-hint" id="username-hint"></div>
+        </div>
+
+        <!-- Password -->
+        <div class="auth-field">
+          <label>
+            Password
+            <span class="auth-hint"> — min 6 characters</span>
+          </label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-lock"></i>
+            <input
+              type="password"
+              id="signup-password"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              oninput="checkPasswordStrength(this.value)"
+              onkeydown="if(event.key==='Enter')document.getElementById('signup-confirm').focus()"
+            />
+            <button class="auth-eye-btn" onclick="togglePass('signup-password',this)" type="button">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+          <!-- Password strength bar -->
+          <div class="auth-strength-bar">
+            <div class="auth-strength-fill" id="strength-fill"></div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="auth-field">
+          <label>Confirm Password</label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-lock-check"></i>
+            <input
+              type="password"
+              id="signup-confirm"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              onkeydown="if(event.key==='Enter')doSignup()"
+            />
+            <button class="auth-eye-btn" onclick="togglePass('signup-confirm',this)" type="button">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error / Success -->
+        <div class="auth-error" id="signup-error"></div>
+        <div class="auth-success" id="signup-success"></div>
+
+        <!-- Submit -->
+        <button class="auth-submit-btn" onclick="doSignup()" id="signup-btn">
+          <span id="signup-btn-text" style="display:flex;align-items:center;gap:8px">
+            <i class="ti ti-user-plus"></i> Create Account
+          </span>
+          <div class="auth-spinner" id="signup-spinner" style="display:none"></div>
+        </button>
+
+        <!-- Divider -->
+        <div class="auth-divider"><span>Already have an account?</span></div>
+
+        <!-- Go to login -->
+        <a href="login.html" class="auth-alt-btn">
+          <i class="ti ti-login"></i> Sign In
+        </a>
+
+        <!-- Terms -->
+        <p class="auth-terms">
+          By creating an account you agree to use this planner responsibly.<br/>
+          Your data is stored securely in Supabase.
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Extra styles just for signup page -->
+<style>
+.auth-field-hint{
+  font-size:11px;color:var(--text3);margin-top:5px;
+  padding-left:4px;min-height:16px;
+}
+.auth-steps{display:flex;flex-direction:column;gap:18px;margin-top:32px}
+.auth-step{display:flex;align-items:flex-start;gap:14px}
+.auth-step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(56,189,248,0.15);
+  border:1.5px solid rgba(56,189,248,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:var(--sky2);
+  flex-shrink:0;margin-top:2px;
+}
+.auth-step-title{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:2px}
+.auth-step-sub{font-size:12px;color:var(--text2)}
+</style>
+
+<script src="auth.js"></script>
+<script>
+// Redirect to planner if already logged in
+(async () => {
+  const { data: { session } } = await _supa.auth.getSession();
+  if (session) window.location.href = 'index.html';
+})();
+
+// Live username hint
+const _origCheckUsername = checkUsername;
+checkUsername = function(val) {
+  _origCheckUsername(val);
+  const hint = document.getElementById('username-hint');
+  if (!hint) return;
+  val = val.trim().toLowerCase();
+  if (!val) { hint.textContent = ''; return; }
+  if (val.length < 3) { hint.textContent = 'At least 3 characters'; return; }
+  if (!/^[a-z0-9_]+$/.test(val)) {
+    hint.textContent = 'Only lowercase letters, numbers, underscores (_)';
+    hint.style.color = '#f87171';
+  } else {
+    hint.textContent = 'Looks good!';
+    hint.style.color = 'var(--text3)';
+  }
+};
+
+async function doSignup() {
+  const name     = document.getElementById('signup-name').value.trim();
+  const username = document.getElementById('signup-username').value.trim().toLowerCase();
+  const password = document.getElementById('signup-password').value;
+  const confirm  = document.getElementById('signup-confirm').value;
+
+  // Clear messages
+  showError('signup', '');
+  showSuccess('signup', '');
+
+  // Validation
+  if (!name)                           return showError('signup', 'Please enter your full name');
+  if (!username || username.length < 3) return showError('signup', 'Username must be at least 3 characters');
+  if (!/^[a-z0-9_]+$/.test(username))  return showError('signup', 'Username: only lowercase letters, numbers, underscores');
+  if (password.length < 6)             return showError('signup', 'Password must be at least 6 characters');
+  if (password !== confirm)            return showError('signup', 'Passwords do not match');
+
+  setLoading('signup', true);
+
+  try {
+    // Step 1: Check username not already taken
+    const { data: existing } = await _supa
+      .from('usernames')
+      .select('username')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (existing) {
+      setLoading('signup', false);
+      return showError('signup', 'Username already taken — please choose another');
+    }
+
+    // Step 2: Create auth user with internal fake email
+    const fakeEmail = `${username}@wlp-internal.app`;
+    const { data: authData, error: authErr } = await _supa.auth.signUp({
+      email:    fakeEmail,
+      password: password,
+      options:  { data: { name, username } }
+    });
+
+    if (authErr) {
+      setLoading('signup', false);
+      return showError('signup', authErr.message || 'Signup failed. Try again.');
+    }
+
+    const userId = authData?.user?.id;
+    if (!userId) {
+      setLoading('signup', false);
+      return showError('signup', 'Account creation failed. Please try again.');
+    }
+
+    // Step 3: Save profile to database
+    await _supa.from('profiles').upsert({
+      id:       userId,
+      name:     name,
+      username: username,
+      color:    '#0ea5e9'
+    });
+
+    // Step 4: Save username → user_id mapping
+    await _supa.from('usernames').insert({
+      username: username,
+      user_id:  userId
+    });
+
+    // Step 5: Auto sign in after signup
+    const { error: loginErr } = await _supa.auth.signInWithPassword({
+      email:    fakeEmail,
+      password: password
+    });
+
+    setLoading('signup', false);
+
+    if (loginErr) {
+      // Signup worked but auto-login failed → send to login page
+      showSuccess('signup', 'Account created! Please sign in.');
+      setTimeout(() => window.location.href = 'login.html', 2000);
+    } else {
+      // All good → go straight to planner
+      window.location.href = 'index.html';
+    }
+
+  } catch (err) {
+    setLoading('signup', false);
+    showError('signup', err.message || 'Something went wrong. Please try again.');
+  }
+}
+</script>
+
+</body>
+</html>
