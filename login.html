@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — WorkLife Planner Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="auth.css"/>
+</head>
+<body>
+
+<div class="auth-bg">
+  <div class="auth-orb auth-orb-1"></div>
+  <div class="auth-orb auth-orb-2"></div>
+  <div class="auth-orb auth-orb-3"></div>
+
+  <div class="auth-split">
+
+    <!-- LEFT: Brand Panel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-content">
+        <div class="auth-brand-logo">
+          <i class="ti ti-layout-kanban"></i>
+        </div>
+        <h1 class="auth-brand-name">WorkLife</h1>
+        <p class="auth-brand-tagline">Planner Pro</p>
+        <p class="auth-brand-desc">
+          Your all-in-one productivity workspace. Tasks, habits, goals,
+          notebook — everything in one beautiful place.
+        </p>
+        <div class="auth-features">
+          <div class="auth-feature">
+            <i class="ti ti-calendar-week"></i>
+            <span>Weekly Task Grid</span>
+          </div>
+          <div class="auth-feature">
+            <i class="ti ti-notebook"></i>
+            <span>Smart Notebook</span>
+          </div>
+          <div class="auth-feature">
+            <i class="ti ti-users"></i>
+            <span>Team Collaboration</span>
+          </div>
+          <div class="auth-feature">
+            <i class="ti ti-chart-bar"></i>
+            <span>Analytics Dashboard</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Login Form -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
+
+        <!-- App logo (mobile only / small header) -->
+        <div class="auth-card-logo">
+          <div class="auth-card-logo-icon">
+            <i class="ti ti-layout-kanban"></i>
+          </div>
+          <div class="auth-card-app-name">WorkLife Planner Pro</div>
+        </div>
+
+        <h2 class="auth-title">Welcome back 👋</h2>
+        <p class="auth-sub">Sign in to continue to your planner</p>
+
+        <!-- Username -->
+        <div class="auth-field">
+          <label>Username</label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-user"></i>
+            <input
+              type="text"
+              id="login-username"
+              placeholder="your_username"
+              autocomplete="username"
+              onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-input-wrap">
+            <i class="ti ti-lock"></i>
+            <input
+              type="password"
+              id="login-password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              onkeydown="if(event.key==='Enter')doLogin()"
+            />
+            <button class="auth-eye-btn" onclick="togglePass('login-password',this)" type="button">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        <div class="auth-error" id="login-error"></div>
+
+        <!-- Submit -->
+        <button class="auth-submit-btn" onclick="doLogin()" id="login-btn">
+          <span id="login-btn-text" style="display:flex;align-items:center;gap:8px">
+            <i class="ti ti-login"></i> Sign In
+          </span>
+          <div class="auth-spinner" id="login-spinner" style="display:none"></div>
+        </button>
+
+        <!-- Divider -->
+        <div class="auth-divider"><span>New to WorkLife Planner?</span></div>
+
+        <!-- Go to signup -->
+        <a href="signup.html" class="auth-alt-btn">
+          <i class="ti ti-user-plus"></i> Create Account
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+// Redirect to planner if already logged in
+(async () => {
+  const { data: { session } } = await _supa.auth.getSession();
+  if (session) window.location.href = 'index.html';
+})();
+
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+
+  // Clear old errors
+  showError('login', '');
+
+  // Basic validation
+  if (!username) return showError('login', 'Please enter your username');
+  if (!password) return showError('login', 'Please enter your password');
+
+  setLoading('login', true);
+
+  try {
+    // Step 1: Look up username → get internal email
+    const { data: row, error: lookupErr } = await _supa
+      .from('usernames')
+      .select('user_id')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (lookupErr || !row) {
+      setLoading('login', false);
+      return showError('login', 'Username not found. Check spelling or create an account.');
+    }
+
+    // Step 2: Sign in with internal email + password
+    const fakeEmail = `${username}@wlp-internal.app`;
+    const { error: authErr } = await _supa.auth.signInWithPassword({
+      email: fakeEmail,
+      password: password
+    });
+
+    if (authErr) {
+      setLoading('login', false);
+      return showError('login', 'Incorrect password. Please try again.');
+    }
+
+    // Step 3: Success → go to planner
+    window.location.href = 'index.html';
+
+  } catch (err) {
+    setLoading('login', false);
+    showError('login', err.message || 'Something went wrong. Please try again.');
+  }
+}
+</script>
+
+</body>
+</html>
