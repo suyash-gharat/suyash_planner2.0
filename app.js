@@ -869,11 +869,22 @@ function handleProfileUpload(e){
   reader.readAsDataURL(file);
   e.target.value='';
 }
-function applyProfilePic(b64){
+function applyProfilePic(src){
   const img=document.getElementById('sb-profile-img');
   const ini=document.getElementById('sb-profile-initials');
-  if(b64){img.src=b64;img.style.display='block';ini.style.display='none';}
-  else{img.style.display='none';ini.style.display='flex';}
+  if(!img||!ini)return;
+  if(src){
+    // Add cache-buster to force browser to reload image URL
+    const finalSrc = src.startsWith('http') ? src+'?t='+Date.now() : src;
+    img.onload = function(){ img.style.display='block'; ini.style.display='none'; };
+    img.onerror = function(){ img.style.display='none'; ini.style.display='flex'; };
+    img.src = finalSrc;
+    img.style.display='block';
+    ini.style.display='none';
+  } else {
+    img.style.display='none';
+    ini.style.display='flex';
+  }
 }
 function getInitials(name){
   const parts=name.trim().split(/\s+/);
@@ -1892,7 +1903,8 @@ async function initAuth() {
     const p = _currentUser.name.trim().split(/\s+/);
     iniEl.textContent = p.length>1 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : _currentUser.name.slice(0,2).toUpperCase();
   }
-  if (_currentUser.avatar_url) applyProfilePic(_currentUser.avatar_url);
+  const picSrc = _currentUser.avatar_url || localStorage.getItem('profilePic');
+  if (picSrc) applyProfilePic(picSrc);
 
   updateSbGreeting();
   await supaLoadAll();
@@ -1989,6 +2001,7 @@ handleProfileUpload = async function(e) {
       const { data } = _supa.storage.from('avatars').getPublicUrl(path);
       await _supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',_currentUser.id);
       _currentUser.avatar_url = data.publicUrl;
+      localStorage.setItem('profilePic', data.publicUrl);
       applyProfilePic(data.publicUrl);
       toast('Profile picture updated ✓');
     } catch(err) { toast('Upload failed'); }
