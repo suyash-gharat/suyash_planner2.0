@@ -2056,3 +2056,259 @@ function nbInsertFileUpload() {
 // ── Boot ──
 document.addEventListener('DOMContentLoaded', initAuth);
 if (document.readyState !== 'loading') initAuth();
+
+// =============================================
+//  DAILY LOG
+// =============================================
+const DL_MAX_TASKS = 8;
+
+let dlData = load('dailyLog', { cols: ['Task 1','Task 2','Task 3'], rows: [] });
+// rows: [{ id, date, dateLabel, tasks: [{text,done},...] }]
+
+function dlSave() { save('dailyLog', dlData); }
+
+function dlFmtDate(d) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day = d.getDate();
+  const suffix = day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  return `${day}${suffix} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function dlIsToday(dateLabel) {
+  return dateLabel === dlFmtDate(new Date());
+}
+
+// ── Render ──────────────────────────────────
+function dlRender() {
+  const empty   = document.getElementById('dl-empty');
+  const tableWrap = document.querySelector('.dl-table-wrap');
+  const thead   = document.getElementById('dl-thead-row');
+  const tbody   = document.getElementById('dl-tbody');
+  const addBtn  = document.getElementById('dl-add-col-btn');
+  if (!tbody) return;
+
+  const hasRows = dlData.rows.length > 0;
+  if (empty)    empty.style.display    = hasRows ? 'none' : 'flex';
+  if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
+
+  if (!hasRows) return;
+
+  // Build header columns
+  const colsHtml = dlData.cols.map((col, ci) => `
+    <th>
+      <div class="dl-task-th-inner">
+        <input class="dl-col-name" value="${esc(col)}" title="Click to rename"
+          onchange="dlRenameCol(${ci},this.value)"
+          onblur="dlRenameCol(${ci},this.value)"/>
+        <button class="dl-col-del" onclick="dlDeleteCol(${ci})" title="Remove column">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+    </th>
+  `).join('');
+
+  // Rebuild header (keep first date-th and last two cols)
+  thead.innerHTML = `
+    <th class="dl-date-th">Date</th>
+    ${colsHtml}
+    <th class="dl-add-col">
+      <button class="dl-add-task-btn" onclick="dlAddTaskCol()" id="dl-add-col-btn"
+        ${dlData.cols.length >= DL_MAX_TASKS ? 'disabled' : ''}>
+        <i class="ti ti-plus"></i> Add Task
+      </button>
+    </th>
+    <th class="dl-dl-col"><i class="ti ti-download"></i></th>
+  `;
+
+  // Build rows
+  tbody.innerHTML = dlData.rows.map((row, ri) => {
+    const isToday = dlIsToday(row.dateLabel);
+    const taskCells = dlData.cols.map((_, ci) => {
+      const task = row.tasks[ci] || { text:'', done:false };
+      return `
+        <td class="dl-task-cell">
+          <div class="dl-task-wrap">
+            <input type="checkbox" class="dl-check"
+              ${task.done ? 'checked' : ''}
+              onchange="dlToggleTask(${ri},${ci},this.checked)"/>
+            <textarea class="dl-task-input" rows="1"
+              placeholder="Write task…"
+              oninput="dlUpdateTask(${ri},${ci},this.value);autoResize(this)"
+              onfocus="autoResize(this)"
+              onblur="dlSave()"
+              >${esc(task.text)}</textarea>
+          </div>
+        </td>`;
+    }).join('');
+
+    return `
+      <tr class="${isToday ? 'dl-today-row' : ''}" id="dl-row-${row.id}">
+        <td class="dl-date-cell">
+          <div class="dl-date-label">
+            <div class="dl-date-dot"></div>
+            <span>${esc(row.dateLabel)}</span>
+            <button class="dl-date-del" onclick="dlDeleteRow('${row.id}')" title="Delete row">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </td>
+        ${taskCells}
+        <td></td>
+        <td class="dl-row-dl-cell">
+          <button class="dl-row-dl-btn" onclick="dlDownloadRow('${row.id}')" title="Download this row">
+            <i class="ti ti-download"></i>
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+
+  // Auto-resize all textareas
+  setTimeout(() => {
+    document.querySelectorAll('.dl-task-input').forEach(autoResize);
+  }, 50);
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(32, el.scrollHeight) + 'px';
+}
+
+// ── Add today's date row ──────────────────────
+function dlAddToday() {
+  const label = dlFmtDate(new Date());
+  // Don't add duplicate
+  if (dlData.rows.find(r => r.dateLabel === label)) {
+    toast('Today\'s date already added');
+    return;
+  }
+  dlData.rows.unshift({
+    id: 'dl_' + Date.now(),
+    dateLabel: label,
+    tasks: dlData.cols.map(() => ({ text:'', done:false }))
+  });
+  dlSave();
+  dlRender();
+  toast('Today added ✓');
+}
+
+// ── Add custom date row ───────────────────────
+function dlAddDateRow(dateStr) {
+  const d = new Date(dateStr);
+  const label = dlFmtDate(d);
+  if (dlData.rows.find(r => r.dateLabel === label)) {
+    toast('Date already exists');
+    return;
+  }
+  dlData.rows.unshift({
+    id: 'dl_' + Date.now(),
+    dateLabel: label,
+    tasks: dlData.cols.map(() => ({ text:'', done:false }))
+  });
+  dlSave();
+  dlRender();
+}
+
+// ── Delete row ────────────────────────────────
+function dlDeleteRow(id) {
+  if (!confirm('Delete this date row?')) return;
+  dlData.rows = dlData.rows.filter(r => r.id !== id);
+  dlSave();
+  dlRender();
+}
+
+// ── Add task column ───────────────────────────
+function dlAddTaskCol() {
+  if (dlData.cols.length >= DL_MAX_TASKS) { toast('Maximum 8 task columns'); return; }
+  const num = dlData.cols.length + 1;
+  dlData.cols.push(`Task ${num}`);
+  dlData.rows.forEach(r => r.tasks.push({ text:'', done:false }));
+  dlSave();
+  dlRender();
+}
+
+// ── Delete task column ────────────────────────
+function dlDeleteCol(ci) {
+  if (dlData.cols.length <= 1) { toast('Need at least 1 column'); return; }
+  if (!confirm(`Delete column "${dlData.cols[ci]}"?`)) return;
+  dlData.cols.splice(ci, 1);
+  dlData.rows.forEach(r => r.tasks.splice(ci, 1));
+  dlSave();
+  dlRender();
+}
+
+// ── Rename column ─────────────────────────────
+function dlRenameCol(ci, val) {
+  dlData.cols[ci] = val.trim() || `Task ${ci+1}`;
+  dlSave();
+}
+
+// ── Update task text ──────────────────────────
+function dlUpdateTask(ri, ci, val) {
+  if (!dlData.rows[ri]) return;
+  if (!dlData.rows[ri].tasks[ci]) dlData.rows[ri].tasks[ci] = { text:'', done:false };
+  dlData.rows[ri].tasks[ci].text = val;
+}
+
+// ── Toggle task done ──────────────────────────
+function dlToggleTask(ri, ci, done) {
+  if (!dlData.rows[ri]) return;
+  if (!dlData.rows[ri].tasks[ci]) dlData.rows[ri].tasks[ci] = { text:'', done:false };
+  dlData.rows[ri].tasks[ci].done = done;
+  dlSave();
+}
+
+// ── Download ALL as CSV ───────────────────────
+function dlDownload() {
+  if (!dlData.rows.length) { toast('No data to download'); return; }
+  const headers = ['Date', ...dlData.cols];
+  const rows = dlData.rows.map(row => [
+    row.dateLabel,
+    ...dlData.cols.map((_, ci) => {
+      const t = row.tasks[ci] || { text:'', done:false };
+      return t.done ? `[✓] ${t.text}` : t.text;
+    })
+  ]);
+  const csv = [headers, ...rows]
+    .map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `daily-log-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Downloaded ✓');
+}
+
+// ── Download single row ───────────────────────
+function dlDownloadRow(id) {
+  const row = dlData.rows.find(r => r.id === id);
+  if (!row) return;
+  const headers = ['Date', ...dlData.cols];
+  const data = [
+    row.dateLabel,
+    ...dlData.cols.map((_, ci) => {
+      const t = row.tasks[ci] || { text:'', done:false };
+      return t.done ? `[✓] ${t.text}` : t.text;
+    })
+  ];
+  const csv = [headers, data]
+    .map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `log-${row.dateLabel.replace(/\s+/g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Row downloaded ✓');
+}
+
+// ── Init when view opens ──────────────────────
+const _origSwitchViewDL = switchView;
+switchView = function(name) {
+  _origSwitchViewDL(name);
+  if (name === 'dailylog') setTimeout(dlRender, 50);
+};
