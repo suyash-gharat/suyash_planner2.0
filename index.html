@@ -102,6 +102,7 @@
 
     <a class="sb-link" data-view="today"><i class="ti ti-sun"></i>Today's Tasks</a>
     <a class="sb-link" data-view="notebook"><i class="ti ti-notebook"></i>Notebook</a>
+    <a class="sb-link" data-view="dailylog"><i class="ti ti-table"></i>Daily Log</a>
 
     <div class="sb-sec">Planner</div>
     <a class="sb-link" data-view="tasks"><i class="ti ti-list-check"></i>All Tasks</a>
@@ -620,6 +621,47 @@
     <button class="nb-mob-chapters-btn" id="nb-mob-chapters-btn" onclick="nbToggleMobileChapters()">
       <i class="ti ti-layout-sidebar"></i> Chapters
     </button>
+  </div>
+</section>
+
+<!-- ===== DAILY LOG ===== -->
+<section id="view-dailylog" class="view">
+  <div class="page-hdr">
+    <div>
+      <h1 class="page-title"><i class="ti ti-table"></i> Daily Task Log</h1>
+      <p class="page-sub">Track what you accomplish each day — add tasks per date and download anytime</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="dlAddToday()"><i class="ti ti-calendar-plus"></i> Add Today</button>
+      <button class="btn-primary" onclick="dlDownload()"><i class="ti ti-download"></i> Download</button>
+    </div>
+  </div>
+
+  <!-- Table wrap -->
+  <div class="dl-table-wrap">
+    <table class="dl-table" id="dl-table">
+      <thead>
+        <tr id="dl-thead-row">
+          <th class="dl-date-th">Date</th>
+          <!-- task columns injected by JS -->
+          <th class="dl-add-col">
+            <button class="dl-add-task-btn" onclick="dlAddTaskCol()" id="dl-add-col-btn">
+              <i class="ti ti-plus"></i> Add Task
+            </button>
+          </th>
+          <th class="dl-dl-col"><i class="ti ti-download"></i></th>
+        </tr>
+      </thead>
+      <tbody id="dl-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Empty state -->
+  <div class="dl-empty" id="dl-empty">
+    <div class="dl-empty-icon">📋</div>
+    <div class="dl-empty-title">No log entries yet</div>
+    <div class="dl-empty-sub">Click "Add Today" to start tracking your daily tasks</div>
+    <button class="btn-primary" onclick="dlAddToday()"><i class="ti ti-plus"></i> Add Today's Date</button>
   </div>
 </section>
 
