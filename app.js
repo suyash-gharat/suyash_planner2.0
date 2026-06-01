@@ -1863,6 +1863,21 @@ async function initAuth() {
 
   _currentUser = await getCurrentUserProfile();
 
+  // Clear localStorage if a different user logged in
+  const storedUserId = localStorage.getItem('wlp-active-user');
+  if (storedUserId && storedUserId !== _currentUser.id) {
+    // Different user — wipe all cached data
+    const keysToKeep = ['wlp-theme'];
+    const savedTheme = localStorage.getItem('wlp-theme');
+    localStorage.clear();
+    if (savedTheme) localStorage.setItem('wlp-theme', savedTheme);
+    // Reset in-memory state
+    fixedTasks = []; gridChecks = {};
+    teammates = []; memberFixedTasks = {}; memberGridChecks = {};
+    nbChapters = []; nbActiveId = null;
+  }
+  localStorage.setItem('wlp-active-user', _currentUser.id);
+
   // Show logout btn
   const lb = document.getElementById('logout-btn');
   if (lb) lb.style.display = 'flex';
