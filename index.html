@@ -626,19 +626,48 @@
 
 <!-- ===== DAILY LOG ===== -->
 <section id="view-dailylog" class="view">
-  <div class="page-hdr">
-    <div>
-      <h1 class="page-title"><i class="ti ti-table"></i> Daily Task Log</h1>
-      <p class="page-sub">Track what you accomplish each day — add tasks per date and download anytime</p>
+
+  <!-- ── Premium Header ── -->
+  <div class="dl-hero">
+    <div class="dl-hero-left">
+      <div class="dl-hero-icon"><i class="ti ti-layout-grid"></i></div>
+      <div>
+        <h1 class="dl-hero-title">Daily Task Log</h1>
+        <p class="dl-hero-sub">Track what you accomplish each day — add tasks per date and download anytime</p>
+      </div>
     </div>
-    <div class="hdr-btns">
-      <button class="btn-outline" onclick="dlAddToday()"><i class="ti ti-calendar-plus"></i> Add Today</button>
-      <button class="btn-primary" onclick="dlDownload()"><i class="ti ti-download"></i> Download</button>
+    <div class="dl-hero-actions">
+      <button class="dl-btn-ghost" onclick="dlAddToday()">
+        <i class="ti ti-calendar-plus"></i> Add Today
+      </button>
+      <button class="dl-btn-primary" onclick="dlDownload()">
+        <i class="ti ti-download"></i> Download CSV
+      </button>
     </div>
   </div>
 
-  <!-- Table wrap -->
-  <div class="dl-table-wrap">
+  <!-- ── Stats Strip ── -->
+  <div class="dl-stats-strip" id="dl-stats-strip" style="display:none">
+    <div class="dl-stat-pill">
+      <i class="ti ti-calendar-stats"></i>
+      <span id="dl-stat-days">0</span> days logged
+    </div>
+    <div class="dl-stat-pill">
+      <i class="ti ti-check"></i>
+      <span id="dl-stat-done">0</span> tasks done
+    </div>
+    <div class="dl-stat-pill">
+      <i class="ti ti-list"></i>
+      <span id="dl-stat-total">0</span> total tasks
+    </div>
+    <div class="dl-stat-pill dl-stat-accent">
+      <i class="ti ti-trending-up"></i>
+      <span id="dl-stat-pct">0%</span> completion rate
+    </div>
+  </div>
+
+  <!-- ── Table wrap ── -->
+  <div class="dl-table-wrap" style="display:none">
     <table class="dl-table" id="dl-table">
       <thead>
         <tr id="dl-thead-row">
@@ -656,13 +685,19 @@
     </table>
   </div>
 
-  <!-- Empty state -->
+  <!-- ── Empty state ── -->
   <div class="dl-empty" id="dl-empty">
-    <div class="dl-empty-icon">📋</div>
-    <div class="dl-empty-title">No log entries yet</div>
-    <div class="dl-empty-sub">Click "Add Today" to start tracking your daily tasks</div>
-    <button class="btn-primary" onclick="dlAddToday()"><i class="ti ti-plus"></i> Add Today's Date</button>
+    <div class="dl-empty-glow"></div>
+    <div class="dl-empty-icon-wrap">
+      <i class="ti ti-layout-grid" style="font-size:40px;color:var(--sky2)"></i>
+    </div>
+    <div class="dl-empty-title">Your log is empty</div>
+    <div class="dl-empty-sub">Start tracking your daily tasks — add today's date and fill in what you're working on.</div>
+    <button class="dl-btn-primary dl-empty-btn" onclick="dlAddToday()">
+      <i class="ti ti-plus"></i> Add Today's Date
+    </button>
   </div>
+
 </section>
 
 </main>
