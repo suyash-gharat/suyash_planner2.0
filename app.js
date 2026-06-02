@@ -2091,6 +2091,28 @@ function dlRender() {
   if (empty)    empty.style.display    = hasRows ? 'none' : 'flex';
   if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
 
+  // Update stats strip
+  const statsStrip = document.getElementById('dl-stats-strip');
+  if (statsStrip) statsStrip.style.display = hasRows ? 'flex' : 'none';
+  if (hasRows) {
+    let totalTasks = 0, doneTasks = 0;
+    dlData.rows.forEach(r => {
+      dlData.cols.forEach((_, ci) => {
+        const t = r.tasks[ci];
+        if (t && t.text) { totalTasks++; if (t.done) doneTasks++; }
+      });
+    });
+    const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+    const sdEl = document.getElementById('dl-stat-days');
+    const sDoneEl = document.getElementById('dl-stat-done');
+    const sTotalEl = document.getElementById('dl-stat-total');
+    const sPctEl = document.getElementById('dl-stat-pct');
+    if (sdEl) sdEl.textContent = dlData.rows.length;
+    if (sDoneEl) sDoneEl.textContent = doneTasks;
+    if (sTotalEl) sTotalEl.textContent = totalTasks;
+    if (sPctEl) sPctEl.textContent = pct + '%';
+  }
+
   if (!hasRows) return;
 
   // Build header columns
@@ -2147,6 +2169,7 @@ function dlRender() {
           <div class="dl-date-label">
             <div class="dl-date-dot"></div>
             <span>${esc(row.dateLabel)}</span>
+            ${isToday ? '<span class="dl-date-badge">Today</span>' : ''}
             <button class="dl-date-del" onclick="dlDeleteRow('${row.id}')" title="Delete row">
               <i class="ti ti-trash"></i>
             </button>
