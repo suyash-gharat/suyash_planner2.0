@@ -2149,3 +2149,43 @@ html[data-theme="light"] .nb-empty-title { color:#1e293b }
 @media(min-width:901px){
   .nb-mob-chapters-btn { display:none }
 }
+
+
+/* ─── Daily Log Stats Bar ─── */
+.dl-stats-bar {
+  display:flex;align-items:center;gap:0;
+  background:rgba(255,255,255,0.045);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius);
+  padding:0;margin-bottom:18px;
+  overflow:hidden;box-shadow:var(--shadow);
+  backdrop-filter:blur(12px);
+}
+.dl-stat {
+  display:flex;align-items:center;gap:8px;
+  padding:14px 22px;flex:1;
+  font-size:13px;font-weight:600;color:var(--text);
+}
+.dl-stat i { font-size:16px;color:var(--sky2);flex-shrink:0 }
+.dl-stat span:nth-child(2) {
+  font-family:var(--mono);font-size:18px;font-weight:800;color:#fff;
+}
+.dl-stat-lbl { font-size:11px;color:var(--text3);font-weight:500 }
+.dl-stat-divider {
+  width:1px;height:40px;background:rgba(255,255,255,0.07);flex-shrink:0;
+}
+
+/* Light theme stats bar */
+html[data-theme="light"] .dl-stats-bar {
+  background:#fff;border-color:rgba(15,31,75,0.09);
+}
+html[data-theme="light"] .dl-stat span:nth-child(2) { color:#0f1f4b }
+html[data-theme="light"] .dl-stat-lbl { color:#5572a0 }
+html[data-theme="light"] .dl-stat-divider { background:rgba(15,31,75,0.08) }
+
+/* Mobile stats bar */
+@media(max-width:600px) {
+  .dl-stats-bar { flex-wrap:wrap;padding:4px 0 }
+  .dl-stat { flex:1 1 45%;padding:10px 14px }
+  .dl-stat-divider { display:none }
+}
