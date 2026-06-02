@@ -2503,3 +2503,422 @@ html[data-theme="light"] .dl-task-input { color:#1e293b }
 html[data-theme="light"] .dl-task-input:focus { background:rgba(14,165,233,0.06) }
 html[data-theme="light"] .dl-date-cell { color:#0f1f4b }
 html[data-theme="light"] .dl-col-name { color:#0ea5e9 }
+
+/* =============================================
+   DAILY LOG — PREMIUM REDESIGN
+   ============================================= */
+
+#view-dailylog {
+  padding: 28px 28px 80px;
+}
+
+/* ── Hero Header ── */
+.dl-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(56,189,248,0.15);
+  background:
+    linear-gradient(135deg,
+      rgba(14,165,233,0.12) 0%,
+      rgba(129,140,248,0.08) 50%,
+      rgba(16,185,129,0.06) 100%
+    );
+  background-size: 300% 300%;
+  animation: hero-slide 8s ease infinite;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+.dl-hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -5%;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.dl-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dl-hero-icon {
+  width: 54px; height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff; flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(14,165,233,0.45);
+}
+.dl-hero-icon i { font-size: 26px }
+
+.dl-hero-title {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 30%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -.5px;
+  margin: 0 0 4px;
+}
+
+.dl-hero-sub {
+  font-size: 12.5px;
+  color: var(--text3);
+  margin: 0;
+}
+
+.dl-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── Hero Buttons ── */
+.dl-btn-ghost {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text2);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  font-family: var(--font);
+  backdrop-filter: blur(8px);
+}
+.dl-btn-ghost:hover {
+  border-color: var(--sky2);
+  color: var(--sky2);
+  background: rgba(56,189,248,0.08);
+  transform: translateY(-2px);
+}
+
+.dl-btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  background: var(--grad-sky);
+  border: none; color: #fff;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  font-family: var(--font);
+  box-shadow: 0 4px 18px rgba(14,165,233,0.4);
+  position: relative; overflow: hidden;
+}
+.dl-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(14,165,233,0.55);
+}
+.dl-btn-primary:active { transform: translateY(0); }
+
+/* ── Stats Strip ── */
+.dl-stats-strip {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.dl-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  font-size: 12.5px;
+  color: var(--text2);
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transition: all .2s;
+}
+.dl-stat-pill i { font-size: 14px; color: var(--sky2) }
+.dl-stat-pill span { color: #fff; font-weight: 800 }
+.dl-stat-pill:hover { border-color: rgba(56,189,248,0.25); transform: translateY(-1px) }
+
+.dl-stat-accent {
+  background: rgba(56,189,248,0.1);
+  border-color: rgba(56,189,248,0.25);
+}
+.dl-stat-accent i { color: var(--emerald) }
+.dl-stat-accent span { color: var(--emerald) }
+
+/* ── Table wrapper ── */
+.dl-table-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: var(--shadow-md);
+  background: rgba(8,16,34,0.7);
+  backdrop-filter: blur(16px);
+}
+
+.dl-table {
+  width: 100%; border-collapse: collapse;
+  min-width: 600px; font-size: 13px;
+}
+
+/* ── Header row ── */
+.dl-table thead tr {
+  background: linear-gradient(90deg, rgba(14,165,233,0.18), rgba(129,140,248,0.1));
+  border-bottom: 2px solid rgba(56,189,248,0.2);
+}
+.dl-table th {
+  padding: 14px 16px; text-align: left;
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--sky2); white-space: nowrap;
+}
+.dl-date-th { width: 160px; min-width: 160px }
+.dl-add-col  { width: 160px }
+.dl-dl-col   { width: 50px; text-align: center; color: var(--text3) }
+
+/* ── Task column header ── */
+.dl-task-th-inner {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+}
+.dl-col-name {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--sky2); font-size: 10.5px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  font-family: var(--font); cursor: pointer; min-width: 60px;
+  padding: 3px 6px; border-radius: 6px;
+  transition: background .15s;
+}
+.dl-col-name:focus {
+  background: rgba(56,189,248,0.12); color: #fff;
+  box-shadow: 0 0 0 2px rgba(56,189,248,0.3);
+}
+.dl-col-del {
+  width: 20px; height: 20px; border-radius: 6px;
+  background: transparent; border: none;
+  color: rgba(244,63,94,0.4); font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0; opacity: 0;
+}
+.dl-table th:hover .dl-col-del { opacity: 1 }
+.dl-col-del:hover { background: rgba(244,63,94,0.18); color: #f43f5e; opacity: 1 }
+
+/* ── Body rows ── */
+.dl-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background .18s;
+}
+.dl-table tbody tr:last-child { border-bottom: none }
+.dl-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(14,165,233,0.06), rgba(129,140,248,0.03));
+}
+
+/* ── Date cell ── */
+.dl-date-cell {
+  padding: 14px 16px;
+  font-size: 13px; font-weight: 700; color: var(--text);
+  white-space: nowrap;
+  border-right: 2px solid rgba(56,189,248,0.12);
+  min-width: 160px;
+}
+.dl-date-label {
+  display: flex; align-items: center; gap: 9px;
+}
+.dl-date-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: var(--grad-sky);
+  box-shadow: 0 0 8px rgba(56,189,248,0.6);
+}
+.dl-date-badge {
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 8px; border-radius: 8px;
+  background: rgba(56,189,248,0.15);
+  color: var(--sky2);
+  border: 1px solid rgba(56,189,248,0.25);
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.dl-date-del {
+  width: 20px; height: 20px; border-radius: 6px;
+  background: transparent; border: none;
+  color: rgba(244,63,94,0.4); font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; opacity: 0; margin-left: auto;
+}
+.dl-table tbody tr:hover .dl-date-del { opacity: 1 }
+.dl-date-del:hover { background: rgba(244,63,94,0.18); color: #f43f5e }
+
+/* ── Task cells ── */
+.dl-task-cell {
+  padding: 8px 12px;
+  min-width: 150px;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.dl-task-wrap {
+  position: relative; display: flex; align-items: flex-start; gap: 8px;
+}
+.dl-check {
+  width: 16px; height: 16px; border-radius: 5px;
+  border: 1.5px solid rgba(56,189,248,0.4);
+  background: transparent; cursor: pointer;
+  flex-shrink: 0; margin-top: 7px;
+  accent-color: var(--sky);
+  transition: all .15s;
+}
+.dl-task-input {
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-size: 13px; font-family: var(--font);
+  padding: 6px 8px; border-radius: 8px;
+  transition: background .15s, box-shadow .15s;
+  resize: none; line-height: 1.45; min-height: 32px;
+}
+.dl-task-input::placeholder { color: var(--text3); font-style: italic }
+.dl-task-input:focus {
+  background: rgba(56,189,248,0.07);
+  box-shadow: 0 0 0 2px rgba(56,189,248,0.25);
+  color: #fff;
+}
+.dl-check:checked + .dl-task-input {
+  text-decoration: line-through;
+  color: var(--text3);
+}
+
+/* ── Row download cell ── */
+.dl-row-dl-cell { text-align: center; padding: 8px 6px }
+.dl-row-dl-btn {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2);
+  color: var(--sky2); font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; transition: all .2s; opacity: 0;
+}
+.dl-table tbody tr:hover .dl-row-dl-btn { opacity: 1 }
+.dl-row-dl-btn:hover {
+  background: var(--grad-sky); border-color: transparent; color: #fff;
+  transform: scale(1.1); box-shadow: 0 4px 14px rgba(14,165,233,0.45);
+}
+
+/* ── Add task column button ── */
+.dl-add-task-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  background: rgba(56,189,248,0.07);
+  border: 1px dashed rgba(56,189,248,0.3);
+  color: var(--sky2); font-size: 11.5px; font-weight: 700;
+  cursor: pointer; transition: all .2s; font-family: var(--font);
+  white-space: nowrap;
+}
+.dl-add-task-btn:hover {
+  background: rgba(56,189,248,0.15); border-color: var(--sky2); color: #fff;
+  border-style: solid;
+}
+.dl-add-task-btn:disabled { opacity: .4; cursor: not-allowed }
+
+/* ── Today row highlight ── */
+.dl-today-row { background: rgba(14,165,233,0.04) }
+.dl-today-row .dl-date-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16,185,129,0.7);
+}
+
+/* ── Empty state ── */
+.dl-empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 20px; text-align: center;
+  gap: 14px; position: relative;
+}
+.dl-empty-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dl-empty-icon-wrap {
+  width: 80px; height: 80px; border-radius: 24px;
+  background: rgba(56,189,248,0.1);
+  border: 1px solid rgba(56,189,248,0.2);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
+  box-shadow: 0 0 30px rgba(56,189,248,0.15);
+}
+.dl-empty-title {
+  font-size: 22px; font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 30%, #7dd3fc 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dl-empty-sub {
+  font-size: 13.5px; color: var(--text2);
+  max-width: 360px; line-height: 1.7; margin-bottom: 6px;
+}
+.dl-empty-btn { padding: 12px 28px; font-size: 14px }
+
+/* ── Light theme overrides ── */
+html[data-theme="light"] .dl-hero {
+  background: linear-gradient(135deg,
+    rgba(14,165,233,0.07) 0%,
+    rgba(129,140,248,0.05) 50%,
+    rgba(16,185,129,0.04) 100%
+  );
+  border-color: rgba(14,165,233,0.18);
+}
+html[data-theme="light"] .dl-hero-title {
+  background: linear-gradient(135deg, #0f1f4b 30%, #0ea5e9 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+html[data-theme="light"] .dl-btn-ghost {
+  background: #fff; border-color: rgba(15,31,75,0.15); color: #0f1f4b;
+}
+html[data-theme="light"] .dl-btn-ghost:hover {
+  border-color: #0ea5e9; color: #0ea5e9; background: rgba(14,165,233,0.05);
+}
+html[data-theme="light"] .dl-stat-pill {
+  background: #fff; border-color: rgba(15,31,75,0.1); color: #1e3a6e;
+}
+html[data-theme="light"] .dl-stat-pill span { color: #0f1f4b }
+html[data-theme="light"] .dl-stat-accent {
+  background: rgba(14,165,233,0.07); border-color: rgba(14,165,233,0.2);
+}
+html[data-theme="light"] .dl-table-wrap {
+  background: #fff; border-color: rgba(15,31,75,0.1);
+}
+html[data-theme="light"] .dl-table thead tr {
+  background: linear-gradient(90deg, rgba(14,165,233,0.09), rgba(129,140,248,0.05));
+}
+html[data-theme="light"] .dl-table th { color: #0ea5e9 }
+html[data-theme="light"] .dl-table tbody tr { border-bottom-color: rgba(15,31,75,0.07) }
+html[data-theme="light"] .dl-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(14,165,233,0.05), transparent);
+}
+html[data-theme="light"] .dl-date-cell { color: #0f1f4b; border-right-color: rgba(14,165,233,0.15) }
+html[data-theme="light"] .dl-task-cell { border-right-color: rgba(15,31,75,0.06) }
+html[data-theme="light"] .dl-task-input { color: #1e3a6e }
+html[data-theme="light"] .dl-task-input:focus { background: rgba(14,165,233,0.06) }
+html[data-theme="light"] .dl-col-name { color: #0ea5e9 }
+html[data-theme="light"] .dl-empty-title {
+  background: linear-gradient(135deg, #0f1f4b 30%, #0ea5e9 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+html[data-theme="light"] .dl-empty-sub { color: #1e3a6e }
+
+/* ── Responsive ── */
+@media(max-width:900px) {
+  #view-dailylog { padding: 64px 14px 40px }
+  .dl-hero { padding: 18px 16px; gap: 14px }
+  .dl-hero-icon { width: 44px; height: 44px; font-size: 20px }
+  .dl-hero-title { font-size: 20px }
+  .dl-stats-strip { gap: 7px }
+  .dl-stat-pill { font-size: 11.5px; padding: 7px 12px }
+}
