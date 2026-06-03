@@ -1,324 +1,817 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Sign Up — WorkLife Planner Pro</title>
+<title>WorkLife Planner Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@400;600&family=Dancing+Script:wght@400;600&family=Patrick+Hand&family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css"/>
+<link rel="stylesheet" href="style.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="auth.css"/>
+<script src="auth.js"></script>
 </head>
 <body>
 
-<div class="auth-bg">
-  <div class="auth-orb auth-orb-1"></div>
-  <div class="auth-orb auth-orb-2"></div>
-  <div class="auth-orb auth-orb-3"></div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-layout-kanban"></i></div>
+    <div style="flex:1">
+      <div class="sb-name">WorkLife</div>
+      <div class="sb-tagline">Planner Pro</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark theme">
+        <span class="theme-icon-dark"><i class="ti ti-moon"></i></span>
+        <span class="theme-icon-light"><i class="ti ti-sun"></i></span>
+      </button>
+      <button class="logout-btn" id="logout-btn" onclick="authLogout()" title="Sign out" style="display:none"><i class="ti ti-logout"></i></button>
+      <button class="mob-close-btn" id="mob-close-btn" onclick="closeMobileSidebar()" aria-label="Close menu" title="Close menu">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
 
-  <div class="auth-split">
-
-    <!-- LEFT: Brand Panel -->
-    <div class="auth-brand-panel">
-      <div class="auth-brand-content">
-        <div class="auth-brand-logo">
-          <i class="ti ti-layout-kanban"></i>
-        </div>
-        <h1 class="auth-brand-name">WorkLife</h1>
-        <p class="auth-brand-tagline">Planner Pro</p>
-        <p class="auth-brand-desc">
-          Join thousands of professionals managing their work and life
-          in one beautiful, powerful workspace.
-        </p>
-
-        <!-- Steps -->
-        <div class="auth-steps">
-          <div class="auth-step">
-            <div class="auth-step-num">1</div>
-            <div>
-              <div class="auth-step-title">Create your account</div>
-              <div class="auth-step-sub">Choose a username & password</div>
-            </div>
-          </div>
-          <div class="auth-step">
-            <div class="auth-step-num">2</div>
-            <div>
-              <div class="auth-step-title">Set up your profile</div>
-              <div class="auth-step-sub">Add photo, name, preferences</div>
-            </div>
-          </div>
-          <div class="auth-step">
-            <div class="auth-step-num">3</div>
-            <div>
-              <div class="auth-step-title">Start planning</div>
-              <div class="auth-step-sub">Tasks, notebook, habits & more</div>
-            </div>
-          </div>
-        </div>
+  <!-- PROFILE PICTURE SECTION -->
+  <div class="sb-profile-section">
+    <div class="sb-profile-pic-wrap" id="sb-profile-pic-wrap" onclick="triggerProfileUpload()" title="Click to upload profile picture">
+      <div class="sb-profile-pic" id="sb-profile-pic">
+        <div class="sb-profile-initials" id="sb-profile-initials">WP</div>
+        <img class="sb-profile-img" id="sb-profile-img" src="" alt="Profile" style="display:none"/>
+      </div>
+      <div class="sb-profile-overlay">
+        <i class="ti ti-camera-plus"></i>
+        <span class="sb-overlay-txt">Change</span>
       </div>
     </div>
+    <div class="sb-profile-info">
+      <div class="sb-greeting" id="sb-greeting">Good afternoon ☀️, <strong id="sb-greeting-name">User</strong></div>
+      <button class="sb-edit-name-btn" id="sb-edit-name-btn" onclick="editProfileName()" title="Edit your name">
+        <i class="ti ti-pencil"></i> Edit name
+      </button>
+    </div>
+    <!-- Edit name panel (hidden by default) -->
+    <div class="sb-name-edit-panel" id="sb-name-edit-panel" style="display:none">
+      <input class="sb-profile-name-input" id="sb-profile-name-input" type="text" maxlength="24" placeholder="Your name…"/>
+      <div class="sb-name-edit-actions">
+        <button class="sb-save-btn" onclick="saveProfileName()"><i class="ti ti-check"></i> Save</button>
+        <button class="sb-cancel-btn" onclick="cancelEditName()"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="profile-upload-input" accept=".png,.jpg,.jpeg" style="display:none" onchange="handleProfileUpload(event)"/>
 
-    <!-- RIGHT: Signup Form -->
-    <div class="auth-form-panel">
-      <div class="auth-card">
+  <div class="sb-ring-wrap">
+    <svg width="72" height="72" viewBox="0 0 72 72">
+      <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+      <circle id="sb-ring" cx="36" cy="36" r="30" fill="none" stroke="#7dd3fc" stroke-width="6"
+        stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"
+        transform="rotate(-90 36 36)" style="transition:stroke-dashoffset .7s ease"/>
+    </svg>
+    <div class="sb-ring-center">
+      <div class="sb-ring-pct" id="sb-ring-pct">0%</div>
+      <div class="sb-ring-lbl">today</div>
+    </div>
+  </div>
 
-        <div class="auth-card-logo">
-          <div class="auth-card-logo-icon">
-            <i class="ti ti-layout-kanban"></i>
-          </div>
-          <div class="auth-card-app-name">WorkLife Planner Pro</div>
-        </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a class="sb-link active" data-view="dashboard"><i class="ti ti-home-2"></i>Dashboard</a>
 
-        <h2 class="auth-title">Create your account ✨</h2>
-        <p class="auth-sub">Takes less than a minute to get started</p>
-
-        <!-- Full Name -->
-        <div class="auth-field">
-          <label>Full Name</label>
-          <div class="auth-input-wrap">
-            <i class="ti ti-id-badge"></i>
-            <input
-              type="text"
-              id="signup-name"
-              placeholder="Suyash Gharat"
-              autocomplete="name"
-              onkeydown="if(event.key==='Enter')document.getElementById('signup-username').focus()"
-            />
-          </div>
-        </div>
-
-        <!-- Username -->
-        <div class="auth-field">
-          <label>
-            Username
-            <span class="auth-hint"> — used to log in, cannot be changed</span>
-          </label>
-          <div class="auth-input-wrap">
-            <i class="ti ti-at"></i>
-            <input
-              type="text"
-              id="signup-username"
-              placeholder="suyash_gharat"
-              autocomplete="username"
-              oninput="checkUsername(this.value)"
-              onkeydown="if(event.key==='Enter')document.getElementById('signup-password').focus()"
-            />
-            <span class="auth-check-icon" id="signup-username-icon"></span>
-          </div>
-          <div class="auth-field-hint" id="username-hint"></div>
-        </div>
-
-        <!-- Password -->
-        <div class="auth-field">
-          <label>
-            Password
-            <span class="auth-hint"> — min 6 characters</span>
-          </label>
-          <div class="auth-input-wrap">
-            <i class="ti ti-lock"></i>
-            <input
-              type="password"
-              id="signup-password"
-              placeholder="••••••••"
-              autocomplete="new-password"
-              oninput="checkPasswordStrength(this.value)"
-              onkeydown="if(event.key==='Enter')document.getElementById('signup-confirm').focus()"
-            />
-            <button class="auth-eye-btn" onclick="togglePass('signup-password',this)" type="button">
-              <i class="ti ti-eye"></i>
-            </button>
-          </div>
-          <!-- Password strength bar -->
-          <div class="auth-strength-bar">
-            <div class="auth-strength-fill" id="strength-fill"></div>
-          </div>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="auth-field">
-          <label>Confirm Password</label>
-          <div class="auth-input-wrap">
-            <i class="ti ti-lock-check"></i>
-            <input
-              type="password"
-              id="signup-confirm"
-              placeholder="••••••••"
-              autocomplete="new-password"
-              onkeydown="if(event.key==='Enter')doSignup()"
-            />
-            <button class="auth-eye-btn" onclick="togglePass('signup-confirm',this)" type="button">
-              <i class="ti ti-eye"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Error / Success -->
-        <div class="auth-error" id="signup-error"></div>
-        <div class="auth-success" id="signup-success"></div>
-
-        <!-- Submit -->
-        <button class="auth-submit-btn" onclick="doSignup()" id="signup-btn">
-          <span id="signup-btn-text" style="display:flex;align-items:center;gap:8px">
-            <i class="ti ti-user-plus"></i> Create Account
-          </span>
-          <div class="auth-spinner" id="signup-spinner" style="display:none"></div>
-        </button>
-
-        <!-- Divider -->
-        <div class="auth-divider"><span>Already have an account?</span></div>
-
-        <!-- Go to login -->
-        <a href="login.html" class="auth-alt-btn">
-          <i class="ti ti-login"></i> Sign In
+    <!-- Weekly Grid with user/team sub-sections -->
+    <div class="sb-group-wrap" id="sb-weekly-group">
+      <a class="sb-link sb-group-toggle" onclick="toggleWeeklyGroup(event)">
+        <i class="ti ti-calendar-week"></i>Weekly Grid
+        <i class="ti ti-chevron-down sb-chevron" id="sb-weekly-chevron"></i>
+      </a>
+      <div class="sb-group-children" id="sb-weekly-children">
+        <!-- Main user row -->
+        <a class="sb-child-link sb-child-main active-child" id="sb-main-user-link" onclick="switchMemberView('main',event)">
+          <span class="sb-child-dot main-dot"></span>
+          <span class="sb-child-name" id="sb-main-child-name">My Planner</span>
         </a>
-
-        <!-- Terms -->
-        <p class="auth-terms">
-          By creating an account you agree to use this planner responsibly.<br/>
-          Your data is stored securely in Supabase.
-        </p>
-
+        <!-- Teammate rows (rendered by JS) -->
+        <div id="sb-teammate-links"></div>
+        <!-- Add teammate button (max 5) -->
+        <button class="sb-add-teammate-btn" id="sb-add-teammate-btn" onclick="openAddTeammate()">
+          <i class="ti ti-user-plus"></i> Add Teammate
+        </button>
       </div>
     </div>
 
+    <a class="sb-link" data-view="today"><i class="ti ti-sun"></i>Today's Tasks</a>
+    <a class="sb-link" data-view="notebook"><i class="ti ti-notebook"></i>Notebook</a>
+    <a class="sb-link" data-view="dailylog"><i class="ti ti-table"></i>Daily Log</a>
+
+    <div class="sb-sec">Planner</div>
+    <a class="sb-link" data-view="tasks"><i class="ti ti-list-check"></i>All Tasks</a>
+    <a class="sb-link" data-view="habits"><i class="ti ti-repeat"></i>Habits</a>
+    <a class="sb-link" data-view="goals"><i class="ti ti-target"></i>Goals</a>
+    <a class="sb-link" data-view="journal"><i class="ti ti-notebook"></i>Journal</a>
+
+    <div class="sb-sec">Life</div>
+    <a class="sb-link" data-view="finance"><i class="ti ti-wallet"></i>Finance</a>
+    <a class="sb-link" data-view="health"><i class="ti ti-heart-rate-monitor"></i>Health</a>
+    <a class="sb-link" data-view="notes"><i class="ti ti-notes"></i>Notes</a>
+    <a class="sb-link" data-view="analytics"><i class="ti ti-chart-bar"></i>Analytics</a>
+  </nav>
+
+  <div class="sb-timer-box">
+    <i class="ti ti-clock"></i>
+    <span id="sb-timer">00:00:00</span>
+  </div>
+
+  <!-- Theme Toggle -->
+</aside>
+
+<!-- Mobile hamburger -->
+<button class="mob-btn" id="mob-open-btn" onclick="openMobileSidebar()" aria-label="Open menu">
+  <i class="ti ti-menu-2"></i>
+</button>
+<!-- Mobile overlay backdrop (tap to close) -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ===== DASHBOARD ===== -->
+<section id="view-dashboard" class="view active">
+  <div class="page-hdr">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Your complete life overview</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="exportData()"><i class="ti ti-download"></i> Export</button>
+      <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> Quick add</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-icon blue"><i class="ti ti-list-check"></i></div><div><div class="kpi-num" id="kpi-tasks">0</div><div class="kpi-lbl">Tasks today</div><div class="kpi-sub" id="kpi-tasks-sub">0 done</div></div></div>
+    <div class="kpi"><div class="kpi-icon sky"><i class="ti ti-repeat"></i></div><div><div class="kpi-num" id="kpi-habits">0%</div><div class="kpi-lbl">Habit rate</div><div class="kpi-sub" id="kpi-habits-sub">—</div></div></div>
+    <div class="kpi"><div class="kpi-icon navy"><i class="ti ti-target"></i></div><div><div class="kpi-num" id="kpi-goals">0</div><div class="kpi-lbl">Active goals</div><div class="kpi-sub" id="kpi-goals-sub">in progress</div></div></div>
+    <div class="kpi"><div class="kpi-icon slate"><i class="ti ti-wallet"></i></div><div><div class="kpi-num" id="kpi-budget">₹0</div><div class="kpi-lbl">Spent today</div><div class="kpi-sub">of daily budget</div></div></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="card span2">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-sun"></i> Today's Tasks</span>
+        <button class="btn-link" onclick="switchView('today')">View all →</button></div>
+      <div id="dash-task-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-calendar-week"></i> This Week</span>
+        <button class="btn-link" onclick="switchView('weekly')">Full grid →</button></div>
+      <div id="dash-week-mini"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-repeat"></i> Habits</span>
+        <button class="btn-link" onclick="switchView('habits')">View all →</button></div>
+      <div id="dash-habits"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-target"></i> Goals</span>
+        <button class="btn-link" onclick="switchView('goals')">View all →</button></div>
+      <div id="dash-goals"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-wallet"></i> Recent Expenses</span></div>
+      <div id="dash-finance"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WEEKLY GRID ===== -->
+<section id="view-weekly" class="view">
+  <!-- Member context bar -->
+  <div class="member-context-bar" id="member-context-bar">
+    <div class="mcb-avatar" id="mcb-avatar"><i class="ti ti-user"></i></div>
+    <div class="mcb-info">
+      <div class="mcb-label" id="mcb-label">My Planner</div>
+      <div class="mcb-sub" id="mcb-sub">Your personal weekly &amp; daily tasks</div>
+    </div>
+    <div class="mcb-actions" id="mcb-actions"></div>
+  </div>
+  <div class="page-hdr">
+    <div>
+      <h1 class="page-title"><i class="ti ti-calendar-week"></i> Weekly Task Grid</h1>
+      <p class="page-sub" id="weekly-grid-sub">Track your recurring daily tasks across the week</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="prevWeek()"><i class="ti ti-chevron-left"></i> Prev</button>
+      <button class="btn-outline" onclick="goToday()">Today</button>
+      <button class="btn-outline" onclick="nextWeek()">Next <i class="ti ti-chevron-right"></i></button>
+      <button class="btn-primary" id="add-task-row-btn" onclick="openModal('fixed-task-modal')"><i class="ti ti-plus"></i> Add task row</button>
+    </div>
+  </div>
+
+  <div class="week-nav-label" id="week-nav-label">Week of —</div>
+
+  <!-- Daily section -->
+  <div class="grid-section-hdr">
+    <span><i class="ti ti-sun"></i> Daily Tasks</span>
+    <span class="grid-section-sub">These repeat every day — check off as you complete them</span>
+  </div>
+  <div class="weekly-table-wrap">
+    <table class="weekly-table" id="daily-grid-table">
+      <thead id="daily-thead"></thead>
+      <tbody id="daily-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Weekly section -->
+  <div class="grid-section-hdr" style="margin-top:28px">
+    <span><i class="ti ti-calendar-week"></i> Weekly Tasks</span>
+    <span class="grid-section-sub">Specific tasks assigned to certain days</span>
+  </div>
+  <div class="weekly-table-wrap">
+    <table class="weekly-table">
+      <thead id="weekly-thead2"></thead>
+      <tbody id="weekly-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Progress summary -->
+  <div class="week-summary-row" id="week-summary-row"></div>
+</section>
+
+<!-- ===== TODAY ===== -->
+<section id="view-today" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Today's Tasks</h1><p class="page-sub" id="today-date-lbl">—</p></div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="resetToday()"><i class="ti ti-refresh"></i> Reset</button>
+      <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> Add task</button>
+    </div>
+  </div>
+  <div class="prog-bar-wrap">
+    <div class="prog-track"><div class="prog-fill" id="today-prog" style="width:0%"></div></div>
+    <span class="prog-label" id="today-prog-lbl">0% complete</span>
+  </div>
+  <div class="ftabs" id="today-filters">
+    <button class="ftab active" data-f="all">All</button>
+    <button class="ftab" data-f="pending">Pending</button>
+    <button class="ftab" data-f="done">Done</button>
+    <button class="ftab" data-f="high">High priority</button>
+  </div>
+  <div class="task-list" id="today-task-list"></div>
+</section>
+
+<!-- ===== ALL TASKS ===== -->
+<section id="view-tasks" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">All Tasks</h1><p class="page-sub">Manage your full task list</p></div>
+    <button class="btn-primary" onclick="openModal('task-modal')"><i class="ti ti-plus"></i> New task</button>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="add-row">
+      <input id="t-name" placeholder="Task name…" onkeydown="if(event.key==='Enter')quickAdd()"/>
+      <select id="t-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option><option value="learning">Learning</option></select>
+      <select id="t-pri"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select>
+      <button class="btn-primary" onclick="quickAdd()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+  </div>
+  <div class="ftabs" id="task-filters">
+    <button class="ftab active" data-f2="all">All</button>
+    <button class="ftab" data-f2="work">Work</button>
+    <button class="ftab" data-f2="personal">Personal</button>
+    <button class="ftab" data-f2="health">Health</button>
+  </div>
+  <div class="task-list" id="all-task-list"></div>
+</section>
+
+<!-- ===== HABITS ===== -->
+<section id="view-habits" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Habits</h1><p class="page-sub">Build streaks. Stay consistent.</p></div>
+    <button class="btn-primary" onclick="openModal('habit-modal')"><i class="ti ti-plus"></i> New habit</button>
+  </div>
+  <div class="habits-grid" id="habits-grid"></div>
+  <div class="card" style="margin-top:24px">
+    <div class="card-hdr"><span class="card-title"><i class="ti ti-calendar-week"></i> Weekly heatmap</span></div>
+    <div id="habit-week-map"></div>
+  </div>
+</section>
+
+<!-- ===== GOALS ===== -->
+<section id="view-goals" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Goals</h1><p class="page-sub">Dream big. Track progress.</p></div>
+    <button class="btn-primary" onclick="openModal('goal-modal')"><i class="ti ti-plus"></i> New goal</button>
+  </div>
+  <div class="goals-grid" id="goals-grid"></div>
+</section>
+
+<!-- ===== JOURNAL ===== -->
+<section id="view-journal" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Journal</h1><p class="page-sub">Reflect. Write. Grow.</p></div>
+    <button class="btn-primary" onclick="saveJournal()"><i class="ti ti-device-floppy"></i> Save entry</button>
+  </div>
+  <div class="journal-layout">
+    <div class="card journal-write">
+      <div class="j-date-lbl" id="j-date-lbl">—</div>
+      <div class="mood-row">
+        <span class="mood-lbl">Mood:</span>
+        <div id="mood-btns">
+          <button class="mood-btn active" data-mood="5">😄</button>
+          <button class="mood-btn" data-mood="4">🙂</button>
+          <button class="mood-btn" data-mood="3">😐</button>
+          <button class="mood-btn" data-mood="2">😔</button>
+          <button class="mood-btn" data-mood="1">😞</button>
+        </div>
+      </div>
+      <input class="j-title-inp" id="j-title" placeholder="Entry title…"/>
+      <textarea class="j-body-inp" id="j-body" placeholder="What's on your mind today?…"></textarea>
+      <div class="j-tags-row">
+        <input class="tag-inp" id="j-tag-inp" placeholder="Tag + Enter…" onkeydown="addTag(event)"/>
+        <div id="j-tags-list"></div>
+      </div>
+    </div>
+    <div class="card journal-hist">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-history"></i> Past entries</span></div>
+      <div id="journal-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINANCE ===== -->
+<section id="view-finance" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Finance</h1><p class="page-sub">Track every rupee</p></div>
+    <button class="btn-primary" onclick="openModal('exp-modal')"><i class="ti ti-plus"></i> Add expense</button>
+  </div>
+  <div class="fin-kpis">
+    <div class="fkpi" style="border-top:3px solid #1e40af"><div class="fkpi-lbl">Monthly budget</div><div class="fkpi-val" id="fin-budget">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #ef4444"><div class="fkpi-lbl">Spent this month</div><div class="fkpi-val" id="fin-spent">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #0ea5e9"><div class="fkpi-lbl">Remaining</div><div class="fkpi-val" id="fin-rem">₹0</div></div>
+    <div class="fkpi" style="border-top:3px solid #22c55e"><div class="fkpi-lbl">Today's spend</div><div class="fkpi-val" id="fin-today">₹0</div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="add-row" style="flex-wrap:wrap">
+      <input id="e-name" placeholder="Description…" style="flex:2"/>
+      <input id="e-amt" type="number" placeholder="Amount (₹)" style="max-width:140px"/>
+      <select id="e-cat"><option value="food">Food</option><option value="transport">Transport</option><option value="shopping">Shopping</option><option value="bills">Bills</option><option value="health">Health</option><option value="other">Other</option></select>
+      <button class="btn-primary" onclick="addExp()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <label style="font-size:12px;color:var(--text2)">Monthly budget:</label>
+      <input id="budget-inp" type="number" placeholder="e.g. 30000" class="mini-inp"/>
+      <button class="btn-outline" onclick="setBudget()">Set</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-title"><i class="ti ti-receipt"></i> Expense log</span></div><div id="exp-list"></div></div>
+</section>
+
+<!-- ===== HEALTH ===== -->
+<section id="view-health" class="view">
+  <div class="page-hdr"><div><h1 class="page-title">Health</h1><p class="page-sub">Your body, your priority</p></div></div>
+  <div class="health-grid">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-droplet"></i> Water intake</span></div>
+      <div class="water-cups" id="water-cups"></div>
+      <div class="water-lbl" id="water-lbl">0 / 8 glasses</div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-run"></i> Daily steps</span></div>
+      <input id="steps-inp" class="full-inp" type="number" placeholder="Steps today…"/>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="logSteps()">Log steps</button>
+      <div style="text-align:center;margin-top:16px">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--border)" stroke-width="8"/>
+          <circle id="steps-ring" cx="55" cy="55" r="46" fill="none" stroke="#0ea5e9" stroke-width="8"
+            stroke-dasharray="289" stroke-dashoffset="289" stroke-linecap="round"
+            transform="rotate(-90 55 55)" style="transition:stroke-dashoffset .7s ease"/>
+        </svg>
+        <div style="font-size:20px;font-weight:700;color:var(--navy);margin-top:-62px;position:relative" id="steps-val">0</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:38px">/ 10,000 goal</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-moon"></i> Sleep log</span></div>
+      <div class="sleep-form">
+        <div class="sleep-row"><label>Bedtime</label><input type="time" id="sl-bed" value="23:00" class="time-inp"/></div>
+        <div class="sleep-row"><label>Wake time</label><input type="time" id="sl-wake" value="07:00" class="time-inp"/></div>
+        <button class="btn-primary" style="width:100%;margin-top:10px" onclick="logSleep()">Log sleep</button>
+        <div class="sleep-result" id="sleep-result"></div>
+        <div id="sleep-hist"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title"><i class="ti ti-barbell"></i> Workout</span></div>
+      <div class="add-row" style="flex-wrap:wrap">
+        <input id="wk-name" placeholder="Workout…" style="flex:1"/>
+        <input id="wk-dur" type="number" placeholder="Mins" style="max-width:80px"/>
+        <button class="btn-primary" onclick="logWorkout()"><i class="ti ti-plus"></i></button>
+      </div>
+      <div id="workout-list" style="margin-top:12px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NOTES ===== -->
+<section id="view-notes" class="view">
+  <div class="page-hdr">
+    <div><h1 class="page-title">Notes</h1><p class="page-sub">Capture ideas instantly</p></div>
+    <button class="btn-primary" onclick="addNote()"><i class="ti ti-plus"></i> New note</button>
+  </div>
+  <div class="notes-grid" id="notes-grid"></div>
+</section>
+
+<!-- ===== ANALYTICS ===== -->
+<section id="view-analytics" class="view">
+  <div class="page-hdr"><div><h1 class="page-title">Analytics</h1><p class="page-sub">Insights from your data</p></div></div>
+  <div class="ana-grid">
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-chart-bar"></i> Tasks by category</div><div id="ana-cat"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-flag"></i> By priority</div><div id="ana-pri"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-repeat"></i> Habit completion</div><div id="ana-hab"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-wallet"></i> Spending by category</div><div id="ana-fin"></div></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title" style="margin-bottom:16px"><i class="ti ti-award"></i> Life Score</div>
+    <div class="life-score-grid" id="life-score"></div>
+  </div>
+</section>
+
+<!-- ===== NOTEBOOK ===== -->
+<section id="view-notebook" class="view">
+  <div class="nb-layout">
+
+    <!-- LEFT: Chapter list -->
+    <aside class="nb-chapters" id="nb-chapters">
+      <div class="nb-chapters-top">
+        <button class="nb-new-chapter-btn" onclick="nbNewChapter()">
+          <i class="ti ti-plus"></i> New Chapter
+        </button>
+      </div>
+      <div class="nb-chapter-list" id="nb-chapter-list"></div>
+      <div class="nb-page-style-switcher">
+        <span class="nb-style-label">Page style</span>
+        <div class="nb-style-btns" id="nb-style-btns">
+          <button class="nb-style-btn active" data-style="blank" onclick="nbSetPageStyle('blank',this)">Blank</button>
+          <button class="nb-style-btn" data-style="lined" onclick="nbSetPageStyle('lined',this)">Lined</button>
+          <button class="nb-style-btn" data-style="dot" onclick="nbSetPageStyle('dot',this)">Dot Grid</button>
+          <button class="nb-style-btn" data-style="grid" onclick="nbSetPageStyle('grid',this)">Grid</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Editor -->
+    <div class="nb-editor-wrap" id="nb-editor-wrap">
+
+      <!-- Toolbar -->
+      <div class="nb-toolbar" id="nb-toolbar">
+        <!-- Row 1: Formatting -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn" onclick="nbExec('bold')" title="Bold"><i class="ti ti-bold"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('italic')" title="Italic"><i class="ti ti-italic"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('underline')" title="Underline"><i class="ti ti-underline"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('strikeThrough')" title="Strikethrough"><i class="ti ti-strikethrough"></i></button>
+          <div class="nb-tb-divider"></div>
+          <select class="nb-font-select" id="nb-font-select" onchange="nbSetFont(this.value)" title="Font family">
+            <option value="default">Default</option>
+            <option value="Caveat">Handwritten</option>
+            <option value="Dancing Script">Elegant</option>
+            <option value="Patrick Hand">Casual</option>
+            <option value="JetBrains Mono">Monospace</option>
+            <option value="Lora">Serif</option>
+            <option value="Playfair Display">Editorial</option>
+            <option value="Nunito">Rounded</option>
+            <option value="DM Sans">Modern</option>
+            <option value="Libre Baskerville">Newspaper</option>
+          </select>
+          <select class="nb-size-select" id="nb-size-select" onchange="nbSetSize(this.value)" title="Font size">
+            <option value="12">12</option>
+            <option value="14" selected>14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="28">28</option>
+            <option value="32">32</option>
+            <option value="48">48</option>
+          </select>
+          <div class="nb-tb-divider"></div>
+          <label class="nb-color-btn" title="Text color">
+            <i class="ti ti-typography"></i>
+            <input type="color" id="nb-text-color" onchange="nbExec('foreColor',this.value)" style="opacity:0;width:0;height:0;position:absolute"/>
+          </label>
+          <label class="nb-color-btn" title="Highlight color">
+            <i class="ti ti-palette"></i>
+            <input type="color" id="nb-hl-color" value="#fef08a" onchange="nbExec('hiliteColor',this.value)" style="opacity:0;width:0;height:0;position:absolute"/>
+          </label>
+          <div class="nb-tb-divider"></div>
+          <div class="nb-save-indicator" id="nb-save-indicator"></div>
+        </div>
+        <!-- Row 2: Structure -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h1')" title="Heading 1"><i class="ti ti-h-1"></i></button>
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h2')" title="Heading 2"><i class="ti ti-h-2"></i></button>
+          <button class="nb-tb-btn nb-tb-wide" onclick="nbInsertBlock('h3')" title="Heading 3"><i class="ti ti-h-3"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbExec('insertUnorderedList')" title="Bullet list"><i class="ti ti-list"></i></button>
+          <button class="nb-tb-btn" onclick="nbExec('insertOrderedList')" title="Numbered list"><i class="ti ti-list-numbers"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertChecklist()" title="Checklist"><i class="ti ti-checkbox"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbInsertBlock('blockquote')" title="Blockquote"><i class="ti ti-quote"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertCode()" title="Code"><i class="ti ti-code"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertDivider()" title="Divider">—</button>
+        </div>
+        <!-- Row 3: Insert -->
+        <div class="nb-toolbar-row">
+          <button class="nb-tb-btn" onclick="nbInsertLink()" title="Insert link"><i class="ti ti-link"></i></button>
+          <label class="nb-tb-btn" title="Insert image">
+            <i class="ti ti-photo"></i>
+            <input type="file" accept="image/*" id="nb-img-upload" onchange="nbInsertImage(event)" style="display:none"/>
+          </label>
+          <button class="nb-tb-btn" onclick="nbToggleEmojiPicker()" title="Emoji"><i class="ti ti-mood-smile"></i></button>
+          <button class="nb-tb-btn" onclick="nbInsertSticker()" title="Sticker"><i class="ti ti-tag"></i></button>
+          <div class="nb-tb-divider"></div>
+          <button class="nb-tb-btn" onclick="nbExec('removeFormat')" title="Clear formatting"><i class="ti ti-eraser"></i></button>
+        </div>
+      </div>
+
+      <!-- Emoji picker popup -->
+      <div class="nb-emoji-picker" id="nb-emoji-picker" style="display:none">
+        <div class="nb-emoji-cats" id="nb-emoji-cats"></div>
+        <div class="nb-emoji-grid" id="nb-emoji-grid"></div>
+      </div>
+
+      <!-- Page / editor -->
+      <div class="nb-page-wrap" id="nb-page-wrap">
+        <!-- Empty state -->
+        <div class="nb-empty-state" id="nb-empty-state">
+          <div class="nb-empty-icon">📓</div>
+          <h2 class="nb-empty-title">Your notebook is empty</h2>
+          <p class="nb-empty-sub">Create your first chapter to start writing, planning, or brainstorming.</p>
+          <button class="btn-primary" onclick="nbNewChapter()"><i class="ti ti-plus"></i> Create first chapter</button>
+        </div>
+        <!-- Editor page -->
+        <div class="nb-page" id="nb-page" style="display:none">
+          <div class="nb-page-title-row">
+            <span class="nb-chapter-emoji" id="nb-chapter-emoji" onclick="nbOpenEmojiCover()">📄</span>
+            <input class="nb-chapter-title-input" id="nb-chapter-title-input" placeholder="Chapter title…" oninput="nbDebounceSave()"/>
+          </div>
+          <div class="nb-editor"
+               id="nb-editor"
+               contenteditable="true"
+               spellcheck="true"
+               data-placeholder="Start writing, sketching ideas, or paste a link…"
+               oninput="nbDebounceSave()"
+               onkeydown="nbHandleKey(event)"
+               onclick="nbHandleChecklistClick(event)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Emoji cover picker modal -->
+      <div class="nb-cover-picker" id="nb-cover-picker" style="display:none">
+        <div class="nb-cover-picker-inner">
+          <div class="nb-cover-picker-header">
+            <span>Choose chapter emoji</span>
+            <button onclick="document.getElementById('nb-cover-picker').style.display='none'"><i class="ti ti-x"></i></button>
+          </div>
+          <div class="nb-cover-emoji-grid" id="nb-cover-emoji-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Metadata panel -->
+    <aside class="nb-meta" id="nb-meta">
+      <div class="nb-meta-section">
+        <div class="nb-meta-label">Chapter color</div>
+        <div class="nb-color-tags" id="nb-color-tags">
+          <button class="nb-ct-btn" data-color="#0ea5e9" onclick="nbSetColor('#0ea5e9',this)" style="background:#0ea5e9"></button>
+          <button class="nb-ct-btn" data-color="#818cf8" onclick="nbSetColor('#818cf8',this)" style="background:#818cf8"></button>
+          <button class="nb-ct-btn" data-color="#10b981" onclick="nbSetColor('#10b981',this)" style="background:#10b981"></button>
+          <button class="nb-ct-btn" data-color="#f59e0b" onclick="nbSetColor('#f59e0b',this)" style="background:#f59e0b"></button>
+          <button class="nb-ct-btn" data-color="#f43f5e" onclick="nbSetColor('#f43f5e',this)" style="background:#f43f5e"></button>
+          <button class="nb-ct-btn" data-color="#a855f7" onclick="nbSetColor('#a855f7',this)" style="background:#a855f7"></button>
+        </div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-chart-bar"></i> Stats</div>
+        <div class="nb-stats">
+          <div class="nb-stat"><span id="nb-word-count">0</span><span class="nb-stat-lbl">words</span></div>
+          <div class="nb-stat"><span id="nb-read-time">0 min</span><span class="nb-stat-lbl">read</span></div>
+          <div class="nb-stat"><span id="nb-char-count">0</span><span class="nb-stat-lbl">chars</span></div>
+        </div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-tag"></i> Tags</div>
+        <input class="nb-tags-input" id="nb-tags-input" placeholder="Add tag + Enter…" onkeydown="nbAddTag(event)"/>
+        <div class="nb-tags-list" id="nb-tags-list"></div>
+      </div>
+      <div class="nb-meta-section">
+        <div class="nb-meta-label"><i class="ti ti-info-circle"></i> Info</div>
+        <div class="nb-info-row"><span>Created</span><span id="nb-created-at">—</span></div>
+        <div class="nb-info-row"><span>Updated</span><span id="nb-updated-at">—</span></div>
+      </div>
+      <div class="nb-meta-section">
+        <button class="btn-outline" style="width:100%;font-size:12px" onclick="nbShareChapter()">
+          <i class="ti ti-share"></i> Copy as text
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile chapters button -->
+    <button class="nb-mob-chapters-btn" id="nb-mob-chapters-btn" onclick="nbToggleMobileChapters()">
+      <i class="ti ti-layout-sidebar"></i> Chapters
+    </button>
+  </div>
+</section>
+
+<!-- ===== DAILY LOG ===== -->
+<section id="view-dailylog" class="view">
+  <div class="page-hdr">
+    <div>
+      <h1 class="page-title"><i class="ti ti-table"></i> Daily Task Log</h1>
+      <p class="page-sub">Track what you accomplish each day — add tasks per date and download anytime</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-outline" onclick="dlAddToday()"><i class="ti ti-calendar-plus"></i> Add Today</button>
+      <button class="btn-primary" onclick="dlDownload()"><i class="ti ti-download"></i> Download</button>
+    </div>
+  </div>
+
+  <!-- Table wrap -->
+  <div class="dl-table-wrap">
+    <table class="dl-table" id="dl-table">
+      <thead>
+        <tr id="dl-thead-row">
+          <th class="dl-date-th">Date</th>
+          <!-- task columns injected by JS -->
+          <th class="dl-add-col">
+            <button class="dl-add-task-btn" onclick="dlAddTaskCol()" id="dl-add-col-btn">
+              <i class="ti ti-plus"></i> Add Task
+            </button>
+          </th>
+          <th class="dl-dl-col"><i class="ti ti-download"></i></th>
+        </tr>
+      </thead>
+      <tbody id="dl-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Empty state -->
+  <div class="dl-empty" id="dl-empty">
+    <div class="dl-empty-icon">📋</div>
+    <div class="dl-empty-title">No log entries yet</div>
+    <div class="dl-empty-sub">Click "Add Today" to start tracking your daily tasks</div>
+    <button class="btn-primary" onclick="dlAddToday()"><i class="ti ti-plus"></i> Add Today's Date</button>
+  </div>
+</section>
+
+</main>
+
+<!-- ========== MODALS ========== -->
+<!-- Task modal -->
+<div class="modal-ov" id="task-modal" onclick="closeBg(event,'task-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-list-check"></i> Add Task</span><button class="modal-x" onclick="closeModal('task-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Task name *</label><input id="m-t-name" placeholder="What needs to be done?"/>
+      <div class="form2"><div><label>Category</label><select id="m-t-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option><option value="learning">Learning</option></select></div><div><label>Priority</label><select id="m-t-pri"><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select></div></div>
+      <label>Notes</label><textarea id="m-t-notes" rows="3" placeholder="Any details…"></textarea>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('task-modal')">Cancel</button><button class="btn-primary" onclick="addTaskModal()"><i class="ti ti-plus"></i> Add task</button></div>
   </div>
 </div>
 
-<!-- Extra styles just for signup page -->
-<style>
-.auth-field-hint{
-  font-size:11px;color:var(--text3);margin-top:3px;
-  padding-left:4px;min-height:14px;
-}
-.auth-steps{display:flex;flex-direction:column;gap:12px;margin-top:20px}
-.auth-step{display:flex;align-items:flex-start;gap:12px}
-.auth-step-num{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(56,189,248,0.15);
-  border:1.5px solid rgba(56,189,248,0.3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;color:var(--sky2);
-  flex-shrink:0;margin-top:2px;
-}
-.auth-step-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:1px}
-.auth-step-sub{font-size:11.5px;color:var(--text2)}
-</style>
+<!-- Fixed task (weekly grid row) modal -->
+<div class="modal-ov" id="fixed-task-modal" onclick="closeBg(event,'fixed-task-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-calendar-week"></i> Add to Weekly Grid</span><button class="modal-x" onclick="closeModal('fixed-task-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Task name *</label><input id="m-ft-name" placeholder="e.g. techalphawaba count"/>
+      <label>Type</label>
+      <select id="m-ft-type">
+        <option value="daily">Daily (shows every day)</option>
+        <option value="weekly">Weekly (specific days)</option>
+      </select>
+      <div id="day-picker" style="display:none;margin-top:12px">
+        <label>Select days</label>
+        <div class="day-check-row" id="day-checks">
+          <label class="day-chk"><input type="checkbox" value="0"/> Mon</label>
+          <label class="day-chk"><input type="checkbox" value="1"/> Tue</label>
+          <label class="day-chk"><input type="checkbox" value="2"/> Wed</label>
+          <label class="day-chk"><input type="checkbox" value="3"/> Thu</label>
+          <label class="day-chk"><input type="checkbox" value="4"/> Fri</label>
+          <label class="day-chk"><input type="checkbox" value="5"/> Sat</label>
+          <label class="day-chk"><input type="checkbox" value="6"/> Sun</label>
+        </div>
+      </div>
+      <label>Category</label>
+      <select id="m-ft-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option></select>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('fixed-task-modal')">Cancel</button><button class="btn-primary" onclick="addFixedTask()"><i class="ti ti-plus"></i> Add to grid</button></div>
+  </div>
+</div>
 
-<script src="auth.js"></script>
-<script>
-// Redirect to planner if already logged in
-(async () => {
-  const { data: { session } } = await _supa.auth.getSession();
-  if (session) window.location.href = 'index.html';
-})();
+<!-- Habit modal -->
+<div class="modal-ov" id="habit-modal" onclick="closeBg(event,'habit-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-repeat"></i> New Habit</span><button class="modal-x" onclick="closeModal('habit-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Habit name *</label><input id="m-h-name" placeholder="e.g. Morning meditation"/>
+      <label>Icon (emoji)</label><input id="m-h-icon" placeholder="🧘" maxlength="2"/>
+      <label>Target (days/week)</label><input id="m-h-tgt" type="number" min="1" max="7" value="7"/>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('habit-modal')">Cancel</button><button class="btn-primary" onclick="addHabit()"><i class="ti ti-plus"></i> Add</button></div>
+  </div>
+</div>
 
-// Live username hint
-const _origCheckUsername = checkUsername;
-checkUsername = function(val) {
-  _origCheckUsername(val);
-  const hint = document.getElementById('username-hint');
-  if (!hint) return;
-  val = val.trim().toLowerCase();
-  if (!val) { hint.textContent = ''; return; }
-  if (val.length < 3) { hint.textContent = 'At least 3 characters'; return; }
-  if (!/^[a-z0-9_]+$/.test(val)) {
-    hint.textContent = 'Only lowercase letters, numbers, underscores (_)';
-    hint.style.color = '#f87171';
-  } else {
-    hint.textContent = 'Looks good!';
-    hint.style.color = 'var(--text3)';
-  }
-};
+<!-- Goal modal -->
+<div class="modal-ov" id="goal-modal" onclick="closeBg(event,'goal-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-target"></i> New Goal</span><button class="modal-x" onclick="closeModal('goal-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Goal title *</label><input id="m-g-title" placeholder="What do you want to achieve?"/>
+      <div class="form2"><div><label>Category</label><select id="m-g-cat"><option value="career">Career</option><option value="health">Health</option><option value="finance">Finance</option><option value="personal">Personal</option><option value="learning">Learning</option></select></div><div><label>Target date</label><input id="m-g-date" type="date"/></div></div>
+      <label>Progress (%)</label><input id="m-g-prog" type="number" min="0" max="100" value="0"/>
+      <label>Description</label><textarea id="m-g-desc" rows="3" placeholder="Describe your goal…"></textarea>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('goal-modal')">Cancel</button><button class="btn-primary" onclick="addGoal()"><i class="ti ti-plus"></i> Add goal</button></div>
+  </div>
+</div>
 
-async function doSignup() {
-  const name     = document.getElementById('signup-name').value.trim();
-  const username = document.getElementById('signup-username').value.trim().toLowerCase();
-  const password = document.getElementById('signup-password').value;
-  const confirm  = document.getElementById('signup-confirm').value;
+<!-- Expense modal -->
+<div class="modal-ov" id="exp-modal" onclick="closeBg(event,'exp-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-wallet"></i> Add Expense</span><button class="modal-x" onclick="closeModal('exp-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <label>Description *</label><input id="m-e-name" placeholder="What did you spend on?"/>
+      <div class="form2"><div><label>Amount (₹) *</label><input id="m-e-amt" type="number"/></div><div><label>Category</label><select id="m-e-cat"><option value="food">Food</option><option value="transport">Transport</option><option value="shopping">Shopping</option><option value="bills">Bills</option><option value="health">Health</option><option value="other">Other</option></select></div></div>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('exp-modal')">Cancel</button><button class="btn-primary" onclick="addExpModal()"><i class="ti ti-plus"></i> Add</button></div>
+  </div>
+</div>
 
-  // Clear messages
-  showError('signup', '');
-  showSuccess('signup', '');
+<!-- Edit Fixed Task modal -->
+<div class="modal-ov" id="edit-fixed-modal" onclick="closeBg(event,'edit-fixed-modal')">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title"><i class="ti ti-edit"></i> Edit Weekly Task</span><button class="modal-x" onclick="closeModal('edit-fixed-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ef-id"/>
+      <label>Task name *</label><input id="ef-name" placeholder="Task name…"/>
+      <label>Type</label>
+      <select id="ef-type" onchange="document.getElementById('ef-day-picker').style.display=this.value==='weekly'?'block':'none'">
+        <option value="daily">Daily (shows every day)</option>
+        <option value="weekly">Weekly (specific days)</option>
+      </select>
+      <div id="ef-day-picker" style="display:none;margin-top:12px">
+        <label>Select days</label>
+        <div class="day-check-row" id="ef-day-checks">
+          <label class="day-chk"><input type="checkbox" value="0"/> Mon</label>
+          <label class="day-chk"><input type="checkbox" value="1"/> Tue</label>
+          <label class="day-chk"><input type="checkbox" value="2"/> Wed</label>
+          <label class="day-chk"><input type="checkbox" value="3"/> Thu</label>
+          <label class="day-chk"><input type="checkbox" value="4"/> Fri</label>
+          <label class="day-chk"><input type="checkbox" value="5"/> Sat</label>
+          <label class="day-chk"><input type="checkbox" value="6"/> Sun</label>
+        </div>
+      </div>
+      <label>Category</label>
+      <select id="ef-cat"><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="admin">Admin</option><option value="team">Team</option></select>
+      <label>Note <span style="font-size:11px;color:#94a3b8;font-weight:400">(what to do in this task)</span></label>
+      <textarea id="ef-note" rows="4" placeholder="Describe what needs to be done, steps, links, anything useful…"></textarea>
+    </div>
+    <div class="modal-ft"><button class="btn-outline" onclick="closeModal('edit-fixed-modal')">Cancel</button><button class="btn-primary" onclick="saveEditFixedTask()"><i class="ti ti-device-floppy"></i> Save changes</button></div>
+  </div>
+</div>
 
-  // Validation
-  if (!name)                           return showError('signup', 'Please enter your full name');
-  if (!username || username.length < 3) return showError('signup', 'Username must be at least 3 characters');
-  if (!/^[a-z0-9_]+$/.test(username))  return showError('signup', 'Username: only lowercase letters, numbers, underscores');
-  if (password.length < 6)             return showError('signup', 'Password must be at least 6 characters');
-  if (password !== confirm)            return showError('signup', 'Passwords do not match');
+<!-- Add Teammate Modal -->
+<div class="modal-ov" id="add-teammate-modal" onclick="closeBg(event,'add-teammate-modal')">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title"><i class="ti ti-user-plus"></i> Add Teammate</span>
+      <button class="modal-x" onclick="closeModal('add-teammate-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <label>Full Name *</label>
+      <input id="tm-name" placeholder="e.g. Rahul Sharma"/>
+      <label>Role / Title</label>
+      <input id="tm-role" placeholder="e.g. Sales Executive"/>
+      <label>Avatar Color</label>
+      <div class="tm-color-row" id="tm-color-row">
+        <button class="tm-color-btn selected" data-color="#0ea5e9" style="background:#0ea5e9" onclick="selectTmColor('#0ea5e9',this)"></button>
+        <button class="tm-color-btn" data-color="#818cf8" style="background:#818cf8" onclick="selectTmColor('#818cf8',this)"></button>
+        <button class="tm-color-btn" data-color="#10b981" style="background:#10b981" onclick="selectTmColor('#10b981',this)"></button>
+        <button class="tm-color-btn" data-color="#f59e0b" style="background:#f59e0b" onclick="selectTmColor('#f59e0b',this)"></button>
+        <button class="tm-color-btn" data-color="#f43f5e" style="background:#f43f5e" onclick="selectTmColor('#f43f5e',this)"></button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-outline" onclick="closeModal('add-teammate-modal')">Cancel</button>
+      <button class="btn-primary" onclick="addTeammate()"><i class="ti ti-user-plus"></i> Add Teammate</button>
+    </div>
+  </div>
+</div>
 
-  setLoading('signup', true);
-
-  try {
-    // Step 1: Check username not already taken
-    const { data: existing } = await _supa
-      .from('usernames')
-      .select('username')
-      .eq('username', username)
-      .maybeSingle();
-
-    if (existing) {
-      setLoading('signup', false);
-      return showError('signup', 'Username already taken — please choose another');
-    }
-
-    // Step 2: Create auth user with internal fake email
-    const fakeEmail = `${username}@wlp-internal.app`;
-    const { data: authData, error: authErr } = await _supa.auth.signUp({
-      email:    fakeEmail,
-      password: password,
-      options:  { data: { name, username } }
-    });
-
-    if (authErr) {
-      setLoading('signup', false);
-      return showError('signup', authErr.message || 'Signup failed. Try again.');
-    }
-
-    const userId = authData?.user?.id;
-    if (!userId) {
-      setLoading('signup', false);
-      return showError('signup', 'Account creation failed. Please try again.');
-    }
-
-    // Step 3: Save profile to database
-    await _supa.from('profiles').upsert({
-      id:       userId,
-      name:     name,
-      username: username,
-      color:    '#0ea5e9'
-    });
-
-    // Step 4: Save username → user_id mapping
-    await _supa.from('usernames').insert({
-      username: username,
-      user_id:  userId
-    });
-
-    // Step 5: Auto sign in after signup
-    const { error: loginErr } = await _supa.auth.signInWithPassword({
-      email:    fakeEmail,
-      password: password
-    });
-
-    setLoading('signup', false);
-
-    if (loginErr) {
-      // Signup worked but auto-login failed → send to login page
-      showSuccess('signup', 'Account created! Please sign in.');
-      setTimeout(() => window.location.href = 'login.html', 2000);
-    } else {
-      // All good → go straight to planner
-      window.location.href = 'index.html';
-    }
-
-  } catch (err) {
-    setLoading('signup', false);
-    showError('signup', err.message || 'Something went wrong. Please try again.');
-  }
-}
-</script>
-
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
 </body>
 </html>
