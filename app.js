@@ -2080,16 +2080,54 @@ function dlIsToday(dateLabel) {
 
 // ── Render ──────────────────────────────────
 function dlRender() {
-  const empty   = document.getElementById('dl-empty');
-  const tableWrap = document.querySelector('.dl-table-wrap');
-  const thead   = document.getElementById('dl-thead-row');
-  const tbody   = document.getElementById('dl-tbody');
-  const addBtn  = document.getElementById('dl-add-col-btn');
+  const empty    = document.getElementById('dl-empty');
+  const tableWrap = document.getElementById('dl-table-wrap');
+  const thead    = document.getElementById('dl-thead-row');
+  const tbody    = document.getElementById('dl-tbody');
   if (!tbody) return;
 
   const hasRows = dlData.rows.length > 0;
-  if (empty)    empty.style.display    = hasRows ? 'none' : 'flex';
+  if (empty)     empty.style.display     = hasRows ? 'none'  : 'flex';
   if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
+
+  // ── Update KPI stats ──
+  let totalTasks = 0, doneTasks = 0;
+  dlData.rows.forEach(row => {
+    dlData.cols.forEach((_, ci) => {
+      const t = row.tasks[ci];
+      if (t && t.text && t.text.trim()) {
+        totalTasks++;
+        if (t.done) doneTasks++;
+      }
+    });
+  });
+  const rate = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
+
+  // Calculate streak: consecutive days ending today/yesterday
+  let streak = 0;
+  if (dlData.rows.length > 0) {
+    const sorted = [...dlData.rows].sort((a,b) => {
+      return new Date(b.dateLabel) - new Date(a.dateLabel);
+    });
+    let expected = new Date();
+    for (const row of sorted) {
+      const d = new Date(row.dateLabel);
+      const diff = Math.round((expected - d) / 86400000);
+      if (diff <= 1) { streak++; expected = d; expected.setDate(expected.getDate()-1); }
+      else break;
+    }
+  }
+
+  const sd = document.getElementById('dl-stat-days');
+  const sdone = document.getElementById('dl-stat-done');
+  const stotal = document.getElementById('dl-stat-total');
+  const srate = document.getElementById('dl-stat-rate');
+  const sstreak = document.getElementById('dl-stat-streak');
+  if (sd) sd.textContent = dlData.rows.length;
+  if (sdone) sdone.textContent = doneTasks;
+  if (stotal) stotal.textContent = totalTasks;
+  if (srate) srate.textContent = rate + '%';
+  if (sstreak) sstreak.textContent = streak;
 
   if (!hasRows) return;
 
@@ -2146,7 +2184,7 @@ function dlRender() {
         <td class="dl-date-cell">
           <div class="dl-date-label">
             <div class="dl-date-dot"></div>
-            <span>${esc(row.dateLabel)}</span>
+            <span class="dl-date-text">${esc(row.dateLabel)}${isToday ? ' <span style=\"font-size:10px;color:#34d399;font-weight:700;margin-left:4px\">TODAY</span>' : ''}</span>
             <button class="dl-date-del" onclick="dlDeleteRow('${row.id}')" title="Delete row">
               <i class="ti ti-trash"></i>
             </button>
@@ -2171,6 +2209,15 @@ function dlRender() {
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.max(32, el.scrollHeight) + 'px';
+}
+
+// ── Pick custom date (opens native date picker) ──────────
+function dlPickDate() {
+  const picker = document.getElementById('dl-date-picker');
+  if (picker) {
+    picker.max = new Date().toISOString().slice(0,10);
+    picker.click();
+  }
 }
 
 // ── Add today's date row ──────────────────────
@@ -2206,6 +2253,7 @@ function dlAddDateRow(dateStr) {
   });
   dlSave();
   dlRender();
+  toast(`${label} added ✓`);
 }
 
 // ── Delete row ────────────────────────────────
@@ -2312,3 +2360,14 @@ switchView = function(name) {
   _origSwitchViewDL(name);
   if (name === 'dailylog') setTimeout(dlRender, 50);
 };
+
+// Run dlRender on first load if data already exists
+(function() {
+  if (dlData.rows.length > 0) {
+    // Will be rendered when view opens; also update stats immediately
+    setTimeout(() => {
+      const tw = document.getElementById('dl-table-wrap');
+      if (tw && dlData.rows.length > 0) tw.style.display = 'block';
+    }, 200);
+  }
+})();
