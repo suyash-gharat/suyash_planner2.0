@@ -2058,6 +2058,406 @@ document.addEventListener('DOMContentLoaded', initAuth);
 if (document.readyState !== 'loading') initAuth();
 
 // =============================================
+//  DAILY LOG — Premium UI
+// =============================================
+const DL_MAX_TASKS = 8;
+let dlData = load('dailyLog', { cols:['Task 1','Task 2','Task 3'], rows:[] });
+
+function dlSave(){ save('dailyLog', dlData); }
+
+function dlFmtDate(d){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day=d.getDate();
+  const s=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  return `${day}${s} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+function dlIsToday(label){ return label===dlFmtDate(new Date()); }
+
+function dlUpdateStats(){
+  const totalDays = dlData.rows.length;
+  let totalTasks=0, doneTasks=0;
+  dlData.rows.forEach(r => {
+    dlData.cols.forEach((_,ci) => {
+      const t=r.tasks[ci];
+      if(t && t.text.trim()){ totalTasks++; if(t.done) doneTasks++; }
+    });
+  });
+  const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+  const sd=document.getElementById('dl-stat-days');
+  const st=document.getElementById('dl-stat-done');
+  const stt=document.getElementById('dl-stat-total');
+  const sp=document.getElementById('dl-stat-pct');
+  if(sd) sd.textContent=totalDays;
+  if(st) st.textContent=doneTasks;
+  if(stt) stt.textContent=totalTasks;
+  if(sp) sp.textContent=pct+'%';
+}
+
+function dlRender(){
+  const empty=document.getElementById('dl-empty');
+  const wrap=document.getElementById('dl-table-wrap');
+  const thead=document.getElementById('dl-thead-row');
+  const tbody=document.getElementById('dl-tbody');
+  if(!tbody) return;
+
+  dlUpdateStats();
+
+  const hasRows=dlData.rows.length>0;
+  if(empty) empty.style.display=hasRows?'none':'flex';
+  if(wrap)  wrap.style.display=hasRows?'block':'none';
+  if(!hasRows) return;
+
+  // Build header
+  const colsHtml=dlData.cols.map((col,ci)=>`
+    <th class="dl-th-task">
+      <div class="dl-th-task-inner">
+        <input class="dl-col-name-inp" value="${esc(col)}" title="Click to rename"
+          onchange="dlRenameCol(${ci},this.value)"
+          onblur="dlRenameCol(${ci},this.value)"/>
+        <button class="dl-col-del-btn" onclick="dlDeleteCol(${ci})" title="Delete column">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+    </th>`).join('');
+
+  thead.innerHTML=`
+    <th class="dl-th-date">Date</th>
+    ${colsHtml}
+    <th class="dl-th-actions">
+      <button class="dl-add-col-btn" onclick="dlAddTaskCol()"
+        ${dlData.cols.length>=DL_MAX_TASKS?'disabled':''}>
+        <i class="ti ti-plus"></i> Add Task
+      </button>
+    </th>
+    <th class="dl-th-dl"><i class="ti ti-download"></i></th>`;
+
+  // Build rows
+  tbody.innerHTML=dlData.rows.map((row,ri)=>{
+    const isToday=dlIsToday(row.dateLabel);
+    const taskCells=dlData.cols.map((_,ci)=>{
+      const t=row.tasks[ci]||{text:'',done:false};
+      return `<td class="dl-td-task">
+        <div class="dl-task-wrap">
+          <input type="checkbox" class="dl-check" ${t.done?'checked':''}
+            onchange="dlToggleTask(${ri},${ci},this.checked)"/>
+          <textarea class="dl-task-inp${t.done?' done-inp':''}" rows="1"
+            placeholder="Write task…"
+            oninput="dlUpdateTask(${ri},${ci},this.value);dlAutoResize(this)"
+            onfocus="dlAutoResize(this)"
+            onblur="dlSave()"
+            >${esc(t.text)}</textarea>
+        </div>
+      </td>`;
+    }).join('');
+
+    return `<tr class="${isToday?'dl-today-row':''}" id="dl-row-${row.id}">
+      <td class="dl-td-date">
+        <div class="dl-date-inner">
+          <div class="dl-date-badge">
+            <div class="dl-date-dot"></div>
+            ${esc(row.dateLabel)}
+          </div>
+          ${isToday?'<span class="dl-today-tag">Today</span>':''}
+          <button class="dl-row-del-btn" onclick="dlDeleteRow('${row.id}')" title="Delete row">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+      </td>
+      ${taskCells}
+      <td class="dl-td-add"></td>
+      <td class="dl-td-dl">
+        <button class="dl-row-dl-btn" onclick="dlDownloadRow('${row.id}')" title="Download row">
+          <i class="ti ti-download"></i>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  setTimeout(()=>{ document.querySelectorAll('.dl-task-inp').forEach(dlAutoResize); }, 60);
+}
+
+function dlAutoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.max(32,el.scrollHeight)+'px';
+}
+
+function dlAddToday(){
+  const label=dlFmtDate(new Date());
+  if(dlData.rows.find(r=>r.dateLabel===label)){ toast("Today's date already added"); return; }
+  dlData.rows.unshift({id:'dl_'+Date.now(),dateLabel:label,tasks:dlData.cols.map(()=>({text:'',done:false}))});
+  dlSave(); dlRender(); toast('Today added ✓');
+}
+
+function dlDeleteRow(id){
+  if(!confirm('Delete this date row?')) return;
+  dlData.rows=dlData.rows.filter(r=>r.id!==id);
+  dlSave(); dlRender();
+}
+
+function dlAddTaskCol(){
+  if(dlData.cols.length>=DL_MAX_TASKS){ toast('Maximum 8 task columns'); return; }
+  dlData.cols.push('Task '+(dlData.cols.length+1));
+  dlData.rows.forEach(r=>r.tasks.push({text:'',done:false}));
+  dlSave(); dlRender();
+}
+
+function dlDeleteCol(ci){
+  if(dlData.cols.length<=1){ toast('Need at least 1 column'); return; }
+  if(!confirm(`Delete column "${dlData.cols[ci]}"?`)) return;
+  dlData.cols.splice(ci,1);
+  dlData.rows.forEach(r=>r.tasks.splice(ci,1));
+  dlSave(); dlRender();
+}
+
+function dlRenameCol(ci,val){
+  dlData.cols[ci]=val.trim()||`Task ${ci+1}`;
+  dlSave();
+}
+
+function dlUpdateTask(ri,ci,val){
+  if(!dlData.rows[ri]) return;
+  if(!dlData.rows[ri].tasks[ci]) dlData.rows[ri].tasks[ci]={text:'',done:false};
+  dlData.rows[ri].tasks[ci].text=val;
+}
+
+function dlToggleTask(ri,ci,done){
+  if(!dlData.rows[ri]) return;
+  if(!dlData.rows[ri].tasks[ci]) dlData.rows[ri].tasks[ci]={text:'',done:false};
+  dlData.rows[ri].tasks[ci].done=done;
+  // Toggle strikethrough class
+  const inp=document.querySelector(`#dl-row-${dlData.rows[ri].id} .dl-td-task:nth-child(${ci+2}) .dl-task-inp`);
+  if(inp) inp.classList.toggle('done-inp',done);
+  dlSave(); dlUpdateStats();
+}
+
+function dlDownload(){
+  if(!dlData.rows.length){ toast('No data to download'); return; }
+  const headers=['Date',...dlData.cols];
+  const rows=dlData.rows.map(row=>[
+    row.dateLabel,
+    ...dlData.cols.map((_,ci)=>{
+      const t=row.tasks[ci]||{text:'',done:false};
+      return t.done?`[Done] ${t.text}`:t.text;
+    })
+  ]);
+  const csv=[headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`daily-log-${new Date().toISOString().slice(0,10)}.csv`});
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Downloaded ✓');
+}
+
+function dlDownloadRow(id){
+  const row=dlData.rows.find(r=>r.id===id);
+  if(!row) return;
+  const headers=['Date',...dlData.cols];
+  const data=[row.dateLabel,...dlData.cols.map((_,ci)=>{const t=row.tasks[ci]||{text:'',done:false};return t.done?`[Done] ${t.text}`:t.text;})];
+  const csv=[headers,data].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`log-${row.dateLabel.replace(/\s+/g,'-')}.csv`});
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Row downloaded ✓');
+}
+
+const _origSwitchViewDL = typeof _origSwitchViewDL !== 'undefined' ? _origSwitchViewDL : switchView;
+switchView = function(name){
+  _origSwitchViewDL(name);
+  if(name==='dailylog') setTimeout(dlRender, 60);
+};
+// =============================================
+//  SUPABASE INTEGRATION — Batch 4
+// =============================================
+let _currentUser = null;
+
+// ── Auth guard: redirect to login if not logged in ──
+async function initAuth() {
+  const { data:{ session } } = await _supa.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  _currentUser = await getCurrentUserProfile();
+
+  // Clear localStorage if a different user logged in
+  const storedUserId = localStorage.getItem('wlp-active-user');
+  if (storedUserId && storedUserId !== _currentUser.id) {
+    // Different user — wipe all cached data
+    const keysToKeep = ['wlp-theme'];
+    const savedTheme = localStorage.getItem('wlp-theme');
+    localStorage.clear();
+    if (savedTheme) localStorage.setItem('wlp-theme', savedTheme);
+    // Reset in-memory state
+    fixedTasks = []; gridChecks = {};
+    teammates = []; memberFixedTasks = {}; memberGridChecks = {};
+    nbChapters = []; nbActiveId = null;
+  }
+  localStorage.setItem('wlp-active-user', _currentUser.id);
+
+  // Show logout btn
+  const lb = document.getElementById('logout-btn');
+  if (lb) lb.style.display = 'flex';
+
+  // Apply saved name & photo
+  const nameEl = document.getElementById('sb-profile-name');
+  if (nameEl) nameEl.textContent = _currentUser.name;
+  localStorage.setItem('profileName', _currentUser.name);
+
+  const iniEl = document.getElementById('sb-profile-initials');
+  if (iniEl) {
+    const p = _currentUser.name.trim().split(/\s+/);
+    iniEl.textContent = p.length>1 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : _currentUser.name.slice(0,2).toUpperCase();
+  }
+  const picSrc = _currentUser.avatar_url || localStorage.getItem('profilePic');
+  if (picSrc) applyProfilePic(picSrc);
+
+  updateSbGreeting();
+  await supaLoadAll();
+}
+
+// ── Load all data from Supabase ──
+async function supaLoadAll() {
+  if (!_currentUser) return;
+  const oid = _currentUser.id;
+  try {
+    // Tasks (main user)
+    const { data: dbTasks } = await _supa.from('tasks').select('*').eq('owner_id',oid).eq('teammate_id','main');
+    if (dbTasks?.length) {
+      fixedTasks = dbTasks.map(t=>({id:t.id,name:t.name,cat:t.cat,type:t.type,days:t.days||[],note:t.note||''}));
+      save('fixedTasks', fixedTasks);
+    }
+    // Grid checks
+    const { data: dbChecks } = await _supa.from('grid_checks').select('*').eq('owner_id',oid).eq('teammate_id','main');
+    if (dbChecks?.length) {
+      gridChecks = {};
+      dbChecks.forEach(c => { gridChecks[`${c.task_id}_${c.check_date}`] = c.checked; });
+      save('gridChecks', gridChecks);
+    }
+    // Teammates
+    const { data: dbTM } = await _supa.from('teammates').select('*').eq('owner_id',oid);
+    if (dbTM?.length) {
+      teammates = dbTM.map(t=>({id:t.id,name:t.name,role:t.role||'',color:t.color||'#0ea5e9',avatar_url:t.avatar_url||null}));
+      save('teammates', teammates);
+    }
+    // Notebook chapters
+    const { data: dbCh } = await _supa.from('notebook_chapters').select('*').eq('owner_id',oid).order('updated_at',{ascending:false});
+    if (dbCh?.length) {
+      nbChapters = dbCh.map(c=>({
+        id:c.id,title:c.title||'',emoji:c.emoji||'📄',content:c.content||'',
+        font:c.font||'default',pageStyle:c.page_style||'blank',color:c.color||'#0ea5e9',
+        tags:c.tags||[],wordCount:c.word_count||0,
+        createdAt:new Date(c.created_at).getTime(),updatedAt:new Date(c.updated_at).getTime()
+      }));
+      save('wlp-notebook',{chapters:nbChapters});
+    }
+    // Re-render
+    if(typeof renderDashboard==='function') renderDashboard();
+    if(typeof renderToday==='function') renderToday();
+    if(typeof renderTeammateLinks==='function') renderTeammateLinks();
+    if(typeof nbRenderChapters==='function') nbRenderChapters();
+  } catch(e){ console.error('Supabase load error:',e); }
+}
+
+// ── Save helpers ──
+async function supaSaveTask(task, tmId='main') {
+  if(!_currentUser) return;
+  await _supa.from('tasks').upsert({id:task.id,owner_id:_currentUser.id,teammate_id:tmId,name:task.name,cat:task.cat,type:task.type,days:task.days||[],note:task.note||''});
+}
+async function supaDeleteTask(id) {
+  if(!_currentUser) return;
+  await _supa.from('tasks').delete().eq('id',id).eq('owner_id',_currentUser.id);
+}
+async function supaSaveCheck(taskId, dateStr, checked, tmId='main') {
+  if(!_currentUser) return;
+  await _supa.from('grid_checks').upsert({owner_id:_currentUser.id,teammate_id:tmId,task_id:taskId,check_date:dateStr,checked},{onConflict:'owner_id,teammate_id,task_id,check_date'});
+}
+async function supaSaveChapter(ch) {
+  if(!_currentUser) return;
+  await _supa.from('notebook_chapters').upsert({id:ch.id,owner_id:_currentUser.id,title:ch.title||'',emoji:ch.emoji||'📄',content:ch.content||'',font:ch.font||'default',page_style:ch.pageStyle||'blank',color:ch.color||'#0ea5e9',tags:ch.tags||[],word_count:ch.wordCount||0,updated_at:new Date().toISOString()});
+}
+async function supaDeleteChapter(id) {
+  if(!_currentUser) return;
+  await _supa.from('notebook_chapters').delete().eq('id',id).eq('owner_id',_currentUser.id);
+}
+async function supaSaveTeammate(tm) {
+  if(!_currentUser) return;
+  await _supa.from('teammates').upsert({id:tm.id,owner_id:_currentUser.id,name:tm.name,role:tm.role||'',color:tm.color||'#0ea5e9',avatar_url:tm.avatar_url||null});
+}
+async function supaDeleteTeammate(id) {
+  if(!_currentUser) return;
+  await _supa.from('teammates').delete().eq('id',id).eq('owner_id',_currentUser.id);
+  await _supa.from('tasks').delete().eq('teammate_id',id).eq('owner_id',_currentUser.id);
+  await _supa.from('grid_checks').delete().eq('teammate_id',id).eq('owner_id',_currentUser.id);
+}
+
+// ── Profile picture upload to Supabase Storage ──
+const _origHandleProfileUpload = handleProfileUpload;
+handleProfileUpload = async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!['image/png','image/jpeg'].includes(file.type)) { toast('Only PNG/JPG allowed'); e.target.value=''; return; }
+  if (file.size > 2*1024*1024) { toast('Max 2MB'); e.target.value=''; return; }
+  if (_currentUser) {
+    try {
+      toast('Uploading...');
+      const ext = file.name.split('.').pop();
+      const path = `${_currentUser.id}/avatar.${ext}`;
+      await _supa.storage.from('avatars').upload(path, file, {upsert:true});
+      const { data } = _supa.storage.from('avatars').getPublicUrl(path);
+      await _supa.from('profiles').update({avatar_url:data.publicUrl}).eq('id',_currentUser.id);
+      _currentUser.avatar_url = data.publicUrl;
+      localStorage.setItem('profilePic', data.publicUrl);
+      applyProfilePic(data.publicUrl);
+      toast('Profile picture updated ✓');
+    } catch(err) { toast('Upload failed'); }
+  } else { _origHandleProfileUpload(e); }
+  e.target.value = '';
+};
+
+// ── Notebook: patch save+delete to sync Supabase ──
+const _origNbSave = nbSaveCurrentChapter;
+nbSaveCurrentChapter = function() {
+  _origNbSave();
+  const ch = nbActiveChapter();
+  if (ch && _currentUser) supaSaveChapter(ch);
+};
+const _origNbDel = nbDeleteChapter;
+nbDeleteChapter = function(id, e) {
+  if (_currentUser) supaDeleteChapter(id);
+  _origNbDel(id, e);
+};
+
+// ── PDF/CSV upload in Notebook ──
+function nbInsertFileUpload() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.pdf,.csv';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10*1024*1024) { toast('Max 10MB'); return; }
+    if (!nbActiveId) { toast('Open a chapter first'); return; }
+    if (!_currentUser) { toast('Login required'); return; }
+    try {
+      toast('Uploading...');
+      const path = `${_currentUser.id}/${nbActiveId}/${Date.now()}_${file.name}`;
+      await _supa.storage.from('notebook-files').upload(path, file, {upsert:true});
+      const { data } = _supa.storage.from('notebook-files').getPublicUrl(path);
+      await _supa.from('notebook_files').insert({chapter_id:nbActiveId,owner_id:_currentUser.id,file_name:file.name,file_type:file.type,file_url:data.publicUrl,file_size:file.size});
+      const isPdf = file.type==='application/pdf';
+      nbExec('insertHTML', `<div class="nb-file-embed"><div class="nb-file-icon">${isPdf?'📄':'📊'}</div><div class="nb-file-info"><div class="nb-file-name">${esc(file.name)}</div><div class="nb-file-size">${(file.size/1024).toFixed(1)} KB · ${isPdf?'PDF':'CSV'}</div></div><a href="${data.publicUrl}" target="_blank" class="nb-file-open-btn">${isPdf?'Open PDF':'Download CSV'}</a></div>`);
+      toast(file.name + ' uploaded ✓');
+    } catch(err) { toast('Upload failed: '+err.message); }
+  };
+  input.click();
+}
+
+// ── Logout button CSS ──
+(function(){
+  const s = document.createElement('style');
+  s.textContent = `.logout-btn{width:28px;height:28px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);color:rgba(244,63,94,0.7);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}.logout-btn:hover{background:rgba(244,63,94,0.22);color:#f43f5e;}`;
+  document.head.appendChild(s);
+})();
+
+// ── Boot ──
+document.addEventListener('DOMContentLoaded', initAuth);
+if (document.readyState !== 'loading') initAuth();
+
+// =============================================
 //  DAILY LOG
 // =============================================
 const DL_MAX_TASKS = 8;
@@ -2090,29 +2490,6 @@ function dlRender() {
   const hasRows = dlData.rows.length > 0;
   if (empty)    empty.style.display    = hasRows ? 'none' : 'flex';
   if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
-
-  // Update stats bar
-  {
-    let totalTasks = 0, doneTasks = 0;
-    dlData.rows.forEach(row => {
-      dlData.cols.forEach((_, ci) => {
-        const t = row.tasks[ci];
-        if (t && t.text && t.text.trim()) {
-          totalTasks++;
-          if (t.done) doneTasks++;
-        }
-      });
-    });
-    const rate = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
-    const sd = document.getElementById('dl-stat-days');
-    const sdone = document.getElementById('dl-stat-done');
-    const stotal = document.getElementById('dl-stat-total');
-    const srate = document.getElementById('dl-stat-rate');
-    if (sd) sd.textContent = dlData.rows.length;
-    if (sdone) sdone.textContent = doneTasks;
-    if (stotal) stotal.textContent = totalTasks;
-    if (srate) srate.textContent = rate + '%';
-  }
 
   if (!hasRows) return;
 
