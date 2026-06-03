@@ -626,43 +626,131 @@
 
 <!-- ===== DAILY LOG ===== -->
 <section id="view-dailylog" class="view">
-  <div class="page-hdr">
-    <div>
-      <h1 class="page-title"><i class="ti ti-table"></i> Daily Task Log</h1>
-      <p class="page-sub">Track what you accomplish each day — add tasks per date and download anytime</p>
+
+  <!-- ── HERO HEADER ── -->
+  <div class="dl-hero">
+    <div class="dl-hero-left">
+      <div class="dl-hero-icon"><i class="ti ti-table"></i></div>
+      <div>
+        <h1 class="dl-hero-title">Daily Task Log</h1>
+        <p class="dl-hero-sub">Track every accomplishment — one row per day, download anytime</p>
+      </div>
     </div>
-    <div class="hdr-btns">
-      <button class="btn-outline" onclick="dlAddToday()"><i class="ti ti-calendar-plus"></i> Add Today</button>
-      <button class="btn-primary" onclick="dlDownload()"><i class="ti ti-download"></i> Download</button>
+    <div class="dl-hero-actions">
+      <button class="dl-btn-ghost" onclick="dlPickDate()">
+        <i class="ti ti-calendar-plus"></i> Pick date
+      </button>
+      <button class="dl-btn-secondary" onclick="dlAddToday()">
+        <i class="ti ti-sun"></i> Add today
+      </button>
+      <button class="dl-btn-primary" onclick="dlDownload()">
+        <i class="ti ti-download"></i> Export CSV
+      </button>
     </div>
   </div>
 
-  <!-- Table wrap -->
-  <div class="dl-table-wrap">
+  <!-- ── KPI STATS ROW ── -->
+  <div class="dl-kpi-row">
+    <div class="dl-kpi" id="dl-kpi-days">
+      <div class="dl-kpi-icon" style="background:rgba(14,165,233,0.15);color:#38bdf8">
+        <i class="ti ti-calendar-stats"></i>
+      </div>
+      <div class="dl-kpi-body">
+        <div class="dl-kpi-num" id="dl-stat-days">0</div>
+        <div class="dl-kpi-lbl">Days logged</div>
+      </div>
+    </div>
+    <div class="dl-kpi">
+      <div class="dl-kpi-icon" style="background:rgba(16,185,129,0.15);color:#34d399">
+        <i class="ti ti-circle-check"></i>
+      </div>
+      <div class="dl-kpi-body">
+        <div class="dl-kpi-num" id="dl-stat-done">0</div>
+        <div class="dl-kpi-lbl">Tasks done</div>
+      </div>
+    </div>
+    <div class="dl-kpi">
+      <div class="dl-kpi-icon" style="background:rgba(129,140,248,0.15);color:#a78bfa">
+        <i class="ti ti-list"></i>
+      </div>
+      <div class="dl-kpi-body">
+        <div class="dl-kpi-num" id="dl-stat-total">0</div>
+        <div class="dl-kpi-lbl">Total tasks</div>
+      </div>
+    </div>
+    <div class="dl-kpi">
+      <div class="dl-kpi-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24">
+        <i class="ti ti-trending-up"></i>
+      </div>
+      <div class="dl-kpi-body">
+        <div class="dl-kpi-num" id="dl-stat-rate">0%</div>
+        <div class="dl-kpi-lbl">Completion rate</div>
+      </div>
+    </div>
+    <div class="dl-kpi">
+      <div class="dl-kpi-icon" style="background:rgba(244,63,94,0.15);color:#fb7185">
+        <i class="ti ti-flame"></i>
+      </div>
+      <div class="dl-kpi-body">
+        <div class="dl-kpi-num" id="dl-stat-streak">0</div>
+        <div class="dl-kpi-lbl">Day streak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DATE PICKER (hidden, shown by JS) ── -->
+  <input type="date" id="dl-date-picker" style="display:none"
+    onchange="dlAddDateRow(this.value);this.value=''"/>
+
+  <!-- ── TABLE ── -->
+  <div class="dl-table-wrap" id="dl-table-wrap" style="display:none">
     <table class="dl-table" id="dl-table">
       <thead>
         <tr id="dl-thead-row">
-          <th class="dl-date-th">Date</th>
-          <!-- task columns injected by JS -->
+          <th class="dl-date-th">
+            <div style="display:flex;align-items:center;gap:6px">
+              <i class="ti ti-calendar" style="color:#38bdf8;font-size:13px"></i>
+              DATE
+            </div>
+          </th>
+          <!-- columns injected by JS -->
           <th class="dl-add-col">
             <button class="dl-add-task-btn" onclick="dlAddTaskCol()" id="dl-add-col-btn">
-              <i class="ti ti-plus"></i> Add Task
+              <i class="ti ti-plus"></i> Add column
             </button>
           </th>
-          <th class="dl-dl-col"><i class="ti ti-download"></i></th>
+          <th class="dl-dl-col" title="Download row"></th>
         </tr>
       </thead>
       <tbody id="dl-tbody"></tbody>
     </table>
   </div>
 
-  <!-- Empty state -->
+  <!-- ── EMPTY STATE ── -->
   <div class="dl-empty" id="dl-empty">
-    <div class="dl-empty-icon">📋</div>
-    <div class="dl-empty-title">No log entries yet</div>
-    <div class="dl-empty-sub">Click "Add Today" to start tracking your daily tasks</div>
-    <button class="btn-primary" onclick="dlAddToday()"><i class="ti ti-plus"></i> Add Today's Date</button>
+    <div class="dl-empty-bg"></div>
+    <div class="dl-empty-content">
+      <div class="dl-empty-icon-wrap">
+        <div class="dl-empty-icon-ring"></div>
+        <span class="dl-empty-icon">📋</span>
+      </div>
+      <h3 class="dl-empty-title">Your log is empty</h3>
+      <p class="dl-empty-sub">Start by adding today's date — then fill in what you accomplished</p>
+      <div class="dl-empty-btns">
+        <button class="dl-btn-primary" onclick="dlAddToday()">
+          <i class="ti ti-sun"></i> Add Today
+        </button>
+        <button class="dl-btn-secondary" onclick="dlPickDate()">
+          <i class="ti ti-calendar-plus"></i> Pick a date
+        </button>
+      </div>
+      <div class="dl-empty-hint">
+        <i class="ti ti-info-circle"></i>
+        Tip: Add as many task columns as you need. Download to CSV anytime.
+      </div>
+    </div>
   </div>
+
 </section>
 
 </main>
