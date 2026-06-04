@@ -637,15 +637,9 @@
       </div>
     </div>
     <div class="dl-hero-actions">
-      <button class="dl-btn-ghost" onclick="dlPickDate()">
-        <i class="ti ti-calendar-plus"></i> Pick date
-      </button>
-      <button class="dl-btn-secondary" onclick="dlAddToday()">
-        <i class="ti ti-sun"></i> Add today
-      </button>
-      <button class="dl-btn-primary" onclick="dlDownload()">
-        <i class="ti ti-download"></i> Export CSV
-      </button>
+      <button class="dl-btn-ghost" onclick="dlPickDate()"><i class="ti ti-calendar-plus"></i> Pick date</button>
+      <button class="dl-btn-secondary" onclick="dlAddToday()"><i class="ti ti-sun"></i> Add today</button>
+      <button class="dl-btn-primary" onclick="dlDownload()"><i class="ti ti-download"></i> Export CSV</button>
     </div>
   </div>
 
@@ -674,7 +668,8 @@
   </div>
 
   <!-- Hidden date picker -->
-  <input type="date" id="dl-date-picker" style="display:none;position:absolute;opacity:0"
+  <input type="date" id="dl-date-picker"
+    style="position:absolute;opacity:0;pointer-events:none;width:0;height:0"
     onchange="dlAddDateRow(this.value);this.value=''"/>
 
   <!-- TABLE -->
@@ -710,12 +705,8 @@
       <h3 class="dl-empty-title">Your log is empty</h3>
       <p class="dl-empty-sub">Start by adding today's date — then write what you accomplished in each task column</p>
       <div class="dl-empty-btns">
-        <button class="dl-btn-primary" onclick="dlAddToday()">
-          <i class="ti ti-sun"></i> Add Today
-        </button>
-        <button class="dl-btn-secondary" onclick="dlPickDate()">
-          <i class="ti ti-calendar-plus"></i> Pick a date
-        </button>
+        <button class="dl-btn-primary" onclick="dlAddToday()"><i class="ti ti-sun"></i> Add Today</button>
+        <button class="dl-btn-secondary" onclick="dlPickDate()"><i class="ti ti-calendar-plus"></i> Pick a date</button>
       </div>
       <div class="dl-empty-hint">
         <i class="ti ti-bulb"></i>
