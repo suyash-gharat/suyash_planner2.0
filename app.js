@@ -2080,17 +2080,17 @@ function dlIsToday(dateLabel) {
 
 // ── Render ──────────────────────────────────
 function dlRender() {
-  const empty    = document.getElementById('dl-empty');
+  const empty     = document.getElementById('dl-empty');
   const tableWrap = document.getElementById('dl-table-wrap');
-  const thead    = document.getElementById('dl-thead-row');
-  const tbody    = document.getElementById('dl-tbody');
+  const thead     = document.getElementById('dl-thead-row');
+  const tbody     = document.getElementById('dl-tbody');
   if (!tbody) return;
 
   const hasRows = dlData.rows.length > 0;
   if (empty)     empty.style.display     = hasRows ? 'none'  : 'flex';
   if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
 
-  // ── Update KPI stats ──
+  // ── Update KPI stats ──────────────────────────
   let totalTasks = 0, doneTasks = 0;
   dlData.rows.forEach(row => {
     dlData.cols.forEach((_, ci) => {
@@ -2103,37 +2103,37 @@ function dlRender() {
   });
   const rate = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
 
-  // Calculate streak: consecutive days ending today/yesterday
+  // Streak: count consecutive days
   let streak = 0;
   if (dlData.rows.length > 0) {
-    const sorted = [...dlData.rows].sort((a,b) => {
-      return new Date(b.dateLabel) - new Date(a.dateLabel);
-    });
-    let expected = new Date();
-    for (const row of sorted) {
-      const d = new Date(row.dateLabel);
-      const diff = Math.round((expected - d) / 86400000);
-      if (diff <= 1) { streak++; expected = d; expected.setDate(expected.getDate()-1); }
-      else break;
+    const labels = dlData.rows.map(r => r.dateLabel);
+    const today  = dlFmtDate(new Date());
+    const yest   = dlFmtDate(new Date(Date.now() - 86400000));
+    if (labels.includes(today) || labels.includes(yest)) {
+      streak = 1;
+      // Simple streak: count consecutive rows (already sorted newest first)
+      for (let i = 1; i < dlData.rows.length; i++) {
+        const a = new Date(dlData.rows[i-1].dateLabel);
+        const b = new Date(dlData.rows[i].dateLabel);
+        const diff = Math.round((a - b) / 86400000);
+        if (diff <= 1) streak++;
+        else break;
+      }
     }
   }
 
-  const sd = document.getElementById('dl-stat-days');
-  const sdone = document.getElementById('dl-stat-done');
-  const stotal = document.getElementById('dl-stat-total');
-  const srate = document.getElementById('dl-stat-rate');
-  const sstreak = document.getElementById('dl-stat-streak');
-  if (sd) sd.textContent = dlData.rows.length;
-  if (sdone) sdone.textContent = doneTasks;
-  if (stotal) stotal.textContent = totalTasks;
-  if (srate) srate.textContent = rate + '%';
-  if (sstreak) sstreak.textContent = streak;
+  const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setEl('dl-stat-days',   dlData.rows.length);
+  setEl('dl-stat-done',   doneTasks);
+  setEl('dl-stat-total',  totalTasks);
+  setEl('dl-stat-rate',   rate + '%');
+  setEl('dl-stat-streak', streak);
 
   if (!hasRows) return;
 
-  // Build header columns
+  // ── Build header columns ─────────────────────
   const colsHtml = dlData.cols.map((col, ci) => `
-    <th>
+    <th style="min-width:140px">
       <div class="dl-task-th-inner">
         <input class="dl-col-name" value="${esc(col)}" title="Click to rename"
           onchange="dlRenameCol(${ci},this.value)"
@@ -2142,29 +2142,31 @@ function dlRender() {
           <i class="ti ti-x"></i>
         </button>
       </div>
-    </th>
-  `).join('');
+    </th>`).join('');
 
-  // Rebuild header (keep first date-th and last two cols)
   thead.innerHTML = `
-    <th class="dl-date-th">Date</th>
+    <th class="dl-date-th">
+      <div style="display:flex;align-items:center;gap:7px">
+        <i class="ti ti-calendar" style="font-size:13px"></i> DATE
+      </div>
+    </th>
     ${colsHtml}
     <th class="dl-add-col">
       <button class="dl-add-task-btn" onclick="dlAddTaskCol()" id="dl-add-col-btn"
         ${dlData.cols.length >= DL_MAX_TASKS ? 'disabled' : ''}>
-        <i class="ti ti-plus"></i> Add Task
+        <i class="ti ti-plus"></i> Add column
       </button>
     </th>
-    <th class="dl-dl-col"><i class="ti ti-download"></i></th>
+    <th class="dl-dl-col"><i class="ti ti-download" style="font-size:13px"></i></th>
   `;
 
-  // Build rows
+  // ── Build rows ────────────────────────────────
   tbody.innerHTML = dlData.rows.map((row, ri) => {
     const isToday = dlIsToday(row.dateLabel);
     const taskCells = dlData.cols.map((_, ci) => {
       const task = row.tasks[ci] || { text:'', done:false };
       return `
-        <td class="dl-task-cell">
+        <td class="dl-task-cell" style="min-width:140px">
           <div class="dl-task-wrap">
             <input type="checkbox" class="dl-check"
               ${task.done ? 'checked' : ''}
@@ -2174,6 +2176,7 @@ function dlRender() {
               oninput="dlUpdateTask(${ri},${ci},this.value);autoResize(this)"
               onfocus="autoResize(this)"
               onblur="dlSave()"
+              style="${task.done ? 'text-decoration:line-through;color:var(--text3)' : ''}"
               >${esc(task.text)}</textarea>
           </div>
         </td>`;
@@ -2184,7 +2187,10 @@ function dlRender() {
         <td class="dl-date-cell">
           <div class="dl-date-label">
             <div class="dl-date-dot"></div>
-            <span class="dl-date-text">${esc(row.dateLabel)}${isToday ? ' <span style=\"font-size:10px;color:#34d399;font-weight:700;margin-left:4px\">TODAY</span>' : ''}</span>
+            <div class="dl-date-text">
+              ${esc(row.dateLabel)}
+              ${isToday ? '<span class="dl-today-badge">TODAY</span>' : ''}
+            </div>
             <button class="dl-date-del" onclick="dlDeleteRow('${row.id}')" title="Delete row">
               <i class="ti ti-trash"></i>
             </button>
@@ -2211,13 +2217,12 @@ function autoResize(el) {
   el.style.height = Math.max(32, el.scrollHeight) + 'px';
 }
 
-// ── Pick custom date (opens native date picker) ──────────
+// ── Open native date picker ──────────────────────
 function dlPickDate() {
-  const picker = document.getElementById('dl-date-picker');
-  if (picker) {
-    picker.max = new Date().toISOString().slice(0,10);
-    picker.click();
-  }
+  const p = document.getElementById('dl-date-picker');
+  if (!p) return;
+  p.max = new Date().toISOString().slice(0,10);
+  p.click();
 }
 
 // ── Add today's date row ──────────────────────
@@ -2253,7 +2258,6 @@ function dlAddDateRow(dateStr) {
   });
   dlSave();
   dlRender();
-  toast(`${label} added ✓`);
 }
 
 // ── Delete row ────────────────────────────────
@@ -2358,16 +2362,17 @@ function dlDownloadRow(id) {
 const _origSwitchViewDL = switchView;
 switchView = function(name) {
   _origSwitchViewDL(name);
-  if (name === 'dailylog') setTimeout(dlRender, 50);
-};
-
-// Run dlRender on first load if data already exists
-(function() {
-  if (dlData.rows.length > 0) {
-    // Will be rendered when view opens; also update stats immediately
+  if (name === 'dailylog') {
     setTimeout(() => {
+      // Make sure table-wrap visibility is correct
       const tw = document.getElementById('dl-table-wrap');
-      if (tw && dlData.rows.length > 0) tw.style.display = 'block';
-    }, 200);
+      const em = document.getElementById('dl-empty');
+      if (tw && em) {
+        const hasRows = dlData.rows.length > 0;
+        tw.style.display = hasRows ? 'block' : 'none';
+        em.style.display = hasRows ? 'none'  : 'flex';
+      }
+      dlRender();
+    }, 50);
   }
-})();
+};
