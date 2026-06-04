@@ -2090,39 +2090,26 @@ function dlRender() {
   if (empty)     empty.style.display     = hasRows ? 'none'  : 'flex';
   if (tableWrap) tableWrap.style.display = hasRows ? 'block' : 'none';
 
-  // ── Update KPI stats ──────────────────────────
+  // ── KPI stats ──────────────────────────────
   let totalTasks = 0, doneTasks = 0;
   dlData.rows.forEach(row => {
     dlData.cols.forEach((_, ci) => {
       const t = row.tasks[ci];
-      if (t && t.text && t.text.trim()) {
-        totalTasks++;
-        if (t.done) doneTasks++;
-      }
+      if (t && t.text && t.text.trim()) { totalTasks++; if (t.done) doneTasks++; }
     });
   });
   const rate = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
-
-  // Streak: count consecutive days
   let streak = 0;
   if (dlData.rows.length > 0) {
-    const labels = dlData.rows.map(r => r.dateLabel);
-    const today  = dlFmtDate(new Date());
-    const yest   = dlFmtDate(new Date(Date.now() - 86400000));
-    if (labels.includes(today) || labels.includes(yest)) {
-      streak = 1;
-      // Simple streak: count consecutive rows (already sorted newest first)
-      for (let i = 1; i < dlData.rows.length; i++) {
-        const a = new Date(dlData.rows[i-1].dateLabel);
-        const b = new Date(dlData.rows[i].dateLabel);
-        const diff = Math.round((a - b) / 86400000);
-        if (diff <= 1) streak++;
-        else break;
-      }
+    for (let i = 0; i < dlData.rows.length; i++) {
+      if (i === 0) { streak = 1; continue; }
+      const a = new Date(dlData.rows[i-1].dateLabel);
+      const b = new Date(dlData.rows[i].dateLabel);
+      if (Math.round((a - b) / 86400000) <= 1) streak++;
+      else break;
     }
   }
-
-  const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   setEl('dl-stat-days',   dlData.rows.length);
   setEl('dl-stat-done',   doneTasks);
   setEl('dl-stat-total',  totalTasks);
@@ -2131,13 +2118,12 @@ function dlRender() {
 
   if (!hasRows) return;
 
-  // ── Build header columns ─────────────────────
+  // ── Header ──────────────────────────────────
   const colsHtml = dlData.cols.map((col, ci) => `
-    <th style="min-width:140px">
+    <th style="min-width:160px">
       <div class="dl-task-th-inner">
         <input class="dl-col-name" value="${esc(col)}" title="Click to rename"
-          onchange="dlRenameCol(${ci},this.value)"
-          onblur="dlRenameCol(${ci},this.value)"/>
+          onchange="dlRenameCol(${ci},this.value)" onblur="dlRenameCol(${ci},this.value)"/>
         <button class="dl-col-del" onclick="dlDeleteCol(${ci})" title="Remove column">
           <i class="ti ti-x"></i>
         </button>
@@ -2157,27 +2143,25 @@ function dlRender() {
         <i class="ti ti-plus"></i> Add column
       </button>
     </th>
-    <th class="dl-dl-col"><i class="ti ti-download" style="font-size:13px"></i></th>
-  `;
+    <th class="dl-dl-col"><i class="ti ti-download" style="font-size:13px"></i></th>`;
 
-  // ── Build rows ────────────────────────────────
+  // ── Rows ─────────────────────────────────────
   tbody.innerHTML = dlData.rows.map((row, ri) => {
     const isToday = dlIsToday(row.dateLabel);
     const taskCells = dlData.cols.map((_, ci) => {
       const task = row.tasks[ci] || { text:'', done:false };
+      const doneStyle = task.done ? 'text-decoration:line-through;opacity:.5' : '';
       return `
-        <td class="dl-task-cell" style="min-width:140px">
+        <td class="dl-task-cell">
           <div class="dl-task-wrap">
             <input type="checkbox" class="dl-check"
               ${task.done ? 'checked' : ''}
               onchange="dlToggleTask(${ri},${ci},this.checked)"/>
             <textarea class="dl-task-input" rows="1"
               placeholder="Write task…"
+              style="${doneStyle}"
               oninput="dlUpdateTask(${ri},${ci},this.value);autoResize(this)"
-              onfocus="autoResize(this)"
-              onblur="dlSave()"
-              style="${task.done ? 'text-decoration:line-through;color:var(--text3)' : ''}"
-              >${esc(task.text)}</textarea>
+              onfocus="autoResize(this)" onblur="dlSave()">${esc(task.text)}</textarea>
           </div>
         </td>`;
     }).join('');
@@ -2188,7 +2172,7 @@ function dlRender() {
           <div class="dl-date-label">
             <div class="dl-date-dot"></div>
             <div class="dl-date-text">
-              ${esc(row.dateLabel)}
+              <span>${esc(row.dateLabel)}</span>
               ${isToday ? '<span class="dl-today-badge">TODAY</span>' : ''}
             </div>
             <button class="dl-date-del" onclick="dlDeleteRow('${row.id}')" title="Delete row">
@@ -2199,33 +2183,17 @@ function dlRender() {
         ${taskCells}
         <td></td>
         <td class="dl-row-dl-cell">
-          <button class="dl-row-dl-btn" onclick="dlDownloadRow('${row.id}')" title="Download this row">
+          <button class="dl-row-dl-btn" onclick="dlDownloadRow('${row.id}')" title="Download row">
             <i class="ti ti-download"></i>
           </button>
         </td>
       </tr>`;
   }).join('');
 
-  // Auto-resize all textareas
-  setTimeout(() => {
-    document.querySelectorAll('.dl-task-input').forEach(autoResize);
-  }, 50);
+  setTimeout(() => document.querySelectorAll('.dl-task-input').forEach(autoResize), 60);
 }
 
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.max(32, el.scrollHeight) + 'px';
-}
 
-// ── Open native date picker ──────────────────────
-function dlPickDate() {
-  const p = document.getElementById('dl-date-picker');
-  if (!p) return;
-  p.max = new Date().toISOString().slice(0,10);
-  p.click();
-}
-
-// ── Add today's date row ──────────────────────
 function dlAddToday() {
   const label = dlFmtDate(new Date());
   // Don't add duplicate
@@ -2364,13 +2332,12 @@ switchView = function(name) {
   _origSwitchViewDL(name);
   if (name === 'dailylog') {
     setTimeout(() => {
-      // Make sure table-wrap visibility is correct
       const tw = document.getElementById('dl-table-wrap');
       const em = document.getElementById('dl-empty');
       if (tw && em) {
-        const hasRows = dlData.rows.length > 0;
-        tw.style.display = hasRows ? 'block' : 'none';
-        em.style.display = hasRows ? 'none'  : 'flex';
+        const has = dlData.rows.length > 0;
+        tw.style.display = has ? 'block' : 'none';
+        em.style.display = has ? 'none'  : 'flex';
       }
       dlRender();
     }, 50);
