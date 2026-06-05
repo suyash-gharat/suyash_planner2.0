@@ -2151,100 +2151,58 @@ html[data-theme="light"] .nb-empty-title { color:#1e293b }
 }
 
 /* =============================================
-   DAILY LOG — COMPLETE v4 (alignment fixed)
+   DAILY LOG — COMPLETE ALIGNMENT FIX v5
+   Fixes: dot outside row, checkbox misalign,
+   text overflow, row height inconsistency
    ============================================= */
 
 /* ── Hero ── */
-.dl-hero{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:22px 26px;
-  background:linear-gradient(135deg,rgba(14,165,233,0.1),rgba(129,140,248,0.07),rgba(16,185,129,0.05));
-  border:1px solid rgba(56,189,248,0.15);
-  border-radius:var(--radius);margin-bottom:18px;
-  backdrop-filter:blur(12px);flex-wrap:wrap;gap:14px;
-}
+.dl-hero{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;background:linear-gradient(135deg,rgba(14,165,233,0.1),rgba(129,140,248,0.07));border:1px solid rgba(56,189,248,0.15);border-radius:var(--radius);margin-bottom:18px;backdrop-filter:blur(12px);flex-wrap:wrap;gap:14px}
 .dl-hero-left{display:flex;align-items:center;gap:16px}
-.dl-hero-icon{
-  width:54px;height:54px;border-radius:14px;
-  background:linear-gradient(135deg,#0ea5e9,#38bdf8);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;color:#fff;flex-shrink:0;
-  box-shadow:0 6px 20px rgba(56,189,248,0.45);
-}
+.dl-hero-icon{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;box-shadow:0 6px 20px rgba(56,189,248,0.45)}
 .dl-hero-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:3px}
 .dl-hero-sub{font-size:12px;color:var(--text3)}
 .dl-hero-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-
-/* ── Buttons ── */
-.dl-btn-primary{
-  display:inline-flex;align-items:center;gap:7px;padding:10px 20px;
-  border-radius:var(--radius-sm);background:linear-gradient(135deg,#0ea5e9,#38bdf8);
-  border:none;color:#fff;font-size:13px;font-weight:700;
-  cursor:pointer;white-space:nowrap;font-family:var(--font);
-  box-shadow:0 4px 16px rgba(56,189,248,0.4);transition:all .22s;
-}
+.dl-btn-primary{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font);box-shadow:0 4px 16px rgba(56,189,248,0.4);transition:all .22s}
 .dl-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(56,189,248,0.55)}
-.dl-btn-secondary{
-  display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
-  border-radius:var(--radius-sm);background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.14);color:var(--text2);
-  font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
-  font-family:var(--font);backdrop-filter:blur(8px);transition:all .2s;
-}
+.dl-btn-secondary{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all .2s}
 .dl-btn-secondary:hover{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.4);color:var(--sky2);transform:translateY(-1px)}
-.dl-btn-ghost{
-  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;
-  border-radius:var(--radius-sm);background:transparent;
-  border:1px solid rgba(255,255,255,0.09);color:var(--text3);
-  font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
-  font-family:var(--font);transition:all .2s;
-}
+.dl-btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--radius-sm);background:transparent;border:1px solid rgba(255,255,255,0.09);color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all .2s}
 .dl-btn-ghost:hover{border-color:rgba(255,255,255,0.2);color:var(--text2)}
 
 /* ── KPI row ── */
 .dl-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
-.dl-kpi{
-  display:flex;align-items:center;gap:13px;padding:16px 18px;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
-  border-radius:var(--radius);backdrop-filter:blur(12px);
-  box-shadow:var(--shadow);transition:all .22s;
-  position:relative;overflow:hidden;
-}
-.dl-kpi::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#0ea5e9,#818cf8);opacity:.7;
-}
+.dl-kpi{display:flex;align-items:center;gap:13px;padding:16px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:var(--radius);backdrop-filter:blur(12px);box-shadow:var(--shadow);transition:all .22s;position:relative;overflow:hidden}
+.dl-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#0ea5e9,#818cf8);opacity:.7}
 .dl-kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:rgba(56,189,248,0.2)}
-.dl-kpi-icon{
-  width:40px;height:40px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
+.dl-kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .dl-kpi-num{font-size:22px;font-weight:800;color:#fff;line-height:1;font-family:var(--mono)}
 .dl-kpi-lbl{font-size:11px;color:var(--text3);margin-top:3px;font-weight:500}
 
-/* ── TABLE WRAPPER ── */
+/* ══════════════════════════════════════════════
+   TABLE — ALL ALIGNMENT FIXES BELOW
+   ══════════════════════════════════════════════ */
+
+/* Wrapper */
 .dl-table-wrap{
   border-radius:var(--radius);
   border:1px solid rgba(255,255,255,0.1);
   box-shadow:var(--shadow-md);
   background:rgba(8,18,40,0.88);
   backdrop-filter:blur(16px);
-  overflow-x:auto; /* horizontal scroll on narrow screens */
+  overflow-x:auto;
   margin-bottom:16px;
 }
 
-/* ── TABLE ── */
+/* Table */
 .dl-table{
   width:100%;
   border-collapse:collapse;
   min-width:560px;
   font-size:13px;
-  /* Fixed layout so columns are even */
-  table-layout:auto;
 }
 
-/* ── THEAD ── */
+/* Header */
 .dl-table thead tr{
   background:linear-gradient(90deg,rgba(12,28,64,0.98),rgba(22,44,90,0.98));
   border-bottom:2px solid rgba(56,189,248,0.22);
@@ -2260,95 +2218,80 @@ html[data-theme="light"] .nb-empty-title { color:#1e293b }
   vertical-align:middle;
 }
 .dl-table thead th:last-child{border-right:none}
-
-/* Date header cell */
 .dl-date-th{
-  width:170px;min-width:160px;
+  width:160px;min-width:150px;
   color:#38bdf8 !important;
   border-right:2px solid rgba(56,189,248,0.2) !important;
 }
-/* Add column cell */
-.dl-add-col{width:150px;text-align:center;padding:10px 12px !important}
-/* Download icon header */
+.dl-add-col{width:150px;text-align:center}
 .dl-dl-col{width:48px;text-align:center;color:var(--text3) !important}
 
-/* Editable column name */
+/* Column name input */
 .dl-task-th-inner{display:flex;align-items:center;gap:6px;width:100%}
-.dl-col-name{
-  flex:1;background:transparent;border:none;outline:none;
-  color:#38bdf8;font-size:11px;font-weight:800;
-  letter-spacing:1px;text-transform:uppercase;
-  font-family:var(--font);cursor:text;
-  padding:3px 6px;border-radius:5px;min-width:50px;
-  transition:background .15s;
-}
-.dl-col-name:focus{
-  background:rgba(56,189,248,0.12);color:#fff;
-  box-shadow:0 0 0 1.5px rgba(56,189,248,0.35);
-}
-.dl-col-del{
-  width:20px;height:20px;border-radius:5px;
-  background:transparent;border:none;
-  color:rgba(244,63,94,0.4);font-size:12px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;flex-shrink:0;opacity:0;
-}
+.dl-col-name{flex:1;background:transparent;border:none;outline:none;color:#38bdf8;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-family:var(--font);cursor:text;padding:3px 6px;border-radius:5px;min-width:50px;transition:background .15s}
+.dl-col-name:focus{background:rgba(56,189,248,0.12);color:#fff;box-shadow:0 0 0 1.5px rgba(56,189,248,0.35)}
+.dl-col-del{width:20px;height:20px;border-radius:5px;background:transparent;border:none;color:rgba(244,63,94,0.4);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;opacity:0}
 .dl-table th:hover .dl-col-del{opacity:1}
 .dl-col-del:hover{background:rgba(244,63,94,0.18);color:#f43f5e}
 
-/* ── TBODY ROWS ── */
-.dl-table tbody tr{
-  border-bottom:1px solid rgba(255,255,255,0.055);
-  transition:background .18s;
-}
+/* Body rows */
+.dl-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.055);transition:background .18s}
 .dl-table tbody tr:nth-child(even){background:rgba(255,255,255,0.018)}
 .dl-table tbody tr:last-child{border-bottom:none}
 .dl-table tbody tr:hover{background:rgba(56,189,248,0.05)}
 
-/* Every cell gets a right border for the grid-line effect */
+/* ALL body cells — FIX: no padding here, controlled per cell */
 .dl-table tbody td{
   padding:0;
   vertical-align:middle;
   border-right:1px solid rgba(255,255,255,0.055);
-  height:52px; /* FIX: fixed row height keeps everything aligned */
 }
 .dl-table tbody td:last-child{border-right:none}
 
-/* ── DATE CELL — KEY ALIGNMENT FIX ── */
+/* ──────────────────────────────────────────────
+   DATE CELL — FIX: dot was outside the row
+   Key: padding INSIDE cell, not on <td> itself
+   Dot must be INSIDE the flex container
+   ────────────────────────────────────────────── */
 .dl-date-cell{
-  padding:0 14px;
-  height:52px;
+  /* FIX 1: padding contained inside so dot doesn't bleed out */
+  padding:0 !important;
   vertical-align:middle !important;
   border-right:2px solid rgba(56,189,248,0.16) !important;
-  width:170px;min-width:160px;
+  width:160px;min-width:150px;
+  overflow:hidden; /* FIX 2: clip anything that tries to escape */
 }
-/* The label row — dot + text all on ONE line */
 .dl-date-label{
+  /* FIX 3: full height flex row — all items stay on ONE line */
   display:flex;
-  align-items:center; /* FIX: vertically centers dot with text */
+  align-items:center;
   gap:10px;
+  padding:12px 14px; /* padding moves to here, inside flex */
   width:100%;
-  height:100%;
+  box-sizing:border-box;
 }
 .dl-date-dot{
-  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  /* FIX 4: flex-shrink:0 stops dot from being squished or pushed out */
+  flex-shrink:0;
+  width:9px;height:9px;border-radius:50%;
   background:linear-gradient(135deg,#0ea5e9,#38bdf8);
   box-shadow:0 0 8px rgba(56,189,248,0.55);
+  /* FIX 5: align-self:center ensures vertical centering independent of text */
+  align-self:center;
 }
-/* FIX: date text + TODAY badge all on ONE line using flex row */
 .dl-date-text{
+  /* FIX 6: flex row so date + TODAY badge stay on same horizontal line */
   display:flex;
-  align-items:center; /* keeps badge on same line as date */
+  align-items:center;
   gap:7px;
   flex:1;
-  min-width:0;
+  min-width:0; /* allows text truncation */
   font-size:13px;font-weight:700;color:var(--text);
   white-space:nowrap;
+  overflow:hidden;
 }
-/* TODAY badge — inline pill, same line as date */
 .dl-today-badge{
-  display:inline-flex;
-  align-items:center;
+  display:inline-flex;align-items:center;
   font-size:9px;font-weight:800;letter-spacing:.8px;
   text-transform:uppercase;color:#10b981;
   background:rgba(16,185,129,0.15);
@@ -2362,43 +2305,112 @@ html[data-theme="light"] .nb-empty-title { color:#1e293b }
   color:rgba(244,63,94,0.35);font-size:12px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .15s;opacity:0;flex-shrink:0;
-  margin-left:auto; /* push delete to right edge */
+  margin-left:auto;
 }
 .dl-table tbody tr:hover .dl-date-del{opacity:1}
 .dl-date-del:hover{background:rgba(244,63,94,0.18);color:#f43f5e}
 
-/* ── TASK CELLS — KEY ALIGNMENT FIX ── */
+/* ──────────────────────────────────────────────
+   TODAY ROW
+   ────────────────────────────────────────────── */
+.dl-today-row{background:rgba(14,165,233,0.04) !important}
+.dl-today-row .dl-date-dot{background:#10b981;box-shadow:0 0 10px rgba(16,185,129,0.7)}
+.dl-today-row .dl-date-text{color:#38bdf8}
+
+/* ──────────────────────────────────────────────
+   TASK CELLS — FIX: checkbox + text alignment
+   ────────────────────────────────────────────── */
 .dl-task-cell{
-  padding:0 10px;
-  height:52px;
+  padding:0 !important;
   vertical-align:middle !important;
-  min-width:140px;
+  min-width:150px;
 }
 .dl-task-wrap{
+  /* FIX 7: flex row with center alignment — checkbox perfectly centered with text */
   display:flex;
-  align-items:center; /* FIX: checkbox vertically centered with textarea */
-  gap:9px;
-  height:100%;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px; /* unified padding inside flex, not on td */
+  width:100%;
+  box-sizing:border-box;
+  min-height:48px; /* consistent row height */
 }
+
+/* ──────────────────────────────────────────────
+   CHECKBOX — complete custom styled checkbox
+   FIX: replaces system checkbox with custom one
+   that aligns perfectly in flex container
+   ────────────────────────────────────────────── */
 .dl-check{
-  width:15px;height:15px;border-radius:4px;
-  border:1.5px solid rgba(56,189,248,0.38);
-  background:transparent;cursor:pointer;
+  /* FIX 8: hide the ugly default checkbox */
+  appearance:none;
+  -webkit-appearance:none;
+  width:17px;height:17px;
+  border-radius:5px;
+  border:2px solid rgba(56,189,248,0.4);
+  background:rgba(255,255,255,0.04);
+  cursor:pointer;
   flex-shrink:0;
-  /* FIX: removed margin-top so flex handles centering */
-  accent-color:#0ea5e9;transition:all .15s;
+  /* FIX 9: use flex to center the checkmark */
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s cubic-bezier(.22,.68,0,1.2);
+  position:relative;
 }
+/* Hover state */
+.dl-check:hover{
+  border-color:var(--sky2);
+  background:rgba(56,189,248,0.1);
+  box-shadow:0 0 0 3px rgba(56,189,248,0.12);
+}
+/* Checked state — sky blue fill */
+.dl-check:checked{
+  background:linear-gradient(135deg,#0ea5e9,#38bdf8);
+  border-color:transparent;
+  box-shadow:0 0 10px rgba(56,189,248,0.45);
+  animation:dl-check-pop .25s cubic-bezier(.22,.68,0,1.2);
+}
+/* FIX 10: custom checkmark drawn via ::after pseudo-element */
+.dl-check::after{
+  content:'';
+  position:absolute;
+  /* Start hidden */
+  opacity:0;
+  width:5px;height:9px;
+  border:2px solid #fff;
+  border-top:none;border-left:none;
+  transform:rotate(45deg) scale(0);
+  transition:all .18s cubic-bezier(.22,.68,0,1.2);
+  top:1px; /* optical centering */
+}
+.dl-check:checked::after{
+  opacity:1;
+  transform:rotate(45deg) scale(1);
+}
+@keyframes dl-check-pop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.3)}
+  70%{transform:scale(.9)}
+  100%{transform:scale(1)}
+}
+
+/* Task textarea */
 .dl-task-input{
-  flex:1;background:transparent;border:none;outline:none;
+  flex:1;
+  background:transparent;border:none;outline:none;
   color:var(--text);font-size:13px;font-family:var(--font);
-  padding:6px 6px;border-radius:7px;
+  padding:5px 6px;border-radius:7px;
   transition:background .15s,box-shadow .15s;
   resize:none;
-  line-height:1.45;
-  min-height:34px;
-  max-height:80px; /* prevent runaway growth */
+  line-height:1.5;
+  /* FIX 11: single line by default, grows when text added */
+  min-height:30px;
+  max-height:72px;
   overflow:hidden;
+  word-break:break-word; /* FIX 12: prevents text overflow */
+  overflow-wrap:break-word;
   width:100%;
+  /* FIX 13: align text start so it aligns with checkbox center */
+  vertical-align:middle;
 }
 .dl-task-input::placeholder{color:var(--text3);font-style:italic}
 .dl-task-input:focus{
@@ -2406,89 +2418,32 @@ html[data-theme="light"] .nb-empty-title { color:#1e293b }
   box-shadow:0 0 0 1.5px rgba(56,189,248,0.25);
 }
 
-/* ── TODAY ROW ── */
-.dl-today-row{background:rgba(14,165,233,0.04) !important}
-.dl-today-row .dl-date-dot{
-  background:#10b981;
-  box-shadow:0 0 10px rgba(16,185,129,0.7);
-}
-.dl-today-row .dl-date-text{color:#38bdf8}
-
-/* ── ROW DOWNLOAD BUTTON ── */
-.dl-row-dl-cell{
-  text-align:center;padding:0 6px;width:48px;height:52px;
-  vertical-align:middle !important;
-}
-.dl-row-dl-btn{
-  width:28px;height:28px;border-radius:7px;
-  background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);
-  color:var(--sky2);font-size:13px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto;transition:all .2s;opacity:0;
-}
+/* Row download */
+.dl-row-dl-cell{text-align:center;padding:0 6px;width:48px;vertical-align:middle !important}
+.dl-row-dl-btn{width:28px;height:28px;border-radius:7px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);color:var(--sky2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:all .2s;opacity:0}
 .dl-table tbody tr:hover .dl-row-dl-btn{opacity:1}
-.dl-row-dl-btn:hover{
-  background:linear-gradient(135deg,#0ea5e9,#38bdf8);
-  border-color:transparent;color:#fff;
-  transform:scale(1.12);box-shadow:0 4px 14px rgba(14,165,233,0.4);
-}
+.dl-row-dl-btn:hover{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent;color:#fff;transform:scale(1.12);box-shadow:0 4px 14px rgba(14,165,233,0.4)}
 
-/* ── ADD COLUMN BUTTON ── */
-.dl-add-task-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:8px;
-  background:rgba(56,189,248,0.07);
-  border:1px dashed rgba(56,189,248,0.28);
-  color:var(--sky2);font-size:11.5px;font-weight:700;
-  cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap;
-}
-.dl-add-task-btn:hover{
-  background:rgba(56,189,248,0.15);border-color:var(--sky2);
-  color:#fff;transform:translateY(-1px);
-}
+/* Add column button */
+.dl-add-task-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(56,189,248,0.07);border:1px dashed rgba(56,189,248,0.28);color:var(--sky2);font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap}
+.dl-add-task-btn:hover{background:rgba(56,189,248,0.15);border-color:var(--sky2);color:#fff;transform:translateY(-1px)}
 .dl-add-task-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
 
-/* ── EMPTY STATE ── */
-.dl-empty{
-  display:flex;align-items:center;justify-content:center;
-  padding:56px 20px;min-height:380px;
-  position:relative;overflow:hidden;
-}
-.dl-empty-bg{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 55% 50% at 30% 40%,rgba(14,165,233,0.09) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 40% at 70% 60%,rgba(129,140,248,0.07) 0%,transparent 60%);
-  pointer-events:none;
-}
-.dl-empty-content{
-  display:flex;flex-direction:column;align-items:center;
-  gap:14px;text-align:center;position:relative;z-index:1;max-width:420px;
-}
-.dl-empty-icon-wrap{
-  position:relative;width:88px;height:88px;
-  display:flex;align-items:center;justify-content:center;margin-bottom:4px;
-}
-.dl-empty-icon-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(56,189,248,0.22);
-  animation:dl-ring-pulse 2.2s ease-in-out infinite;
-}
+/* Empty state */
+.dl-empty{display:flex;align-items:center;justify-content:center;padding:56px 20px;min-height:380px;position:relative;overflow:hidden}
+.dl-empty-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 50% at 30% 40%,rgba(14,165,233,0.09) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 70% 60%,rgba(129,140,248,0.07) 0%,transparent 60%);pointer-events:none}
+.dl-empty-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;position:relative;z-index:1;max-width:420px}
+.dl-empty-icon-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.dl-empty-icon-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(56,189,248,0.22);animation:dl-ring-pulse 2.2s ease-in-out infinite}
 @keyframes dl-ring-pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.12);opacity:1}}
 .dl-empty-icon{font-size:48px;line-height:1}
 .dl-empty-title{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px}
 .dl-empty-sub{font-size:14px;color:var(--text2);line-height:1.7}
 .dl-empty-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-.dl-empty-hint{
-  display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text3);
-  padding:10px 16px;background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);border-radius:8px;margin-top:4px;
-}
+.dl-empty-hint{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text3);padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;margin-top:4px}
 .dl-empty-hint i{font-size:13px;color:var(--sky2);flex-shrink:0}
 
-/* ============================================
-   LIGHT THEME OVERRIDES — DAILY LOG
-   ============================================ */
+/* ── LIGHT THEME ── */
 html[data-theme="light"] .dl-hero{background:linear-gradient(135deg,rgba(14,165,233,0.07),rgba(129,140,248,0.04));border-color:rgba(14,165,233,0.14)}
 html[data-theme="light"] .dl-hero-title{color:#0f1f4b}
 html[data-theme="light"] .dl-hero-sub{color:#5572a0}
@@ -2497,10 +2452,9 @@ html[data-theme="light"] .dl-btn-ghost{border-color:rgba(15,31,75,0.1);color:#55
 html[data-theme="light"] .dl-kpi{background:#fff;border-color:rgba(15,31,75,0.09);box-shadow:0 2px 10px rgba(15,31,75,0.07)}
 html[data-theme="light"] .dl-kpi-num{color:#0f1f4b}
 html[data-theme="light"] .dl-kpi-lbl{color:#5572a0}
-/* Table */
 html[data-theme="light"] .dl-table-wrap{background:#fff;border-color:rgba(15,31,75,0.12);box-shadow:0 4px 20px rgba(15,31,75,0.08)}
 html[data-theme="light"] .dl-table thead tr{background:linear-gradient(90deg,#0f1f4b,#1a3268)}
-html[data-theme="light"] .dl-table thead th{color:rgba(255,255,255,0.88);border-right-color:rgba(255,255,255,0.1)}
+html[data-theme="light"] .dl-table thead th{color:rgba(255,255,255,0.9);border-right-color:rgba(255,255,255,0.1)}
 html[data-theme="light"] .dl-date-th{color:#7dd3fc !important;border-right-color:rgba(255,255,255,0.15) !important}
 html[data-theme="light"] .dl-col-name{color:#7dd3fc}
 html[data-theme="light"] .dl-col-name:focus{background:rgba(255,255,255,0.12);color:#fff}
@@ -2515,20 +2469,16 @@ html[data-theme="light"] .dl-today-row .dl-date-text{color:#0284c7 !important}
 html[data-theme="light"] .dl-task-input{color:#0f1f4b}
 html[data-theme="light"] .dl-task-input::placeholder{color:#94a3b8}
 html[data-theme="light"] .dl-task-input:focus{background:rgba(14,165,233,0.06);box-shadow:0 0 0 1.5px rgba(14,165,233,0.3)}
-html[data-theme="light"] .dl-check{border-color:rgba(15,31,75,0.3)}
+html[data-theme="light"] .dl-check{border-color:rgba(15,31,75,0.3);background:#fff}
+html[data-theme="light"] .dl-check:hover{border-color:#0ea5e9;background:#e0f2fe;box-shadow:0 0 0 3px rgba(14,165,233,0.12)}
+html[data-theme="light"] .dl-check:checked{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent}
 html[data-theme="light"] .dl-add-task-btn{color:#0ea5e9;border-color:rgba(14,165,233,0.3);background:rgba(14,165,233,0.05)}
 html[data-theme="light"] .dl-add-task-btn:hover{color:#0f1f4b;background:rgba(14,165,233,0.1)}
 html[data-theme="light"] .dl-row-dl-btn{background:rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.2)}
 html[data-theme="light"] .dl-empty-title{color:#0f1f4b}
 html[data-theme="light"] .dl-empty-sub{color:#1e3a6e}
 html[data-theme="light"] .dl-empty-hint{background:#f8fafc;border-color:rgba(15,31,75,0.08);color:#5572a0}
-html[data-theme="light"] .dl-date-dot{background:linear-gradient(135deg,#0ea5e9,#38bdf8);box-shadow:0 0 6px rgba(14,165,233,0.4)}
 
 /* ── Responsive ── */
-@media(max-width:900px){
-  .dl-kpi-row{grid-template-columns:repeat(3,1fr)}
-  .dl-hero{flex-direction:column;align-items:flex-start}
-}
-@media(max-width:600px){
-  .dl-kpi-row{grid-template-columns:1fr 1fr}
-}
+@media(max-width:900px){.dl-kpi-row{grid-template-columns:repeat(3,1fr)}.dl-hero{flex-direction:column;align-items:flex-start}}
+@media(max-width:600px){.dl-kpi-row{grid-template-columns:1fr 1fr}}
