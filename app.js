@@ -2,7 +2,24 @@
 // ===== STORAGE =====
 const SK = 'wlp2-';
 function load(k,d){try{const r=localStorage.getItem(SK+k);return r?JSON.parse(r):d;}catch{return d;}}
-function save(k,v){try{localStorage.setItem(SK+k,JSON.stringify(v));}catch{}}
+
+// ===== CLOUD SYNC (generic key/value, for modules with no dedicated table) =====
+let _currentUser = null; // set by initAuth() further down
+const CLOUD_KEYS = ['tasks','habits','goals','journal','expenses','health','notes','budget'];
+let _cloudTimers = {};
+function cloudSave(k,v){
+  if(!CLOUD_KEYS.includes(k) || !_currentUser) return; // not logged in yet, or not a synced key
+  clearTimeout(_cloudTimers[k]);
+  _cloudTimers[k] = setTimeout(async ()=>{
+    try{
+      await _supa.from('user_data').upsert(
+        {owner_id:_currentUser.id, key:k, value:v, updated_at:new Date().toISOString()},
+        {onConflict:'owner_id,key'}
+      );
+    }catch(e){ console.error('cloud save error:', k, e); }
+  }, 800); // debounce so rapid edits don't spam the network
+}
+function save(k,v){try{localStorage.setItem(SK+k,JSON.stringify(v));}catch{} cloudSave(k,v);}
 
 // ===== STATE =====
 let tasks    = load('tasks', defaultTasks());
@@ -1865,7 +1882,7 @@ if (document.readyState !== 'loading') nbRenderChapters();
 // =============================================
 //  SUPABASE INTEGRATION — Batch 4
 // =============================================
-let _currentUser = null;
+// (── _currentUser is declared near the top of this file, next to cloudSave ──)
 
 // ── Auth guard: redirect to login if not logged in ──
 async function initAuth() {
@@ -1945,9 +1962,35 @@ async function supaLoadAll() {
       }));
       save('wlp-notebook',{chapters:nbChapters});
     }
+    // Generic key/value modules (tasks, habits, goals, journal, expenses, health, notes, budget)
+    const { data: dbUD } = await _supa.from('user_data').select('key,value').eq('owner_id',oid);
+    if (dbUD?.length) {
+      dbUD.forEach(row => {
+        if(!CLOUD_KEYS.includes(row.key)) return;
+        switch(row.key){
+          case 'tasks':    tasks    = row.value; break;
+          case 'habits':   habits   = row.value; break;
+          case 'goals':    goals    = row.value; break;
+          case 'journal':  journal  = row.value; break;
+          case 'expenses': expenses = row.value; break;
+          case 'health':   health   = row.value; break;
+          case 'notes':    notes    = row.value; break;
+          case 'budget':   budget   = row.value; break;
+        }
+        localStorage.setItem(SK+row.key, JSON.stringify(row.value)); // refresh cache directly (avoid re-triggering cloudSave)
+      });
+    }
+
     // Re-render
     if(typeof renderDashboard==='function') renderDashboard();
     if(typeof renderToday==='function') renderToday();
+    if(typeof renderAllTasks==='function') renderAllTasks();
+    if(typeof renderHabits==='function') renderHabits();
+    if(typeof renderGoals==='function') renderGoals();
+    if(typeof renderJournal==='function') renderJournal();
+    if(typeof renderFinance==='function') renderFinance();
+    if(typeof renderHealth==='function') renderHealth();
+    if(typeof renderNotes==='function') renderNotes();
     if(typeof renderTeammateLinks==='function') renderTeammateLinks();
     if(typeof nbRenderChapters==='function') nbRenderChapters();
   } catch(e){ console.error('Supabase load error:',e); }
